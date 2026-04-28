@@ -1,14 +1,14 @@
 # Project State
 
 <!-- AUTO_STATUS:START -->
-Generated: 2026-04-28 23:27:35 +1000
+Generated: 2026-04-28 23:27:46 +1000
 
 ## Repository Snapshot
 - Local repo path: `D:\work\bloknot-mashinista-tg`
 - Project memory path: `D:\work\bloknot-mashinista-tg\ai-memory`
 - Branch: `main`
-- HEAD: `962df2c`
-- Last commit: `962df2c feat(docs): add folders 9 and 10`
+- HEAD: `a15fff9`
+- Last commit: `a15fff9 chore(memory): record docs release`
 
 ## Git Remote
 ```text
@@ -20,7 +20,7 @@ origin	https://github.com/iEgor72/bloknot-mashinista.git (push)
 ```text
 codex/next-direction b044dd5 offline mvp
   codex/tabs-ui        117f1fa [origin/codex/tabs-ui] tabs ui
-* main                 962df2c [origin/main: ahead 1] feat(docs): add folders 9 and 10
+* main                 a15fff9 [origin/main: ahead 2] chore(memory): record docs release
 ```
 
 ## Worktree

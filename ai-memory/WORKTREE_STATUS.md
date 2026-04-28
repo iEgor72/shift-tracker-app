@@ -1,10 +1,10 @@
 # Worktree Status
 
-Generated: 2026-04-28 23:27:35 +1000
+Generated: 2026-04-28 23:27:46 +1000
 
 ## git status -sb
 ```text
-## main...origin/main [ahead 1]
+## main...origin/main [ahead 2]
  M ai-memory/CHANGELOG.md
  M ai-memory/PROJECT_STATE.md
  M ai-memory/sessions/2026-04-28.md
@@ -14,26 +14,17 @@ Generated: 2026-04-28 23:27:35 +1000
 ```text
 codex/next-direction b044dd5 offline mvp
   codex/tabs-ui        117f1fa [origin/codex/tabs-ui] tabs ui
-* main                 962df2c [origin/main: ahead 1] feat(docs): add folders 9 and 10
+* main                 a15fff9 [origin/main: ahead 2] chore(memory): record docs release
 ```
 
 ## HEAD
 ```text
-962df2c feat(docs): add folders 9 and 10
- ai-memory/CHANGELOG.md             |  57 +++++++++++++++++++++++++
- ai-memory/INDEX.md                 |   2 +-
- ai-memory/PROJECT_STATE.md         |  28 +++++--------
- ai-memory/RECENT_COMMITS.md        |  62 +++++++++++++--------------
- ai-memory/WORKTREE_STATUS.md       |  45 ++++++++++----------
- ai-memory/sessions/2026-04-28.md   |   8 ++++
- assets/docs/folders/Папка №10.docx | Bin 0 -> 26070 bytes
- assets/docs/folders/Папка №9.docx  | Bin 0 -> 26041 bytes
- assets/docs/manifest.json          |  14 +++++++
- index.html                         |   6 +--
- scripts/local-smoke.mjs            |   8 +++-
- scripts/poekhali-tracker.js        |  84 ++++++++++++++++++-------------------
- scripts/shift-form.js              |  22 ----------
- styles/10-navigation-and-cards.css |  48 +++++++++++----------
- sw.js                              |   2 +-
- 15 files changed, 224 insertions(+), 162 deletions(-)
+a15fff9 chore(memory): record docs release
+ ai-memory/CHANGELOG.md           |  9 +++++++++
+ ai-memory/INDEX.md               |  2 +-
+ ai-memory/PROJECT_STATE.md       |  8 ++++----
+ ai-memory/RECENT_COMMITS.md      |  4 ++--
+ ai-memory/WORKTREE_STATUS.md     | 16 ++++++++--------
+ ai-memory/sessions/2026-04-28.md |  1 +
+ 6 files changed, 25 insertions(+), 15 deletions(-)
 ```

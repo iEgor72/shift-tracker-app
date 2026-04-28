@@ -1,9 +1,10 @@
 # Recent Commits
 
-Generated: 2026-04-28 23:27:36 +1000
+Generated: 2026-04-28 23:27:46 +1000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `a15fff9` | 2026-04-28T23:27:46+10:00 | iEgor72 | chore(memory): record docs release |
 | `962df2c` | 2026-04-28T23:27:15+10:00 | iEgor72 | feat(docs): add folders 9 and 10 |
 | `b7a6600` | 2026-04-27T00:36:34Z | iEgor72 | fix(auth): simplify login copy |
 | `b7c0cb8` | 2026-04-27T00:31:57Z | iEgor72 | fix(auth): keep a single browser login flow |
@@ -43,4 +44,3 @@ Generated: 2026-04-28 23:27:36 +1000
 | `402973d` | 2026-04-23T17:52:45Z | iEgor72 | fix(home): keep calendar dates white |
 | `b42cae0` | 2026-04-23T17:50:29Z | iEgor72 | fix(home): reorder dashboard and calendar |
 | `858ab26` | 2026-04-23T17:46:49Z | iEgor72 | fix(home): keep weekend border on shift days |
-| `304d678` | 2026-04-23T17:40:46Z | iEgor72 | fix(home): polish calendar counters and weekends |
