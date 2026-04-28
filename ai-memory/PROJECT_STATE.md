@@ -1,14 +1,14 @@
 # Project State
 
 <!-- AUTO_STATUS:START -->
-Generated: 2026-04-28 23:51:43 +1000
+Generated: 2026-04-28 23:54:23 +1000
 
 ## Repository Snapshot
 - Local repo path: `D:\work\bloknot-mashinista-tg`
 - Project memory path: `D:\work\bloknot-mashinista-tg\ai-memory`
 - Branch: `main`
-- HEAD: `0f80d4b`
-- Last commit: `0f80d4b chore(memory): record successful docs deploy`
+- HEAD: `10cfcb4`
+- Last commit: `10cfcb4 feat(shifts): simplify shift detail view`
 
 ## Git Remote
 ```text
@@ -20,16 +20,13 @@ origin	https://github.com/iEgor72/bloknot-mashinista.git (push)
 ```text
 codex/next-direction b044dd5 offline mvp
   codex/tabs-ui        117f1fa [origin/codex/tabs-ui] tabs ui
-* main                 0f80d4b [origin/main] chore(memory): record successful docs deploy
+* main                 10cfcb4 [origin/main: ahead 1] feat(shifts): simplify shift detail view
 ```
 
 ## Worktree
 ```text
 M ai-memory/CHANGELOG.md
  M ai-memory/sessions/2026-04-28.md
- M scripts/time-utils.js
- M styles/30-shifts-and-overlays.css
- M sw.js
 ```
 <!-- AUTO_STATUS:END -->
 

@@ -1,33 +1,33 @@
 # Worktree Status
 
-Generated: 2026-04-28 23:51:43 +1000
+Generated: 2026-04-28 23:54:23 +1000
 
 ## git status -sb
 ```text
-## main...origin/main
+## main...origin/main [ahead 1]
  M ai-memory/CHANGELOG.md
  M ai-memory/PROJECT_STATE.md
  M ai-memory/sessions/2026-04-28.md
- M scripts/time-utils.js
- M styles/30-shifts-and-overlays.css
- M sw.js
 ```
 
 ## git branch -vv
 ```text
 codex/next-direction b044dd5 offline mvp
   codex/tabs-ui        117f1fa [origin/codex/tabs-ui] tabs ui
-* main                 0f80d4b [origin/main] chore(memory): record successful docs deploy
+* main                 10cfcb4 [origin/main: ahead 1] feat(shifts): simplify shift detail view
 ```
 
 ## HEAD
 ```text
-0f80d4b chore(memory): record successful docs deploy
- ai-memory/CHANGELOG.md           |  8 ++++++++
- ai-memory/INDEX.md               |  2 +-
- ai-memory/PROJECT_STATE.md       |  8 ++++----
- ai-memory/RECENT_COMMITS.md      |  4 ++--
- ai-memory/WORKTREE_STATUS.md     | 12 ++++++------
- ai-memory/sessions/2026-04-28.md |  1 +
- 6 files changed, 22 insertions(+), 13 deletions(-)
+10cfcb4 feat(shifts): simplify shift detail view
+ ai-memory/CHANGELOG.md            |  16 ++++
+ ai-memory/INDEX.md                |   2 +-
+ ai-memory/PROJECT_STATE.md        |  11 ++-
+ ai-memory/RECENT_COMMITS.md       |   4 +-
+ ai-memory/WORKTREE_STATUS.md      |   9 +-
+ ai-memory/sessions/2026-04-28.md  |   2 +
+ scripts/time-utils.js             | 185 ++++++++++++++++++++------------------
+ styles/30-shifts-and-overlays.css | 115 ++++++++++++++++++++++++
+ sw.js                             |   2 +-
+ 9 files changed, 247 insertions(+), 99 deletions(-)
 ```
