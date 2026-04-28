@@ -1179,6 +1179,31 @@
       return cells ? '<div class="shift-detail-metrics">' + cells + '</div>' : '';
     }
 
+    function buildShiftDetailSubsectionHtml(title, rowsHtml) {
+      var body = getShiftDetailValue(rowsHtml);
+      if (!body) return '';
+      return '' +
+        '<div class="shift-detail-subsection">' +
+          '<div class="shift-detail-subsection-title">' + escapeHtml(title || '') + '</div>' +
+          '<div class="shift-detail-list">' + rowsHtml + '</div>' +
+        '</div>';
+    }
+
+    function buildShiftDetailDisclosureHtml(title, hint, bodyHtml) {
+      var body = getShiftDetailValue(bodyHtml);
+      if (!body) return '';
+      var hintHtml = hint ? '<span class="shift-detail-disclosure-hint">' + escapeHtml(hint) + '</span>' : '';
+      return '' +
+        '<details class="shift-detail-disclosure">' +
+          '<summary class="shift-detail-disclosure-summary">' +
+            '<span class="shift-detail-disclosure-title">' + escapeHtml(title || '') + '</span>' +
+            hintHtml +
+            '<span class="shift-detail-disclosure-icon" aria-hidden="true"></span>' +
+          '</summary>' +
+          '<div class="shift-detail-disclosure-body">' + bodyHtml + '</div>' +
+        '</details>';
+    }
+
     function buildShiftDetailHeroCardHtml(shift, shiftIncomeMap) {
       if (!shift) return '';
       var f = fmtShift(shift);
@@ -1242,35 +1267,27 @@
         ? formatHoursAndMinutes(Math.max(0, Math.round((parsedEnd.getTime() - parsedStart.getTime()) / 60000)))
         : '—';
       var salaryText = incomeVm && incomeVm.hasValue ? incomeVm.amountText : '—';
+      var hasPoekhaliDetails = hasShiftPoekhaliData(shift);
 
       var html = '';
 
-      html += '<section class="shift-detail-section">';
-      html += '<div class="shift-detail-section-title">Время</div>';
-      html += '<div class="shift-detail-list">';
-      html += buildShiftDetailRowHtml('Начало', formatLocalDateTimeFromMsk(shift.start_msk));
-      html += buildShiftDetailRowHtml('Конец', formatLocalDateTimeFromMsk(shift.end_msk));
-      html += buildShiftDetailRowHtml('Длительность', durationLabel === '—' ? periodLabel : durationLabel);
-      html += '</div>';
-      html += '</section>';
+      if (!hasPoekhaliDetails) {
+        html += '<section class="shift-detail-section shift-detail-section-main">';
+        html += '<div class="shift-detail-section-title">Главное</div>';
+        html += '<div class="shift-detail-list">';
+        html += buildShiftDetailRowHtml('Длительность', durationLabel === '—' ? periodLabel : durationLabel);
+        html += buildShiftDetailRowHtml('Начало', formatLocalDateTimeFromMsk(shift.start_msk));
+        html += buildShiftDetailRowHtml('Конец', formatLocalDateTimeFromMsk(shift.end_msk));
+        html += buildShiftDetailRowHtml('Маршрут', direction || shiftType);
+        html += buildShiftDetailRowHtml('Локомотив', locoSummary);
+        html += buildShiftDetailRowHtml('Поезд', trainSummary);
+        html += buildShiftDetailOptionalRowHtml('Топливо', hasFuelData(shift) ? getFuelConsumptionInlineText(fuelTotals) : '');
+        html += buildShiftDetailRowHtml('Доход', salaryText);
+        html += '</div>';
+        html += '</section>';
+      }
 
-      html += '<section class="shift-detail-section">';
-      html += '<div class="shift-detail-section-title">Маршрут</div>';
-      html += '<div class="shift-detail-list">';
-      html += buildShiftDetailRowHtml('Тип', shiftType);
-      html += buildShiftDetailRowHtml('Участок', direction);
-      html += '</div>';
-      html += '</section>';
-
-      html += '<section class="shift-detail-section">';
-      html += '<div class="shift-detail-section-title">Техника</div>';
-      html += '<div class="shift-detail-list">';
-      html += buildShiftDetailRowHtml('Локомотив', locoSummary);
-      html += buildShiftDetailRowHtml('Поезд', trainSummary);
-      html += '</div>';
-      html += '</section>';
-
-      if (hasShiftPoekhaliData(shift)) {
+      if (hasPoekhaliDetails) {
         var restrictionText = formatShiftPoekhaliActiveRestriction(shift);
         var nextRestrictionText = formatShiftPoekhaliNextRestriction(shift);
         var nextSignalText = formatShiftPoekhaliNextObject(shift, 'next_signal');
@@ -1284,9 +1301,14 @@
         var overspeedMax = getShiftPoekhaliNumber(shift, 'poekhali_overspeed_max_kmh');
         var alertCount = getShiftPoekhaliNumber(shift, 'poekhali_alert_count');
         var warningsCount = getShiftPoekhaliNumber(shift, 'poekhali_warnings_count');
+        var currentTargetText = targetText || nextRestrictionText || nextSignalText || nextStationText || routeProgressText;
+        var poekhaliDetailsHtml = '';
+        var poekhaliRouteRows = '';
+        var poekhaliAlertRows = '';
+        var poekhaliGpsRows = '';
 
         html += '<section class="shift-detail-section shift-detail-section-poekhali">';
-        html += '<div class="shift-detail-section-title">Поехали</div>';
+        html += '<div class="shift-detail-section-title">Поездка</div>';
         html += buildShiftDetailMetricGridHtml([
           { label: 'Статус', value: getShiftPoekhaliStatusLabel(shift.poekhali_status), tone: shift.poekhali_status === 'active' ? 'success' : '' },
           { label: 'Дистанция', value: formatShiftPoekhaliDistance(shift.poekhali_distance_m) },
@@ -1294,78 +1316,65 @@
           { label: 'Максимум', value: formatShiftPoekhaliSpeed(shift.poekhali_max_speed_kmh) }
         ]);
         html += '<div class="shift-detail-list">';
-        html += buildShiftDetailOptionalRowHtml('Карта', shift.poekhali_map_title || shift.poekhali_map_id || shift.poekhali_warning_rules_map_title || shift.poekhali_warning_rules_map_id);
-        html += buildShiftDetailOptionalRowHtml('Направление', shift.poekhali_direction);
-        html += buildShiftDetailOptionalRowHtml('Путь', shift.poekhali_track);
-        html += buildShiftDetailOptionalRowHtml('Состав', formatShiftCardPoekhaliTrainLength(shift));
-        html += buildShiftDetailOptionalRowHtml('Старт', formatShiftPoekhaliDateTime(shift.poekhali_started_at));
-        html += buildShiftDetailOptionalRowHtml('Финиш', formatShiftPoekhaliDateTime(shift.poekhali_ended_at));
-        html += buildShiftDetailOptionalRowHtml('Время', formatShiftPoekhaliDuration(shift.poekhali_duration_ms));
-        html += buildShiftDetailOptionalRowHtml('В движении', formatShiftPoekhaliDuration(shift.poekhali_moving_ms));
-        html += buildShiftDetailOptionalRowHtml('Стоянки', formatShiftPoekhaliDuration(shift.poekhali_idle_ms));
-        html += buildShiftDetailOptionalRowHtml('Средняя', formatShiftPoekhaliSpeed(shift.poekhali_average_speed_kmh));
+        html += buildShiftDetailOptionalRowHtml('Сейчас', currentTargetText);
         html += buildShiftDetailOptionalRowHtml('Ограничение', restrictionText);
-        html += '</div>';
-        html += '</section>';
-
-        html += '<section class="shift-detail-section">';
-        html += '<div class="shift-detail-section-title">Навигация</div>';
-        html += '<div class="shift-detail-list">';
-        html += buildShiftDetailOptionalRowHtml('Следующее ограничение', nextRestrictionText);
-        html += buildShiftDetailOptionalRowHtml('Следующий светофор', nextSignalText);
-        html += buildShiftDetailOptionalRowHtml('Следующая станция', nextStationText);
-        html += buildShiftDetailOptionalRowHtml('Маршрут', routeProgressText);
-        html += buildShiftDetailOptionalRowHtml('Цель впереди', targetText);
-        html += buildShiftDetailOptionalRowHtml('Откуда', startPointText);
-        html += buildShiftDetailOptionalRowHtml('Куда', endPointText);
-        html += '</div>';
-        html += '</section>';
-
-        html += '<section class="shift-detail-section">';
-        html += '<div class="shift-detail-section-title">Оповещения</div>';
-        html += '<div class="shift-detail-list">';
-        html += buildShiftDetailRowHtml('Оповещения', alertCount > 0 ? String(alertCount) : '0');
         html += buildShiftDetailOptionalRowHtml('Последнее', lastAlertText);
-        html += buildShiftDetailOptionalRowHtml('Превышение', overspeedMax > 0 ? '+' + overspeedMax + ' км/ч' : '');
-        html += buildShiftDetailOptionalRowHtml('Время превышения', formatShiftPoekhaliDuration(shift.poekhali_overspeed_duration_ms));
-        html += buildShiftDetailOptionalRowHtml('Путь превышения', formatShiftPoekhaliDistance(shift.poekhali_overspeed_distance_m));
-        html += buildShiftDetailRowHtml('Предупреждения', String(warningsCount));
-        html += buildShiftDetailOptionalRowHtml('ПР смены', warningRulesText);
-        html += buildShiftDetailOptionalRowHtml('Список ПР', shift.poekhali_warning_rules_summary || '');
         html += '</div>';
         html += '</section>';
+
+        poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Карта', shift.poekhali_map_title || shift.poekhali_map_id || shift.poekhali_warning_rules_map_title || shift.poekhali_warning_rules_map_id);
+        poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Направление', shift.poekhali_direction);
+        poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Путь', shift.poekhali_track);
+        poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Состав', formatShiftCardPoekhaliTrainLength(shift));
+        poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Старт', formatShiftPoekhaliDateTime(shift.poekhali_started_at));
+        poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Финиш', formatShiftPoekhaliDateTime(shift.poekhali_ended_at));
+        poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Время', formatShiftPoekhaliDuration(shift.poekhali_duration_ms));
+        poekhaliRouteRows += buildShiftDetailOptionalRowHtml('В движении', formatShiftPoekhaliDuration(shift.poekhali_moving_ms));
+        poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Стоянки', formatShiftPoekhaliDuration(shift.poekhali_idle_ms));
+        poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Средняя', formatShiftPoekhaliSpeed(shift.poekhali_average_speed_kmh));
+        poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Следующее ограничение', nextRestrictionText);
+        poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Следующий светофор', nextSignalText);
+        poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Следующая станция', nextStationText);
+        poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Маршрут', routeProgressText);
+        poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Цель впереди', targetText);
+        poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Откуда', startPointText);
+        poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Куда', endPointText);
+        poekhaliDetailsHtml += buildShiftDetailSubsectionHtml('Навигация', poekhaliRouteRows);
+
+        poekhaliAlertRows += buildShiftDetailRowHtml('Оповещения', alertCount > 0 ? String(alertCount) : '0');
+        poekhaliAlertRows += buildShiftDetailOptionalRowHtml('Превышение', overspeedMax > 0 ? '+' + overspeedMax + ' км/ч' : '');
+        poekhaliAlertRows += buildShiftDetailOptionalRowHtml('Время превышения', formatShiftPoekhaliDuration(shift.poekhali_overspeed_duration_ms));
+        poekhaliAlertRows += buildShiftDetailOptionalRowHtml('Путь превышения', formatShiftPoekhaliDistance(shift.poekhali_overspeed_distance_m));
+        poekhaliAlertRows += buildShiftDetailRowHtml('Предупреждения', String(warningsCount));
+        poekhaliAlertRows += buildShiftDetailOptionalRowHtml('ПР смены', warningRulesText);
+        poekhaliAlertRows += buildShiftDetailOptionalRowHtml('Список ПР', shift.poekhali_warning_rules_summary || '');
+        poekhaliDetailsHtml += buildShiftDetailSubsectionHtml('Оповещения', poekhaliAlertRows);
 
         if (shift.poekhali_user_section_id || shift.poekhali_user_section_title) {
-          html += '<section class="shift-detail-section">';
-          html += '<div class="shift-detail-section-title">GPS участок</div>';
-          html += '<div class="shift-detail-list">';
-          html += buildShiftDetailOptionalRowHtml('Участок', shift.poekhali_user_section_title || shift.poekhali_user_section_id);
-          html += buildShiftDetailOptionalRowHtml('Статус', getShiftPoekhaliSectionStatusLabel(shift.poekhali_user_section_status));
-          html += buildShiftDetailOptionalRowHtml('Опорный ЭК', shift.poekhali_user_section_reference_sector ? 'уч. ' + shift.poekhali_user_section_reference_sector : '');
-          html += buildShiftDetailOptionalRowHtml('Объекты', shift.poekhali_user_section_id ? String(getShiftPoekhaliNumber(shift, 'poekhali_user_section_objects_count')) : '');
-          html += buildShiftDetailOptionalRowHtml('Скорости', shift.poekhali_user_section_id ? String(getShiftPoekhaliNumber(shift, 'poekhali_user_section_speeds_count')) : '');
-          html += '</div>';
-          html += '</section>';
+          poekhaliGpsRows += buildShiftDetailOptionalRowHtml('Участок', shift.poekhali_user_section_title || shift.poekhali_user_section_id);
+          poekhaliGpsRows += buildShiftDetailOptionalRowHtml('Статус', getShiftPoekhaliSectionStatusLabel(shift.poekhali_user_section_status));
+          poekhaliGpsRows += buildShiftDetailOptionalRowHtml('Опорный ЭК', shift.poekhali_user_section_reference_sector ? 'уч. ' + shift.poekhali_user_section_reference_sector : '');
+          poekhaliGpsRows += buildShiftDetailOptionalRowHtml('Объекты', shift.poekhali_user_section_id ? String(getShiftPoekhaliNumber(shift, 'poekhali_user_section_objects_count')) : '');
+          poekhaliGpsRows += buildShiftDetailOptionalRowHtml('Скорости', shift.poekhali_user_section_id ? String(getShiftPoekhaliNumber(shift, 'poekhali_user_section_speeds_count')) : '');
+          poekhaliDetailsHtml += buildShiftDetailSubsectionHtml('GPS участок', poekhaliGpsRows);
         }
+
+        html += buildShiftDetailDisclosureHtml('Данные Поехали', 'карта, события, GPS', poekhaliDetailsHtml);
       }
 
-      html += '<section class="shift-detail-section">';
-      html += '<div class="shift-detail-section-title">Топливо</div>';
-      html += '<div class="shift-detail-list">';
-      html += buildShiftDetailRowHtml('Расход', hasFuelData(shift) ? getFuelConsumptionInlineText(fuelTotals) : '');
-      html += buildShiftDetailRowHtml('Приём', fuelReceiveSummary);
-      html += buildShiftDetailRowHtml('Сдача', fuelHandoverSummary);
-      html += '</div>';
-      html += '</section>';
+      if (hasFuelData(shift)) {
+        var fuelRows = '';
+        fuelRows += buildShiftDetailOptionalRowHtml('Приём', fuelReceiveSummary);
+        fuelRows += buildShiftDetailOptionalRowHtml('Сдача', fuelHandoverSummary);
+        html += buildShiftDetailDisclosureHtml('Топливо подробно', 'приём и сдача', '<div class="shift-detail-list">' + fuelRows + '</div>');
+      }
 
-      html += '<section class="shift-detail-section">';
-      html += '<div class="shift-detail-section-title">Расчёт</div>';
-      html += '<div class="shift-detail-list">';
-      html += buildShiftDetailRowHtml('Доход за эту смену', salaryText);
-      html += buildShiftDetailRowHtml('Синхронизация', syncStatus);
-      html += '</div>';
-      html += '<div class="shift-detail-note">Время вы указываете в МСК, а часы приложение пересчитывает по локальному времени устройства.</div>';
-      html += '</section>';
+      html += buildShiftDetailDisclosureHtml('Служебное', 'расчёт и синхронизация', '' +
+        '<div class="shift-detail-list">' +
+          buildShiftDetailRowHtml('Тип', shiftType) +
+          buildShiftDetailRowHtml('Синхронизация', syncStatus) +
+        '</div>'
+      );
 
       return html;
     }

@@ -1,6 +1,6 @@
 # Worktree Status
 
-Generated: 2026-04-28 23:35:48 +1000
+Generated: 2026-04-28 23:51:43 +1000
 
 ## git status -sb
 ```text
@@ -8,18 +8,21 @@ Generated: 2026-04-28 23:35:48 +1000
  M ai-memory/CHANGELOG.md
  M ai-memory/PROJECT_STATE.md
  M ai-memory/sessions/2026-04-28.md
+ M scripts/time-utils.js
+ M styles/30-shifts-and-overlays.css
+ M sw.js
 ```
 
 ## git branch -vv
 ```text
 codex/next-direction b044dd5 offline mvp
   codex/tabs-ui        117f1fa [origin/codex/tabs-ui] tabs ui
-* main                 7ad16a5 [origin/main] chore(memory): record deploy access blocker
+* main                 0f80d4b [origin/main] chore(memory): record successful docs deploy
 ```
 
 ## HEAD
 ```text
-7ad16a5 chore(memory): record deploy access blocker
+0f80d4b chore(memory): record successful docs deploy
  ai-memory/CHANGELOG.md           |  8 ++++++++
  ai-memory/INDEX.md               |  2 +-
  ai-memory/PROJECT_STATE.md       |  8 ++++----
