@@ -1,14 +1,14 @@
 # Project State
 
 <!-- AUTO_STATUS:START -->
-Generated: 2026-04-27 00:32:12 +0000
+Generated: 2026-04-28 23:27:16 +1000
 
 ## Repository Snapshot
-- Local repo path: `/opt/bloknot-mashinista`
-- Project memory path: `/opt/bloknot-mashinista/ai-memory`
+- Local repo path: `D:\work\bloknot-mashinista-tg`
+- Project memory path: `D:\work\bloknot-mashinista-tg\ai-memory`
 - Branch: `main`
-- HEAD: `b7c0cb8`
-- Last commit: `b7c0cb8 fix(auth): keep a single browser login flow`
+- HEAD: `69a1e7f`
+- Last commit: `69a1e7f feat(docs): add folders 9 and 10`
 
 ## Git Remote
 ```text
@@ -18,23 +18,15 @@ origin	https://github.com/iEgor72/bloknot-mashinista.git (push)
 
 ## Branch Tracking
 ```text
-+ calendar-fix-main                             4b9e6c6 (/tmp/bloknot-batch/calendar-fix) Fix home calendar to show manual shifts only
-+ chore/remove-graphs-and-restore-calendar-flow e90d829 (/tmp/bloknot-remove-graphs) refactor(app): remove remaining schedule tails
-+ cleanup-archaeology                           6219db2 (/tmp/bloknot-batch/archaeology) Revert "refactor(schedule): switch app to manual-only shifts"
-+ cleanup-backend                               6219db2 (/tmp/bloknot-clean/backend) Revert "refactor(schedule): switch app to manual-only shifts"
-+ cleanup-backend-migrate                       6219db2 (/tmp/bloknot-batch/backend-migrate) Revert "refactor(schedule): switch app to manual-only shifts"
-+ cleanup-frontend                              6219db2 (/tmp/bloknot-clean/frontend) Revert "refactor(schedule): switch app to manual-only shifts"
-+ cleanup-frontend-smoke                        ed81af6 (/tmp/bloknot-batch/frontend-smoke) Hide schedule planner UI from frontend
-+ cleanup-integration                           dba6ed0 (/tmp/bloknot-batch/integration) Remove schedule planner and add local smoke test
-+ cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
-+ cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
-+ feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          b7c0cb8 [origin/main] fix(auth): keep a single browser login flow
+codex/next-direction b044dd5 offline mvp
+  codex/tabs-ui        117f1fa [origin/codex/tabs-ui] tabs ui
+* main                 69a1e7f [origin/main: ahead 1] feat(docs): add folders 9 and 10
 ```
 
 ## Worktree
 ```text
-clean
+M ai-memory/CHANGELOG.md
+ M ai-memory/sessions/2026-04-28.md
 ```
 <!-- AUTO_STATUS:END -->
 

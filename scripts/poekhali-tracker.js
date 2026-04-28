@@ -332,6 +332,7 @@
     var value = text || 'GPS';
     var width = typeof window !== 'undefined' ? window.innerWidth : 0;
     if (width <= 640 && value === 'НЕТ GPS') return 'GPS';
+    if (width <= 640 && value === 'МАРШРУТ') return 'GPS';
     if (width <= 640 && value.indexOf('GPS · УЧ ') === 0) return 'GPS';
     if (width <= 640 && value.indexOf('ВНЕ · УЧ ') === 0) return 'ВНЕ';
     return value;
@@ -12309,8 +12310,8 @@
     if (!el) return;
     var activeRun = getActiveRun();
     var details = getPoekhaliTrainDetails();
-    el.dataset.controlLabel = 'Запись';
-    el.textContent = getTimerButtonLabel();
+    delete el.dataset.controlLabel;
+    el.textContent = tracker.timerRunning || tracker.runStartPreparing ? '●' : activeRun ? 'II' : '●';
     el.classList.toggle('is-recording', !!tracker.timerRunning);
     el.classList.toggle('is-preparing', !!tracker.runStartPreparing);
     el.classList.toggle('is-paused', !tracker.timerRunning && !!activeRun);
@@ -12339,6 +12340,10 @@
     setMapButton();
     setOpsButton();
     syncGpsStatusDisplay();
+    var wayBtn = byId('btnPoekhaliWay');
+    var mapBtn = byId('btnPoekhaliMap');
+    if (wayBtn) wayBtn.classList.add('is-hidden');
+    if (mapBtn) mapBtn.classList.add('is-hidden');
   }
 
   function getAvailableSectors() {
@@ -14719,6 +14724,17 @@
     return 'info';
   }
 
+  function getLiveNavigationTargetDistanceLabel(target) {
+    if (!target) return 'ДО ЦЕЛИ';
+    if (target.kind === 'signal') return 'ДО СВ';
+    if (target.kind === 'station') return 'ДО СТ';
+    if (target.kind === 'warning') return 'ДО ПР';
+    if (target.kind === 'restriction' || target.kind === 'restriction_end') return 'ДО ОГР';
+    if (target.kind === 'route_start') return 'ДО СТАРТА';
+    if (target.kind === 'route_finish') return 'ДО ФИНИША';
+    return 'ДО ЦЕЛИ';
+  }
+
   function formatLiveNavigationTargetTitle(target) {
     if (!target) return '';
     var label = String(target.label || '').trim();
@@ -14796,12 +14812,12 @@
     var navTarget = resolveLiveNavigationTarget(projection, activeSpeed, nextWarning, nextRestriction, nextSignal, nextStation, routeProgress);
     if (navTarget) {
       blockLabel = Math.max(0, Math.round(Number(navTarget.distanceMeters) || 0)) > 0
-        ? (isPreview ? 'ДАЛЬШЕ ПО КАРТЕ' : 'ДАЛЬШЕ')
+        ? 'СЛЕДУЮЩИЙ'
         : 'СЕЙЧАС';
       title = formatLiveNavigationTargetTitle(navTarget) || title;
       subtitle = formatLiveNavigationTargetSubtitle(navTarget, locationTitle) || subtitle;
     }
-    var chip3Label = navTarget ? (Math.max(0, Math.round(Number(navTarget.distanceMeters) || 0)) > 0 ? 'ДАЛЕЕ' : 'СЕЙЧАС') : (nextRestriction ? 'ДАЛЕЕ' : (nextWarning ? 'ПР' : (isPreview ? 'GPS' : (nextSignal ? 'СВ' : 'ЦЕЛЬ'))));
+    var chip3Label = navTarget ? (Math.max(0, Math.round(Number(navTarget.distanceMeters) || 0)) > 0 ? getLiveNavigationTargetDistanceLabel(navTarget) : 'СЕЙЧАС') : (nextRestriction ? 'ДО ОГР' : (nextWarning ? 'ДО ПР' : (isPreview ? 'GPS' : (nextSignal ? 'ДО СВ' : 'ЦЕЛЬ'))));
     var chip3Text = navTarget
         ? formatLiveNavigationTargetDistance(navTarget)
       : nextRestriction
@@ -14822,8 +14838,8 @@
         : 'info';
 
     var liveAlert = isPreview ? null : getCurrentPoekhaliLiveAlert();
-    var panelFill = 'rgba(19, 19, 24, 0.70)';
-    var panelStroke = 'rgba(255, 255, 255, 0.075)';
+    var panelFill = 'rgba(12, 30, 48, 0.70)';
+    var panelStroke = 'rgba(56, 189, 248, 0.14)';
     var labelColor = THEME.sub;
     var titleColor = THEME.text;
     var subtitleColor = 'rgba(136, 146, 164, 0.78)';
@@ -15631,6 +15647,14 @@
     var points = collectTrainProfilePath(center, sector, layout, trainMeters);
     if (!points || points.length < 2) return;
     var height = Math.max(6, Math.min(9, layout.xUnit * 1.15));
+    var railLift = Math.max(7, height / 2 + 4);
+    points = points.map(function(point) {
+      return {
+        coordinate: point.coordinate,
+        x: point.x,
+        y: point.y - railLift
+      };
+    });
     var fill = isPreview ? 'rgba(91, 210, 255, 0.58)' : '#5bd2ff';
     function stroke(width, color) {
       ctx.strokeStyle = color;
@@ -15764,24 +15788,7 @@
   function drawApkTrain(ctx, layout, center, sector, avgAngle, isPreview) {
     var details = getPoekhaliTrainDetails();
     var trainMeters = Math.max(1, Math.round(Number(details && details.lengthMeters) || getTrainLengthMeters()));
-    var tailCoordinate = center - getCurrentCoordinateDirection() * trainMeters;
-    var headX = coordinateToApkX(center, center, layout);
-    var tailX = coordinateToApkX(tailCoordinate, center, layout);
-    var x = Math.min(tailX, headX);
-    var width = Math.max(2, Math.abs(headX - tailX));
-    var height = Math.max(6, Math.min(9, layout.xUnit * 1.15));
-    var y = layout.trackY - height / 2;
-    var fill = isPreview ? 'rgba(91, 210, 255, 0.58)' : '#5bd2ff';
     drawApkTrainProfileBar(ctx, layout, center, sector, trainMeters, isPreview);
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(layout.viewportX, layout.trackY - 18, layout.viewportWidth, 36);
-    ctx.clip();
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.96)';
-    ctx.fillRect(Math.round(x) - 1, Math.round(y) - 1, Math.round(width) + 2, Math.round(height) + 2);
-    ctx.fillStyle = fill;
-    ctx.fillRect(Math.round(x), Math.round(y), Math.round(width), Math.round(height));
-    ctx.restore();
   }
 
   function drawApkPreviewCursor(ctx, layout, center, sector) {
@@ -15795,17 +15802,6 @@
     ctx.lineTo(layout.headX, layout.trackY - 16);
     ctx.stroke();
     ctx.setLineDash([]);
-
-    ctx.shadowColor = 'rgba(91, 210, 255, 0.30)';
-    ctx.shadowBlur = 10;
-    ctx.fillStyle = 'rgba(9, 10, 15, 0.82)';
-    ctx.strokeStyle = THEME.accentStrong;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(layout.headX, y, 6, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.shadowBlur = 0;
-    ctx.stroke();
 
     ctx.restore();
   }
@@ -15830,8 +15826,8 @@
       if (x > avoidLeft && x < avoidRight) continue;
       var label = formatProfileGradeLabel(segments[i]);
       var profileY = getProfileYAt(mid, center, sector, layout);
-      var laneLift = isPreview ? 32 : (i % 2 ? 28 : 18);
-      var y = clamp(profileY - laneLift, layout.profileTop + 18, layout.profileBottom - 8);
+      var laneDrop = isPreview ? 30 : (i % 2 ? 34 : 24);
+      var y = clamp(profileY + laneDrop, layout.profileTop + 30, layout.trackY - 22);
       var width = Math.max(38, label.length * 7 + 8);
       if (!reserveLabel(labelLayout, x, y - 4, width, 20, isPreview ? 8 : 5)) continue;
       fillRoundRect(ctx, x - width / 2, y - 14, width, 20, 6, grade >= 0 ? 'rgba(74, 222, 128, 0.13)' : 'rgba(56, 189, 248, 0.15)');
@@ -16528,14 +16524,15 @@
     if (y + panelHeight > h - layout.navReserve - 30) {
       y = Math.max(layout.trackY + 38, h - layout.navReserve - panelHeight - 30);
     }
-    var colWidth = panelWidth / 4;
+    var metricCount = isPreview ? 3 : 4;
+    var colWidth = panelWidth / metricCount;
     var compact = w < 360;
 
     ctx.save();
     drawPanel(ctx, x, y, panelWidth, panelHeight, 14, 'rgba(19, 19, 24, 0.78)', 'rgba(255, 255, 255, 0.08)');
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
     ctx.lineWidth = 1;
-    for (var i = 1; i < 4; i++) {
+    for (var i = 1; i < metricCount; i++) {
       var dividerX = Math.round(x + colWidth * i) + 0.5;
       ctx.beginPath();
       ctx.moveTo(dividerX, y + 10);
@@ -16561,10 +16558,9 @@
       });
     }
     if (isPreview) {
-      drawMetric(0, 'УЧ.', formatSectorShortName(sector), THEME.text);
-      drawMetric(1, 'КМ', km, THEME.text);
-      drawMetric(2, 'ПК', pk, THEME.accentStrong);
-      drawMetric(3, 'GPS', tracker.status === 'offtrack' ? 'ВНЕ' : 'НЕТ', THEME.danger);
+      drawMetric(0, 'КМ', km, THEME.text);
+      drawMetric(1, 'ПК', pk, THEME.accentStrong);
+      drawMetric(2, 'GPS', tracker.status === 'offtrack' ? 'ВНЕ' : 'НЕТ', THEME.danger);
     } else {
       drawMetric(0, compact ? 'СКОР.' : 'СКОРОСТЬ', speedText, isOverspeed ? THEME.danger : THEME.text);
       drawMetric(1, compact ? 'УЧ.' : 'УЧАСТОК', formatSectorShortName(sector), THEME.text);
@@ -16669,6 +16665,10 @@
     setMapButton();
     setOpsButton();
     syncGpsStatusDisplay();
+    var wayBtn = byId('btnPoekhaliWay');
+    var mapBtn = byId('btnPoekhaliMap');
+    if (wayBtn) wayBtn.classList.add('is-hidden');
+    if (mapBtn) mapBtn.classList.add('is-hidden');
   }
 
   function getDrawThrottleMs() {

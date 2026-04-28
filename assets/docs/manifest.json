@@ -24,6 +24,20 @@
   ],
   "folders": [
     {
+      "name": "Папка №10",
+      "path": "/assets/docs/folders/Папка №10.docx",
+      "mime_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "size": 26070,
+      "updated_at": "2026-04-28"
+    },
+    {
+      "name": "Папка №9",
+      "path": "/assets/docs/folders/Папка №9.docx",
+      "mime_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "size": 26041,
+      "updated_at": "2026-04-28"
+    },
+    {
       "name": "Папка №8",
       "path": "/assets/docs/folders/Папка №8.jpg",
       "mime_type": "image/jpeg",

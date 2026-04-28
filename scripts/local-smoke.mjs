@@ -9,7 +9,7 @@ import { chromium } from '@playwright/test';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const artifactsDir = path.join(repoRoot, 'artifacts', 'local-smoke');
-const port = Number(process.env.SMOKE_PORT || process.env.PORT || 4173);
+const port = Number(process.env.SMOKE_PORT || process.env.PORT || 49173);
 const baseUrl = `http://127.0.0.1:${port}`;
 const startupTimeoutMs = Number(process.env.SMOKE_START_TIMEOUT_MS || 15000);
 const uiTimeoutMs = Number(process.env.SMOKE_UI_TIMEOUT_MS || 12000);
@@ -31,6 +31,7 @@ const report = {
 const serverLogStream = fs.createWriteStream(path.join(artifactsDir, 'server.log'), { flags: 'w' });
 let server;
 let browser;
+let context;
 
 function isIgnorableRequestFailure(failure) {
   try {
@@ -57,6 +58,7 @@ async function waitForServer() {
 }
 
 async function cleanup(exitCode = 0) {
+  if (context) await context.close().catch(() => {});
   if (browser) await browser.close().catch(() => {});
   if (server && !server.killed) {
     server.kill('SIGTERM');
@@ -87,11 +89,13 @@ async function main() {
   await waitForServer();
 
   browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage();
+  context = await browser.newContext();
+  const page = await context.newPage();
 
   await page.addInitScript(() => {
     const now = new Date().toISOString();
     const userId = '999';
+    localStorage.setItem('shift_tracker_session_token', 'local-smoke-token');
     localStorage.setItem('shift_tracker_cached_user_v1', JSON.stringify({
       id: userId,
       display_name: 'Smoke User',

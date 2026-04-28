@@ -651,12 +651,14 @@
       top: max(10px, var(--safe-top));
       left: calc(max(10px, var(--safe-left)) + 138px);
       width: 60px;
+      display: none;
     }
 
     .poekhali-map-btn {
       top: max(10px, var(--safe-top));
       left: calc(max(10px, var(--safe-left)) + 206px);
       width: 60px;
+      display: none;
     }
 
     .poekhali-gps-btn {
@@ -687,16 +689,21 @@
     }
 
     .poekhali-timer-btn {
-      left: max(16px, var(--safe-left));
-      right: calc(50% + 6px);
-      bottom: calc(94px + var(--safe-bottom));
-      height: 46px;
-      min-width: 0;
+      top: max(10px, var(--safe-top));
+      right: calc(max(10px, var(--safe-right)) + 70px);
+      width: 44px;
+      min-width: 44px;
+      height: 38px;
+      padding: 0;
       transform: none;
-      background: var(--accent-dim);
-      border-color: rgba(56, 189, 248, 0.28);
-      color: var(--accent-strong);
+      background: rgba(19, 19, 24, 0.84);
+      border-color: var(--border-hi);
+      color: var(--sub);
       font-variant-numeric: tabular-nums;
+    }
+
+    .poekhali-timer-btn::before {
+      content: none !important;
     }
 
     .poekhali-timer-btn.is-recording,
@@ -723,7 +730,7 @@
     }
 
     .poekhali-ops-btn {
-      left: calc(50% + 6px);
+      left: max(16px, var(--safe-left));
       right: max(16px, var(--safe-right));
       bottom: calc(94px + var(--safe-bottom));
       height: 46px;
@@ -1900,8 +1907,7 @@
       }
 
       .poekhali-map-btn {
-        left: calc(max(8px, var(--safe-left)) + 166px);
-        width: 50px;
+        display: none;
       }
 
       .poekhali-gps-btn {
@@ -1913,12 +1919,14 @@
       }
 
       .poekhali-timer-btn {
-        left: max(12px, var(--safe-left));
-        right: calc(50% + 5px);
+        top: max(8px, var(--safe-top));
+        right: calc(max(8px, var(--safe-right)) + 54px);
+        width: 40px;
+        min-width: 40px;
       }
 
       .poekhali-ops-btn {
-        left: calc(50% + 5px);
+        left: max(12px, var(--safe-left));
         right: max(12px, var(--safe-right));
       }
 
@@ -1978,9 +1986,7 @@
       }
 
       .poekhali-map-btn {
-        display: inline-flex;
-        left: calc(max(8px, var(--safe-left)) + 152px);
-        width: 44px;
+        display: none;
       }
 
       .poekhali-gps-btn {
@@ -1991,13 +1997,13 @@
       }
 
       .poekhali-timer-btn {
-        left: max(10px, var(--safe-left));
-        right: calc(50% + 5px);
-        min-width: 0;
+        right: calc(max(8px, var(--safe-right)) + 50px);
+        width: 38px;
+        min-width: 38px;
       }
 
       .poekhali-ops-btn {
-        left: calc(50% + 5px);
+        left: max(10px, var(--safe-left));
         right: max(10px, var(--safe-right));
         min-width: 0;
       }

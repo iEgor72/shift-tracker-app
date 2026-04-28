@@ -1117,28 +1117,6 @@
       }
     }());
 
-    var authPrimaryAction = document.getElementById('authPrimaryAction');
-    if (authPrimaryAction) {
-      authPrimaryAction.addEventListener('click', function() {
-        if (AUTH_STATE === 'error') {
-          restartAuthFlow();
-          return;
-        }
-
-        if (AUTH_ENV_STATE === 'dev') {
-          window.open(getTelegramBotUrl(), '_blank', 'noopener');
-          return;
-        }
-
-        if (AUTH_STATE === 'guest' || AUTH_STATE === 'pending') {
-          if (AUTH_WIDGET_SHELL && AUTH_WIDGET_SHELL.scrollIntoView) {
-            AUTH_WIDGET_SHELL.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-          renderTelegramLoginWidget();
-        }
-      });
-    }
-
     bindClickById('btnAuthRetry', function() {
       restartAuthFlow();
     });
