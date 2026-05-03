@@ -282,7 +282,17 @@
       var totalText = userStatsState.totalUsers !== null
         ? String(userStatsState.totalUsers)
         : '—';
-      var nextText = 'Сейчас онлайн: ' + onlineText + ' · Всего пользователей: ' + totalText;
+      var cacheVer =
+        typeof SHELL_CACHE_VERSION !== 'undefined' && SHELL_CACHE_VERSION
+          ? String(SHELL_CACHE_VERSION)
+          : '—';
+      var nextText =
+        'Сейчас онлайн: ' +
+        onlineText +
+        ' · Всего пользователей: ' +
+        totalText +
+        ' · Версия кэша: ' +
+        cacheVer;
       if (el.textContent !== nextText) {
         el.textContent = nextText;
       }
