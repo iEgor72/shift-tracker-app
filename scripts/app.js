@@ -275,6 +275,7 @@
 
     function renderUserStatsFooter() {
       var el = document.getElementById('userStatsFooter');
+      var cacheEl = document.getElementById('userStatsShellCache');
       if (!el) return;
       var onlineText = navigator.onLine && userStatsState.onlineUsers !== null
         ? String(userStatsState.onlineUsers)
@@ -282,21 +283,20 @@
       var totalText = userStatsState.totalUsers !== null
         ? String(userStatsState.totalUsers)
         : '—';
-      var cacheVer =
-        typeof SHELL_CACHE_VERSION !== 'undefined' && SHELL_CACHE_VERSION
-          ? String(SHELL_CACHE_VERSION)
-          : '—';
-      var nextText =
-        'Сейчас онлайн: ' +
-        onlineText +
-        ' · Всего пользователей: ' +
-        totalText +
-        ' · Версия кэша: ' +
-        cacheVer;
+      var nextText = 'Сейчас онлайн: ' + onlineText + ' · Всего пользователей: ' + totalText;
       if (el.textContent !== nextText) {
         el.textContent = nextText;
       }
       el.setAttribute('data-state', navigator.onLine ? 'online' : 'offline');
+
+      var cacheVer =
+        typeof SHELL_CACHE_VERSION !== 'undefined' && SHELL_CACHE_VERSION
+          ? String(SHELL_CACHE_VERSION)
+          : '—';
+      var cacheLine = 'Версия кэша: ' + cacheVer;
+      if (cacheEl && cacheEl.textContent !== cacheLine) {
+        cacheEl.textContent = cacheLine;
+      }
     }
 
     function applyUserStatsPayload(payload) {

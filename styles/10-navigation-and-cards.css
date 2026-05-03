@@ -2773,6 +2773,16 @@
       opacity: 0.92;
     }
 
+    .usage-stats-shell-cache {
+      margin-top: 5px;
+      text-align: center;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      color: var(--sub);
+      opacity: 0.62;
+    }
+
     /* ── Average shift card ── */
     .average-shift-card {
       display: grid;
