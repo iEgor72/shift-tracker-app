@@ -130,6 +130,8 @@
   var LIVE_ALERT_AHEAD_M = 1000;
   var LIVE_ALERT_NEAR_M = 300;
   var LIVE_ALERT_VISIBLE_MS = 9000;
+  /** Canvas HUD height under top overlay buttons (MSK clock only). */
+  var POEKHALI_TOP_HUD_HEIGHT_PX = 46;
   var LIVE_ALERT_REPEAT_MS = 30000;
   var LIVE_ALERT_DANGER_REPEAT_MS = 12000;
   var PROD_AUDIT_MANUAL_CHECKS = [
@@ -331,6 +333,16 @@
   function getGpsStatusDisplayText(text) {
     var value = text || 'GPS';
     var width = typeof window !== 'undefined' ? window.innerWidth : 0;
+    var narrow = width <= 420;
+    if (narrow && value === 'НЕТ GPS') return 'Нет';
+    if (narrow && value === 'МАРШРУТ') return 'Маршр.';
+    if (narrow && value.indexOf('GPS · УЧ ') === 0) {
+      var tail = value.slice('GPS · УЧ '.length).trim();
+      return tail.length > 10 ? 'УЧ…' : 'УЧ ' + tail;
+    }
+    if (narrow && value.indexOf('ВНЕ · УЧ ') === 0) return 'Вне';
+    if (narrow && value.indexOf('ВНЕ') === 0 && value.length <= 12) return value;
+    if (narrow && value.length > 14) return value.slice(0, 12).trim() + '…';
     if (width <= 640 && value === 'НЕТ GPS') return 'GPS';
     if (width <= 640 && value === 'МАРШРУТ') return 'GPS';
     if (width <= 640 && value.indexOf('GPS · УЧ ') === 0) return 'GPS';
@@ -12110,7 +12122,7 @@
   }
 
   function getPoekhaliTopHudBottom() {
-    return getPoekhaliTopHudY() + 72;
+    return getPoekhaliTopHudY() + POEKHALI_TOP_HUD_HEIGHT_PX;
   }
 
   function getPoekhaliLiveSummaryTop() {
@@ -12976,7 +12988,7 @@
     var panelWidth = Math.min(w - getPanelInset(w) * 2, 360);
     var panelHeight = hasMapSummary ? 168 : (sub ? 122 : 96);
     var x = Math.round((w - panelWidth) / 2);
-    var minY = getPoekhaliTopHudY() + 96;
+    var minY = getPoekhaliTopHudBottom() + 36;
     var y = Math.round(Math.max(minY, Math.min((h - panelHeight) / 2 - 4, h - panelHeight - 250)));
     var accent = tone === 'danger' ? THEME.danger : THEME.accent;
     drawPanel(ctx, x, y, panelWidth, panelHeight, 18, 'rgba(19, 19, 24, 0.88)', THEME.borderHi);
@@ -14923,6 +14935,51 @@
     ctx.restore();
   }
 
+  /**
+   * Horizontal band on the km/picket axis: train head at current line coordinate, tail by train length.
+   */
+  function drawTrainKmScaleProjection(ctx, layout, center) {
+    var trainLen = getTrainLengthMeters();
+    if (!isFinite(trainLen) || trainLen <= 0) return;
+    var dir = getCurrentCoordinateDirection();
+    var tailCoord = center - dir * trainLen;
+    var headX = coordinateToApkX(center, center, layout);
+    var tailX = coordinateToApkX(tailCoord, center, layout);
+    var left = Math.min(headX, tailX);
+    var right = Math.max(headX, tailX);
+    var vx0 = layout.viewportX + 10;
+    var vx1 = layout.viewportRight - 10;
+    left = clamp(left, vx0, vx1);
+    right = clamp(right, vx0, vx1);
+    if (right - left < 3) return;
+
+    var railY = layout.trackY;
+    var bandTop = railY + 36;
+    var bandH = 5;
+    var tagY = railY + 50;
+    ctx.save();
+    fillRoundRect(ctx, left, bandTop, right - left, bandH, 3, 'rgba(56, 189, 248, 0.38)');
+    ctx.fillStyle = 'rgba(147, 197, 253, 0.98)';
+    ctx.fillRect(Math.round(headX) - 2, bandTop - 1, 5, bandH + 2);
+    ctx.fillStyle = 'rgba(148, 163, 184, 0.92)';
+    ctx.fillRect(Math.round(tailX) - 2, bandTop - 1, 5, bandH + 2);
+    drawText(ctx, 'Г', headX, tagY, {
+      size: 8,
+      weight: 850,
+      color: THEME.accentStrong,
+      align: 'center',
+      maxWidth: 22
+    });
+    drawText(ctx, 'Х', tailX, tagY, {
+      size: 8,
+      weight: 850,
+      color: THEME.sub,
+      align: 'center',
+      maxWidth: 22
+    });
+    ctx.restore();
+  }
+
   function drawApkKmGrid(ctx, layout, center, bounds, sector) {
     var first = Math.ceil(bounds.left / 100) * 100;
     var railY = layout.trackY;
@@ -14995,6 +15052,7 @@
         });
       }
     }
+    drawTrainKmScaleProjection(ctx, layout, center);
     ctx.restore();
   }
 
@@ -16524,7 +16582,7 @@
     if (y + panelHeight > h - layout.navReserve - 30) {
       y = Math.max(layout.trackY + 38, h - layout.navReserve - panelHeight - 30);
     }
-    var metricCount = isPreview ? 3 : 4;
+    var metricCount = 4;
     var colWidth = panelWidth / metricCount;
     var compact = w < 360;
 
@@ -16558,9 +16616,10 @@
       });
     }
     if (isPreview) {
-      drawMetric(0, 'КМ', km, THEME.text);
-      drawMetric(1, 'ПК', pk, THEME.accentStrong);
-      drawMetric(2, 'GPS', tracker.status === 'offtrack' ? 'ВНЕ' : 'НЕТ', THEME.danger);
+      drawMetric(0, compact ? 'КМ/Ч' : 'СКОРОСТЬ', speedText, isOverspeed ? THEME.danger : THEME.text);
+      drawMetric(1, 'КМ', km, THEME.text);
+      drawMetric(2, 'ПК', pk, THEME.accentStrong);
+      drawMetric(3, 'GPS', tracker.status === 'offtrack' ? 'ВНЕ' : 'НЕТ', THEME.danger);
     } else {
       drawMetric(0, compact ? 'СКОР.' : 'СКОРОСТЬ', speedText, isOverspeed ? THEME.danger : THEME.text);
       drawMetric(1, compact ? 'УЧ.' : 'УЧАСТОК', formatSectorShortName(sector), THEME.text);
@@ -16571,68 +16630,26 @@
   }
 
   function drawTopHud(ctx, w, displayProjection) {
+    void displayProjection;
     var now = new Date();
     var inset = getPanelInset(w);
     var x = inset;
     var y = getPoekhaliTopHudY();
     var width = w - inset * 2;
-    var height = 72;
-    var liveProjection = tracker.projection && tracker.projection.onTrack ? tracker.projection : null;
-    var previewProjection = displayProjection && displayProjection.preview ? displayProjection : null;
-    var topSector = (liveProjection || previewProjection || tracker.nearestProjection || {}).sector;
-    var topDraft = getRawDraftForSector(topSector);
-    var topUserSection = getUserSectionForSector(topSector);
-    var label = liveProjection
-      ? (topDraft ? 'GPS ЧЕРНОВИК' : topUserSection ? 'GPS УЧАСТОК' : 'КООРДИНАТА')
-      : tracker.status === 'offtrack' && tracker.nearestProjection
-        ? (topDraft || topUserSection ? 'БЛИЖ. GPS' : 'БЛИЖАЙШИЙ УЧ.')
-        : (topDraft ? 'GPS ЧЕРНОВИК' : topUserSection ? 'GPS УЧАСТОК' : 'ПРОСМОТР ЭК');
-    drawPanel(ctx, x, y, width, height, 18, 'rgba(19, 19, 24, 0.72)', THEME.border);
-    drawText(ctx, label, x + 14, y + 24, {
-      size: 10,
-      weight: 850,
-      color: THEME.sub
-    });
-    drawText(ctx, 'МСК', x + width - 14, y + 24, {
+    var height = POEKHALI_TOP_HUD_HEIGHT_PX;
+    drawPanel(ctx, x, y, width, height, 16, 'rgba(19, 19, 24, 0.72)', THEME.border);
+    drawText(ctx, 'МСК', x + width / 2, y + 14, {
       size: 8,
       weight: 850,
       color: THEME.sub,
-      align: 'right'
+      align: 'center'
     });
-    drawText(ctx, formatTime(now), x + width - 14, y + 44, {
-      size: 13,
+    drawText(ctx, formatTime(now), x + width / 2, y + 32, {
+      size: 15,
       weight: 850,
       color: THEME.text,
-      align: 'right'
+      align: 'center'
     });
-    if (liveProjection) {
-      var liveText = formatLineCoordinate(liveProjection.lineCoordinate);
-      var liveLong = liveText.length > 11;
-      drawText(ctx, liveText, liveLong ? x + 14 : x + width / 2, y + 47, {
-        size: liveLong ? 18 : 22,
-        weight: 850,
-        color: THEME.accentStrong,
-        align: liveLong ? 'left' : 'center',
-        maxWidth: liveLong ? width - 118 : width - 96
-      });
-    } else if (previewProjection) {
-      var previewText = formatLineCoordinate(previewProjection.lineCoordinate);
-      var previewLong = previewText.length > 11;
-      drawText(ctx, previewText, previewLong ? x + 14 : x + width / 2, y + 47, {
-        size: previewLong ? 17 : 20,
-        weight: 850,
-        color: THEME.accentStrong,
-        align: previewLong ? 'left' : 'center',
-        maxWidth: previewLong ? width - 118 : width - 108
-      });
-    } else {
-      drawText(ctx, '—', x + width / 2, y + 47, {
-        size: 22,
-        weight: 850,
-        color: THEME.muted,
-        align: 'center'
-      });
-    }
   }
 
   function drawCanvas() {
@@ -16977,6 +16994,7 @@
 
     window.addEventListener('resize', function() {
       resizeCanvas();
+      syncGpsStatusDisplay();
       requestDraw();
     });
     if (typeof document !== 'undefined' && document.addEventListener) {

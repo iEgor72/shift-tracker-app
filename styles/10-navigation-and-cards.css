@@ -557,7 +557,7 @@
       position: absolute;
       z-index: 2;
       min-width: 44px;
-      height: 38px;
+      height: 42px;
       padding: 0 10px;
       border: 1px solid var(--border-hi);
       border-radius: var(--r-inner);
@@ -581,6 +581,7 @@
       flex-direction: column;
       gap: 2px;
       line-height: 1;
+      justify-content: center;
     }
 
     .poekhali-overlay-btn[data-control-label]::before {
@@ -594,6 +595,7 @@
       font-weight: 850;
       line-height: 1;
       text-transform: uppercase;
+      flex-shrink: 0;
     }
 
     .poekhali-overlay-btn svg {
@@ -620,6 +622,7 @@
       top: max(10px, var(--safe-top));
       left: max(10px, var(--safe-left));
       width: 44px;
+      height: 42px;
       padding: 0;
     }
 
@@ -633,6 +636,7 @@
       top: max(10px, var(--safe-top));
       left: calc(max(10px, var(--safe-left)) + 56px);
       width: 74px;
+      height: 42px;
     }
 
     .poekhali-direction-btn.is-auto {
@@ -664,16 +668,21 @@
     .poekhali-gps-btn {
       top: max(10px, var(--safe-top));
       right: max(10px, var(--safe-right));
-      width: 62px;
-      min-width: 62px;
-      padding: 0 7px;
-      height: 38px;
-      flex-direction: row;
+      width: auto;
+      min-width: 72px;
+      max-width: min(112px, 30vw);
+      padding: 4px 8px 5px;
+      height: 42px;
+      flex-direction: column;
+      gap: 2px;
+      justify-content: center;
       color: var(--sub);
-    }
-
-    .poekhali-gps-btn::before {
-      content: none !important;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.05;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .poekhali-gps-btn.is-live {
@@ -690,10 +699,10 @@
 
     .poekhali-timer-btn {
       top: max(10px, var(--safe-top));
-      right: calc(max(10px, var(--safe-right)) + 70px);
+      right: calc(max(10px, var(--safe-right)) + 78px);
       width: 44px;
       min-width: 44px;
-      height: 38px;
+      height: 42px;
       padding: 0;
       transform: none;
       background: rgba(19, 19, 24, 0.84);
@@ -1871,7 +1880,7 @@
 
     @media (max-width: 420px) {
       .poekhali-overlay-btn {
-        height: 34px;
+        height: 40px;
         min-width: 32px;
         padding: 0 5px;
         border-radius: 12px;
@@ -1880,7 +1889,7 @@
 
       .poekhali-overlay-btn[data-control-label] {
         height: 40px;
-        padding: 3px 5px 4px;
+        padding: 3px 6px 4px;
         gap: 2px;
       }
 
@@ -1890,6 +1899,7 @@
 
       .poekhali-back-btn {
         width: 36px;
+        height: 40px;
       }
 
       .poekhali-k-btn {
@@ -1899,6 +1909,7 @@
       .poekhali-direction-btn {
         left: calc(max(8px, var(--safe-left)) + 44px);
         width: 62px;
+        height: 40px;
       }
 
       .poekhali-way-btn {
@@ -1911,18 +1922,20 @@
       }
 
       .poekhali-gps-btn {
-        width: 46px;
-        min-width: 46px;
-        max-width: 46px;
-        padding: 0 4px;
+        width: auto;
+        min-width: 64px;
+        max-width: min(104px, 36vw);
+        height: 40px;
+        padding: 3px 6px 4px;
         font-size: 10px;
       }
 
       .poekhali-timer-btn {
         top: max(8px, var(--safe-top));
-        right: calc(max(8px, var(--safe-right)) + 54px);
+        right: calc(max(8px, var(--safe-right)) + 72px);
         width: 40px;
         min-width: 40px;
+        height: 40px;
       }
 
       .poekhali-ops-btn {
@@ -1949,7 +1962,7 @@
 
     @media (max-width: 370px) {
       .poekhali-overlay-btn {
-        height: 34px;
+        height: 40px;
         min-width: 32px;
         padding: 0 5px;
         border-radius: 12px;
@@ -1958,7 +1971,7 @@
 
       .poekhali-overlay-btn[data-control-label] {
         height: 40px;
-        padding: 3px 5px 4px;
+        padding: 3px 6px 4px;
         gap: 2px;
       }
 
@@ -1969,6 +1982,7 @@
       .poekhali-back-btn {
         left: max(8px, var(--safe-left));
         width: 36px;
+        height: 40px;
       }
 
       .poekhali-k-btn {
@@ -1978,6 +1992,7 @@
       .poekhali-direction-btn {
         left: calc(max(8px, var(--safe-left)) + 42px);
         width: 56px;
+        height: 40px;
       }
 
       .poekhali-way-btn {
@@ -1990,16 +2005,17 @@
       }
 
       .poekhali-gps-btn {
-        min-width: 42px;
-        max-width: 42px;
-        padding: 0 4px;
+        min-width: 58px;
+        max-width: min(96px, 38vw);
+        padding: 3px 5px 4px;
         font-size: 10px;
       }
 
       .poekhali-timer-btn {
-        right: calc(max(8px, var(--safe-right)) + 50px);
+        right: calc(max(8px, var(--safe-right)) + 66px);
         width: 38px;
         min-width: 38px;
+        height: 40px;
       }
 
       .poekhali-ops-btn {
