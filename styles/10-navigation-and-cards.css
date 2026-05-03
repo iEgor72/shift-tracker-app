@@ -707,65 +707,159 @@
       display: none;
     }
 
+    .poekhali-overlay-btn.poekhali-live-btn {
+      overflow: visible;
+    }
+
     .poekhali-live-btn {
+      position: relative;
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
       width: auto;
-      min-width: 56px;
-      max-width: min(118px, 36vw);
-      height: 42px;
-      padding: 0 10px;
+      min-width: 118px;
+      max-width: min(178px, 46vw);
+      height: 44px;
+      padding: 5px 11px;
       transform: none;
-      justify-content: center;
-      color: rgba(148, 163, 184, 0.92);
-      font-size: 11px;
-      font-weight: 850;
-      line-height: 1.05;
-      overflow: hidden;
-      text-overflow: ellipsis;
       white-space: nowrap;
+      overflow: visible;
+      text-overflow: clip;
+      font-size: inherit;
+      font-weight: inherit;
+      line-height: inherit;
       font-variant-numeric: tabular-nums;
+      background: linear-gradient(180deg, rgba(34, 36, 46, 0.98) 0%, rgba(22, 23, 30, 0.96) 100%);
+      border: 1px solid var(--border-hi);
+      color: rgba(148, 163, 184, 0.92);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
 
     .poekhali-live-btn::before {
       content: none !important;
     }
 
-    .poekhali-live-btn.is-recording,
-    .poekhali-live-btn.is-preparing {
-      background: rgba(239, 68, 68, 0.18);
-      border-color: rgba(248, 113, 113, 0.48);
-      color: #f87171;
-      max-width: 52px;
-      min-width: 44px;
-      padding: 0;
-      font-size: 22px;
+    .poekhali-live-dot {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      flex-shrink: 0;
+      font-size: 17px;
       line-height: 1;
-      font-weight: 800;
+      font-weight: 900;
     }
 
-    .poekhali-live-btn.is-paused {
-      background: rgba(245, 158, 11, 0.12);
-      border-color: rgba(245, 158, 11, 0.26);
+    .poekhali-live-dot.is-dot-rec {
+      color: #f87171;
+      text-shadow: 0 0 10px rgba(248, 113, 113, 0.35);
+    }
+
+    .poekhali-live-dot.is-dot-preparing {
+      color: #fb923c;
+      animation: poekhali-live-dot-pulse 1.15s ease-in-out infinite;
+    }
+
+    .poekhali-live-dot.is-dot-pause {
       color: #fbbf24;
-      max-width: 52px;
-      min-width: 44px;
-      padding: 0;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+    }
+
+    .poekhali-live-dot.is-dot-idle {
+      color: rgba(148, 163, 184, 0.42);
       font-size: 14px;
     }
 
+    @keyframes poekhali-live-dot-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.62; transform: scale(0.92); }
+    }
+
+    .poekhali-live-gps {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .poekhali-live-gps-stack {
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0;
+      line-height: 1.15;
+      text-align: left;
+      min-width: 0;
+      flex: 1;
+      flex-wrap: nowrap;
+    }
+
+    .poekhali-live-gps-word {
+      flex-shrink: 0;
+      font-size: 10px;
+      font-weight: 850;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    .poekhali-live-gps-word::after {
+      content: '\00a0·\00a0';
+      opacity: 0.55;
+      letter-spacing: 0;
+      font-weight: 750;
+      font-size: 11px;
+    }
+
+    .poekhali-live-gps-meta {
+      flex: 1;
+      min-width: 0;
+      font-size: 12px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .poekhali-live-gps-stack.is-gps-ok .poekhali-live-gps-word,
+    .poekhali-live-gps-stack.is-gps-ok .poekhali-live-gps-meta {
+      color: #86efac;
+    }
+
+    .poekhali-live-gps-stack.is-gps-warn .poekhali-live-gps-word,
+    .poekhali-live-gps-stack.is-gps-warn .poekhali-live-gps-meta {
+      color: #fcd34d;
+    }
+
+    .poekhali-live-gps-stack.is-gps-muted .poekhali-live-gps-word,
+    .poekhali-live-gps-stack.is-gps-muted .poekhali-live-gps-meta {
+      color: rgba(148, 163, 184, 0.72);
+    }
+
+    .poekhali-live-gps-stack.is-gps-error .poekhali-live-gps-word,
+    .poekhali-live-gps-stack.is-gps-error .poekhali-live-gps-meta {
+      color: #fda4af;
+    }
+
     .poekhali-live-btn.is-blocked {
-      background: rgba(244, 63, 94, 0.12);
-      border-color: rgba(251, 113, 133, 0.24);
-      color: #fb7185;
+      border-color: rgba(251, 113, 133, 0.38);
+      box-shadow:
+        0 8px 28px rgba(0, 0, 0, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 0 0 1px rgba(244, 63, 94, 0.14);
     }
 
-    .poekhali-live-btn.is-error {
-      color: var(--danger);
-      background: var(--color-danger-soft);
-      border-color: var(--color-danger-border);
-    }
-
-    .poekhali-live-btn:active {
+    .poekhali-overlay-btn.poekhali-live-btn:active {
       transform: translateY(1px);
+      background: linear-gradient(180deg, rgba(28, 30, 38, 0.98) 0%, rgba(18, 19, 26, 0.96) 100%);
+      border-color: var(--border-hi);
     }
 
     .poekhali-ops-btn {
@@ -1968,23 +2062,24 @@
       }
 
       .poekhali-live-btn {
-        min-width: 52px;
-        max-width: min(108px, 38vw);
-        height: 40px;
-        padding: 0 8px;
-        font-size: 10px;
+        min-width: 108px;
+        max-width: min(168px, 48vw);
+        height: 42px;
+        padding: 5px 9px;
+        gap: 7px;
       }
 
-      .poekhali-live-btn.is-recording,
-      .poekhali-live-btn.is-preparing {
-        max-width: 44px;
-        min-width: 40px;
-        font-size: 20px;
+      .poekhali-live-dot {
+        width: 20px;
+        font-size: 16px;
       }
 
-      .poekhali-live-btn.is-paused {
-        max-width: 44px;
-        min-width: 40px;
+      .poekhali-live-gps-word {
+        font-size: 9.5px;
+      }
+
+      .poekhali-live-gps-meta {
+        font-size: 11px;
       }
 
       .poekhali-ops-btn {
@@ -2070,22 +2165,28 @@
       }
 
       .poekhali-live-btn {
-        min-width: 50px;
-        max-width: min(100px, 40vw);
-        padding: 0 6px;
+        min-width: 102px;
+        max-width: min(158px, 50vw);
+        height: 40px;
+        padding: 4px 8px;
+        gap: 6px;
+      }
+
+      .poekhali-live-dot {
+        width: 18px;
+        font-size: 15px;
+      }
+
+      .poekhali-live-dot.is-dot-pause {
         font-size: 10px;
       }
 
-      .poekhali-live-btn.is-recording,
-      .poekhali-live-btn.is-preparing {
-        max-width: 42px;
-        min-width: 38px;
-        font-size: 18px;
+      .poekhali-live-gps-word {
+        font-size: 8.5px;
       }
 
-      .poekhali-live-btn.is-paused {
-        max-width: 42px;
-        min-width: 38px;
+      .poekhali-live-gps-meta {
+        font-size: 11px;
       }
 
       .poekhali-ops-btn {

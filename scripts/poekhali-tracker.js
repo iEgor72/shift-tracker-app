@@ -315,7 +315,8 @@
     timerElapsedMs: 0,
     speedMps: 0,
     accuracy: 0,
-    satellites: '—',
+    gpsFixState: 'none',
+    gpsSatellitesCount: null,
     lastUpdatedAt: 0,
     poekhaliMskClockDisplay: ''
   };
@@ -365,24 +366,25 @@
     if (el) el.textContent = text;
   }
 
-  function getGpsStatusDisplayText(text) {
-    var value = text || 'GPS';
-    var width = typeof window !== 'undefined' ? window.innerWidth : 0;
-    var narrow = width <= 420;
-    if (narrow && value === 'НЕТ GPS') return 'Нет';
-    if (narrow && value === 'МАРШРУТ') return 'Маршр.';
-    if (narrow && value.indexOf('GPS · УЧ ') === 0) {
-      var tail = value.slice('GPS · УЧ '.length).trim();
-      return tail.length > 10 ? 'УЧ…' : 'УЧ ' + tail;
+  function extractSatelliteCount(coords) {
+    if (!coords) return null;
+    var keys = ['satellites', 'satelliteCount', 'satellitesUsed', 'satellite'];
+    for (var i = 0; i < keys.length; i++) {
+      var v = coords[keys[i]];
+      if (typeof v === 'number' && isFinite(v)) return Math.max(0, Math.floor(v));
     }
-    if (narrow && value.indexOf('ВНЕ · УЧ ') === 0) return 'Вне';
-    if (narrow && value.indexOf('ВНЕ') === 0 && value.length <= 12) return value;
-    if (narrow && value.length > 14) return value.slice(0, 12).trim() + '…';
-    if (width <= 640 && value === 'НЕТ GPS') return 'GPS';
-    if (width <= 640 && value === 'МАРШРУТ') return 'GPS';
-    if (width <= 640 && value.indexOf('GPS · УЧ ') === 0) return 'GPS';
-    if (width <= 640 && value.indexOf('ВНЕ · УЧ ') === 0) return 'ВНЕ';
-    return value;
+    try {
+      if (typeof coords.toJSON === 'function') {
+        var j = coords.toJSON();
+        if (j) {
+          for (var k = 0; k < keys.length; k++) {
+            var w = j[keys[k]];
+            if (typeof w === 'number' && isFinite(w)) return Math.max(0, Math.floor(w));
+          }
+        }
+      }
+    } catch (err) {}
+    return null;
   }
 
   function syncGpsStatusDisplay() {
@@ -394,10 +396,6 @@
     if (!el) return;
     var value = text || 'GPS';
     el.dataset.fullText = value;
-    el.classList.remove('is-live', 'is-error');
-    if (!(tracker.timerRunning || tracker.runStartPreparing)) {
-      if (tone === 'is-error') el.classList.add('is-error');
-    }
     syncPoekhaliLiveButton();
     maybeEnqueueGpsConnectionToast(value, tone);
   }
@@ -11888,6 +11886,8 @@
     tracker.speedMps = Number(position.coords.speed) || 0;
     tracker.accuracy = Number(position.coords.accuracy) || 0;
     tracker.lastUpdatedAt = position.timestamp || Date.now();
+    tracker.gpsFixState = 'ok';
+    tracker.gpsSatellitesCount = extractSatelliteCount(position.coords);
     tracker.gpsError = '';
     tracker.runStartMessage = '';
     setGpsStatus('GPS', 'is-live');
@@ -11907,16 +11907,20 @@
   }
 
   function handleGpsError(error) {
+    tracker.gpsSatellitesCount = null;
     var code = error && error.code;
     if (code === 1) {
+      tracker.gpsFixState = 'denied';
       tracker.gpsError = 'Нет доступа к геолокации';
       tracker.status = 'gps-denied';
       setGpsStatus('НЕТ GPS', 'is-error');
     } else if (code === 3) {
+      tracker.gpsFixState = 'timeout';
       tracker.gpsError = 'GPS не дал точку';
       tracker.status = 'gps-timeout';
       setGpsStatus('GPS', 'is-error');
     } else {
+      tracker.gpsFixState = 'unavailable';
       tracker.gpsError = 'GPS недоступен';
       tracker.status = 'gps-error';
       setGpsStatus('GPS', 'is-error');
@@ -11981,6 +11985,8 @@
       return;
     }
     if (!navigator.geolocation) {
+      tracker.gpsFixState = 'unsupported';
+      tracker.gpsSatellitesCount = null;
       tracker.gpsError = 'GPS недоступен в браузере';
       tracker.status = 'gps-unsupported';
       setGpsStatus('НЕТ GPS', 'is-error');
@@ -12016,6 +12022,8 @@
   function startWatchingGps() {
     if (!shouldKeepGpsWatching()) return;
     if (!navigator.geolocation) {
+      tracker.gpsFixState = 'unsupported';
+      tracker.gpsSatellitesCount = null;
       tracker.gpsError = 'GPS недоступен в браузере';
       tracker.status = 'gps-unsupported';
       setGpsStatus('НЕТ GPS', 'is-error');
@@ -12355,9 +12363,63 @@
     el.classList.toggle('is-live', tracker.directionSource === 'gps');
   }
 
+  function ensurePoekhaliLiveHud(btn) {
+    if (!btn || btn.querySelector('.poekhali-live-dot')) return;
+    btn.innerHTML =
+      '<span class="poekhali-live-dot" aria-hidden="true">●</span>' +
+      '<span class="poekhali-live-gps">' +
+      '<span class="poekhali-live-gps-stack">' +
+      '<span class="poekhali-live-gps-word">GPS</span>' +
+      '<span class="poekhali-live-gps-meta">—</span>' +
+      '</span></span>';
+  }
+
+  function getPoekhaliGpsMetaLine() {
+    var fs = tracker.gpsFixState;
+    if (fs === 'denied') return 'нет доступа';
+    if (fs === 'unsupported') return 'нет API';
+    if (fs === 'timeout') return 'таймаут';
+    if (fs === 'unavailable') return 'нет связи';
+    var watching = !!(tracker.timerRunning || tracker.runStartPreparing);
+    if (watching && !tracker.lastLocation && (tracker.status === 'waiting' || tracker.status === 'loading')) {
+      return 'поиск…';
+    }
+    if (!tracker.lastLocation && tracker.passiveGpsInFlight) return 'поиск…';
+    var n = tracker.gpsSatellitesCount;
+    if (n != null && isFinite(n)) return String(Math.max(0, Math.floor(n)));
+    if (tracker.lastLocation && fs === 'ok') return '—';
+    return '—';
+  }
+
+  function getPoekhaliGpsStackToneClass() {
+    var fs = tracker.gpsFixState;
+    if (fs === 'denied' || fs === 'unsupported' || fs === 'timeout' || fs === 'unavailable') return 'is-gps-error';
+    if (fs !== 'ok') return 'is-gps-muted';
+
+    var btn = byId('btnPoekhaliLive');
+    var full = btn && btn.dataset && btn.dataset.fullText ? String(btn.dataset.fullText) : '';
+
+    if (full.indexOf('ВНЕ') === 0) return 'is-gps-warn';
+    if (full === 'МАРШРУТ' || full === 'КАРТА' || full.indexOf('ПОИСК') === 0) return 'is-gps-muted';
+
+    if (!tracker.lastLocation) return 'is-gps-muted';
+
+    var acc = tracker.accuracy;
+    var n = tracker.gpsSatellitesCount;
+    if (n != null && isFinite(n) && n <= 3) return 'is-gps-warn';
+    if (isFinite(acc) && acc > 75) return 'is-gps-warn';
+    return 'is-gps-ok';
+  }
+
   function syncPoekhaliLiveButton() {
     var el = byId('btnPoekhaliLive');
     if (!el) return;
+    ensurePoekhaliLiveHud(el);
+    var dot = el.querySelector('.poekhali-live-dot');
+    var stack = el.querySelector('.poekhali-live-gps-stack');
+    var metaEl = el.querySelector('.poekhali-live-gps-meta');
+    if (!dot || !stack || !metaEl) return;
+
     var activeRun = getActiveRun();
     var details = getPoekhaliTrainDetails();
     delete el.dataset.controlLabel;
@@ -12367,13 +12429,25 @@
     el.classList.toggle('is-paused', !tracker.timerRunning && !!activeRun);
     el.classList.toggle('is-blocked', !tracker.timerRunning && (!details || !details.hasShift || tracker.status === 'run-blocked'));
 
-    if (tracker.timerRunning || tracker.runStartPreparing) {
-      el.textContent = '●';
+    dot.classList.remove('is-dot-rec', 'is-dot-preparing', 'is-dot-pause', 'is-dot-idle');
+    if (tracker.timerRunning) {
+      dot.textContent = '●';
+      dot.classList.add('is-dot-rec');
+    } else if (tracker.runStartPreparing) {
+      dot.textContent = '●';
+      dot.classList.add('is-dot-preparing');
     } else if (activeRun) {
-      el.textContent = 'II';
+      dot.textContent = 'II';
+      dot.classList.add('is-dot-pause');
     } else {
-      el.textContent = getGpsStatusDisplayText(el.dataset.fullText || el.textContent || 'GPS');
+      dot.textContent = '●';
+      dot.classList.add('is-dot-idle');
     }
+
+    stack.classList.remove('is-gps-ok', 'is-gps-warn', 'is-gps-muted', 'is-gps-error');
+    stack.classList.add(getPoekhaliGpsStackToneClass());
+
+    metaEl.textContent = getPoekhaliGpsMetaLine();
 
     var title = tracker.runStartPreparing
       ? 'Запуск записи и GPS: готовлю карту и смену. Нажмите — отменить подготовку'
@@ -12388,9 +12462,12 @@
               : tracker.status === 'run-blocked'
                 ? (tracker.runStartMessage || 'Проверьте смену, маршрут и GPS')
                 : 'Нажмите — включить GPS и запись поездки';
+    title +=
+      ' Точка: красная — запись; янтарная — подготовка; жёлтый «II» — пауза; серая — запись выключена.' +
+      ' Справа одной строкой «GPS · …»: цветом показано качество приёма (зелёный / жёлтый / красный / серый); после точки число спутников или короткий статус («—», если браузер число не сообщает).';
     var gpsHint = String(el.dataset.fullText || '').trim();
     if (gpsHint && !tracker.timerRunning && !tracker.runStartPreparing) {
-      title = title + ' · ' + gpsHint;
+      title = title + ' Карта/маршрут: ' + gpsHint + '.';
     }
     el.title = title;
     el.setAttribute('aria-label', title);
@@ -16983,6 +17060,8 @@
     tracker.active = false;
     resetPoekhaliLiveAlert();
     stopWatchingGps();
+    tracker.gpsFixState = 'none';
+    tracker.gpsSatellitesCount = null;
     stopDrawLoop();
     syncPoekhaliLiveButton();
   }
