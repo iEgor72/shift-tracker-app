@@ -12167,7 +12167,7 @@
 
   /** Vertical space reserved below live summary top (must cover max drawApkLiveSummary height + route rail). */
   function getPoekhaliLiveSummaryReservedHeight() {
-    return 142;
+    return 118;
   }
 
   function getPoekhaliTopStackBottom() {
@@ -14782,15 +14782,43 @@
     return 'info';
   }
 
-  function getLiveNavigationTargetDistanceLabel(target) {
-    if (!target) return 'ДО ЦЕЛИ';
-    if (target.kind === 'signal') return 'ДО СВ';
-    if (target.kind === 'station') return 'ДО СТ';
-    if (target.kind === 'warning') return 'ДО ПР';
-    if (target.kind === 'restriction' || target.kind === 'restriction_end') return 'ДО ОГР';
-    if (target.kind === 'route_start') return 'ДО СТАРТА';
-    if (target.kind === 'route_finish') return 'ДО ФИНИША';
-    return 'ДО ЦЕЛИ';
+  /** Compact chip caption: what the distance number refers to (not "до Х"). */
+  function getNavigationHudReachChipCaption(navTarget, nextRestriction, nextWarning, nextSignal, isPreview) {
+    if (navTarget) {
+      switch (navTarget.kind) {
+        case 'signal':
+          return 'СВЕТОФОР';
+        case 'station':
+          return 'СТАНЦИЯ';
+        case 'restriction':
+          return 'СКОРОСТЬ';
+        case 'warning':
+          return 'ПРЕДУПР.';
+        case 'restriction_end':
+          return 'ЗОНА';
+        case 'route_start':
+        case 'route_finish':
+          return 'МАРШРУТ';
+        default:
+          return 'ЦЕЛЬ';
+      }
+    }
+    if (nextRestriction) return 'СКОРОСТЬ';
+    if (nextWarning) return 'ПРЕДУПР.';
+    if (nextSignal) return 'СВЕТОФОР';
+    if (isPreview) return 'GPS';
+    return 'ЦЕЛЬ';
+  }
+
+  /** Single headline line: «Светофор Н2 через 697 м» without extra координаты/пояса. */
+  function formatLiveHudHeadline(navTarget, fallbackTitle) {
+    var fb = String(fallbackTitle || '').trim();
+    if (!navTarget) return fb || '—';
+    var dist = Math.max(0, Math.round(Number(navTarget.distanceMeters) || 0));
+    var head = String(formatLiveNavigationTargetTitle(navTarget) || '').trim();
+    if (!head) return fb || '—';
+    if (dist > 0) return head + ' через ' + formatDistanceLabel(dist);
+    return head + ' · сейчас';
   }
 
   function formatLiveNavigationTargetTitle(target) {
@@ -14811,37 +14839,6 @@
     return label;
   }
 
-  function splitLiveHudSubtitle(subtitle) {
-    var s = String(subtitle || '').trim();
-    if (!s) return { line1: '', line2: '' };
-    var parts = s.split(/\s*·\s*/).map(function(part) {
-      return part.trim();
-    }).filter(Boolean);
-    if (parts.length <= 2) return { line1: s, line2: '' };
-    if (parts.length === 3) {
-      return { line1: parts[0] + ' · ' + parts[1], line2: parts[2] };
-    }
-    var mid = Math.ceil(parts.length / 2);
-    return {
-      line1: parts.slice(0, mid).join(' · '),
-      line2: parts.slice(mid).join(' · ')
-    };
-  }
-
-  function formatLiveNavigationTargetSubtitle(target, locationTitle) {
-    if (!target) return '';
-    var distance = Math.max(0, Math.round(Number(target.distanceMeters) || 0));
-    var coordinate = Number(target.coordinate);
-    var eta = formatEtaSeconds(target.etaSeconds, true);
-    var parts = [];
-    parts.push(distance > 0 ? 'через ' + formatDistanceLabel(distance) : 'сейчас');
-    if (eta) parts.push(eta);
-    if (isFinite(coordinate) && coordinate > 0) parts.push(formatLineCoordinate(coordinate));
-    var location = String(locationTitle || '').trim();
-    if (location && location !== target.label) parts.push(location);
-    return parts.join(' · ');
-  }
-
   function drawApkLiveSummary(ctx, layout, center, sector, visibleObjects, activeSpeed, nextSignal, nextStation, nextWarning, nextRestriction, routeProgress, isPreview, projection) {
     var w = layout.canvasWidth || layout.viewportRight;
     var x = getPanelInset(w);
@@ -14853,44 +14850,23 @@
     var hasProfile = hasProfileForSector(sector);
     var rawDraft = getRawDraftForSector(sector);
     var userSection = getUserSectionForSector(sector);
-    var blockLabel = isPreview ? 'ОРИЕНТИР' : 'МЕСТО';
     var title = rawDraft ? rawDraft.title : userSection ? userSection.title : (station && station.name ? station.name : 'Участок ' + sector);
-    var details = getPoekhaliTrainDetails();
-    var subtitle = isPreview
-      ? (rawDraft ? ('сырой GPS · ' + formatDistanceLabel(rawDraft.lengthMeters) + ' · ' + formatLineCoordinate(center)) : userSection ? ('GPS участок · ' + formatLineCoordinate(center)) : (((tracker.currentMap && tracker.currentMap.title) || 'Карта ЭК') + ' · ' + formatLineCoordinate(center)))
-      : (rawDraft ? ('сырой GPS · ' + formatDistanceLabel(rawDraft.lengthMeters) + ' · ' + formatLineCoordinate(center)) : userSection ? ('GPS участок · ' + formatLineCoordinate(center)) : (details.summary || (((tracker.currentMap && tracker.currentMap.title) || 'Карта ЭК') + ' · ' + formatLineCoordinate(center))));
-    if (hasRouteProgress) {
-      subtitle = formatRouteProgressLiveSubtitle(routeProgress, subtitle);
-    }
-    var locationTitle = title;
-    var chip1Label = 'ЛИМИТ';
-    var chip1Text = activeSpeed ? formatSpeedLabel(activeSpeed) : 'НЕТ';
-    var chip1Tone = activeSpeed && activeSpeed.source === 'warning'
-      ? 'danger'
-      : activeSpeed && activeSpeed.source === 'document' && activeSpeed.conflict
-        ? 'warning'
-      : activeSpeed && activeSpeed.source === 'document'
-        ? 'success'
-      : activeSpeed && activeSpeed.source === 'regime'
-        ? 'warning'
-      : activeSpeed && activeSpeed.source === 'user'
-        ? 'success'
-        : (activeSpeed ? 'info' : 'info');
     var regimeProfile = profilePoint && profilePoint.regime || (!hasProfile && hasRegimeProfileForSector(sector));
-    var chip2Label = rawDraft ? 'GPS' : userSection ? 'GPS' : (profilePoint && profilePoint.regime ? 'РК' : (hasProfile ? 'УКЛОН' : (regimeProfile ? 'РК' : 'ПРОФ')));
-    var chip2Text = (rawDraft || userSection) && profilePoint && profilePoint.altitudeMissing ? 'ЛИН.' : (hasProfile && profilePoint ? formatProfileGradeLabel(profilePoint) : (hasProfile ? '—' : (regimeProfile ? 'ЕСТЬ' : 'НЕТ')));
-    var chip2Tone = rawDraft ? 'warning' : userSection ? 'success' : (profilePoint && profilePoint.regime ? 'warning' : (hasProfile ? (profilePoint && profilePoint.grade >= 0 ? 'success' : 'info') : (regimeProfile ? 'warning' : 'danger')));
+    var slopeLabel = rawDraft ? 'GPS' : userSection ? 'GPS' : (profilePoint && profilePoint.regime ? 'РК' : (hasProfile ? 'УКЛОН' : (regimeProfile ? 'РК' : 'ПРОФ')));
+    var slopeText = (rawDraft || userSection) && profilePoint && profilePoint.altitudeMissing ? 'ЛИН.' : (hasProfile && profilePoint ? formatProfileGradeLabel(profilePoint) : (hasProfile ? '—' : (regimeProfile ? 'ЕСТЬ' : 'НЕТ')));
+    var slopeTone = rawDraft ? 'warning' : userSection ? 'success' : (profilePoint && profilePoint.regime ? 'warning' : (hasProfile ? (profilePoint && profilePoint.grade >= 0 ? 'success' : 'info') : (regimeProfile ? 'warning' : 'danger')));
     var navTarget = resolveLiveNavigationTarget(projection, activeSpeed, nextWarning, nextRestriction, nextSignal, nextStation, routeProgress);
     if (navTarget) {
-      blockLabel = Math.max(0, Math.round(Number(navTarget.distanceMeters) || 0)) > 0
-        ? 'СЛЕДУЮЩИЙ'
-        : 'СЕЙЧАС';
       title = formatLiveNavigationTargetTitle(navTarget) || title;
-      subtitle = formatLiveNavigationTargetSubtitle(navTarget, locationTitle) || subtitle;
     }
-    var chip3Label = navTarget ? (Math.max(0, Math.round(Number(navTarget.distanceMeters) || 0)) > 0 ? getLiveNavigationTargetDistanceLabel(navTarget) : 'СЕЙЧАС') : (nextRestriction ? 'ДО ОГР' : (nextWarning ? 'ДО ПР' : (isPreview ? 'GPS' : (nextSignal ? 'ДО СВ' : 'ЦЕЛЬ'))));
-    var chip3Text = navTarget
-        ? formatLiveNavigationTargetDistance(navTarget)
+    var headline = formatLiveHudHeadline(navTarget, title);
+    if (!navTarget && hasRouteProgress) {
+      headline = formatRouteProgressLiveSubtitle(routeProgress, headline);
+    }
+
+    var reachCaption = getNavigationHudReachChipCaption(navTarget, nextRestriction, nextWarning, nextSignal, isPreview);
+    var reachText = navTarget
+      ? formatLiveNavigationTargetDistance(navTarget)
       : nextRestriction
         ? formatDistanceLabel(nextRestriction.distance)
       : nextWarning
@@ -14898,8 +14874,8 @@
       : isPreview
         ? (tracker.status === 'offtrack' ? 'ВНЕ' : 'НЕТ')
       : (nextSignal ? formatDistanceLabel(Math.abs(nextSignal.coordinate - center)) : '—');
-    var chip3Tone = navTarget
-        ? getLiveNavigationTargetTone(navTarget, isPreview)
+    var reachTone = navTarget
+      ? getLiveNavigationTargetTone(navTarget, isPreview)
       : nextRestriction
         ? (nextRestriction.source === 'warning' && nextRestriction.distance <= 400 ? 'danger' : nextRestriction.distance <= 1500 ? 'warning' : nextRestriction.source === 'document' && nextRestriction.conflict ? 'warning' : 'info')
       : nextWarning
@@ -14911,46 +14887,37 @@
     var liveAlert = isPreview ? null : getCurrentPoekhaliLiveAlert();
     var panelFill = 'rgba(26, 26, 34, 0.82)';
     var panelStroke = 'rgba(56, 189, 248, 0.18)';
-    var labelColor = 'rgba(136, 146, 164, 0.92)';
-    var titleColor = THEME.text;
-    var subtitleColor = 'rgba(154, 164, 182, 0.88)';
+    var headlineColor = THEME.text;
     var insetText = 16;
     if (liveAlert) {
       var dangerAlert = liveAlert.level === 'danger';
-      blockLabel = dangerAlert ? 'КОНТРОЛЬ' : 'ВНИМАНИЕ';
-      title = liveAlert.title || title;
-      subtitle = liveAlert.text || subtitle;
+      var alertParts = [];
+      if (liveAlert.title) alertParts.push(liveAlert.title);
+      if (liveAlert.text) alertParts.push(liveAlert.text);
+      headline = alertParts.length ? alertParts.join(' · ') : headline;
       panelFill = dangerAlert ? 'rgba(45, 14, 26, 0.88)' : 'rgba(42, 34, 11, 0.84)';
       panelStroke = dangerAlert ? 'rgba(244, 63, 94, 0.34)' : 'rgba(250, 204, 21, 0.30)';
-      labelColor = dangerAlert ? 'rgba(251, 113, 133, 0.86)' : 'rgba(250, 204, 21, 0.82)';
-      titleColor = dangerAlert ? '#fecdd3' : '#fef3c7';
-      subtitleColor = dangerAlert ? 'rgba(254, 205, 211, 0.84)' : 'rgba(254, 243, 199, 0.82)';
+      headlineColor = dangerAlert ? '#fecdd3' : '#fef3c7';
       insetText = 20;
     }
 
-    var subtitleSplit = splitLiveHudSubtitle(subtitle);
-    var hasSub2 = !!subtitleSplit.line2;
     var padTop = 12;
     var padBottom = hasRouteProgress ? 10 : 12;
     var textFullW = Math.max(72, width - insetText * 2);
-    var titleSize = liveAlert && w < 360 ? 12 : (navTarget ? (w < 360 ? 14 : 16) : 13);
-    var subSize = navTarget ? 10 : 9;
+    var headlineSize = liveAlert && w < 360 ? 13 : (w < 360 ? 15 : 17);
     var textX = x + insetText;
 
-    var labelBaseline = y + padTop + 9;
-    var titleBaseline = y + padTop + 26;
-    var sub1Baseline = y + padTop + 42;
-    var sub2Baseline = y + padTop + 56;
-    var chipTop = y + padTop + (hasSub2 ? 68 : 52);
+    var headlineBaseline = y + padTop + 22;
+    var chipTop = y + padTop + 42;
     var chipH = w < 360 ? 34 : 36;
     var chipGap = w < 380 ? 5 : 6;
     var chipsInner = width - insetText * 2;
-    var chipW = (chipsInner - chipGap * 3) / 4;
-    if (chipW < 42 && chipGap > 4) {
+    var chipW = (chipsInner - chipGap * 2) / 3;
+    if (chipW < 44 && chipGap > 4) {
       chipGap = 4;
-      chipW = (chipsInner - chipGap * 3) / 4;
+      chipW = (chipsInner - chipGap * 2) / 3;
     }
-    chipW = Math.max(38, chipW);
+    chipW = Math.max(40, chipW);
 
     var railY = chipTop + chipH + 6;
     var chipsBottom = chipTop + chipH;
@@ -14963,38 +14930,18 @@
     if (liveAlert) {
       fillRoundRect(ctx, x + 9, y + 10, 4, panelHeight - 20, 4, liveAlert.level === 'danger' ? THEME.danger : '#facc15');
     }
-    drawText(ctx, blockLabel, textX, labelBaseline, {
-      size: 8,
+    drawText(ctx, headline, textX, headlineBaseline, {
+      size: headlineSize,
       weight: 850,
-      color: labelColor
-    });
-    drawText(ctx, title, textX, titleBaseline, {
-      size: titleSize,
-      weight: 850,
-      color: titleColor,
+      color: headlineColor,
       maxWidth: textFullW
     });
-    drawText(ctx, subtitleSplit.line1 || subtitle, textX, sub1Baseline, {
-      size: subSize,
-      weight: 720,
-      color: subtitleColor,
-      maxWidth: textFullW
-    });
-    if (subtitleSplit.line2) {
-      drawText(ctx, subtitleSplit.line2, textX, sub2Baseline, {
-        size: subSize,
-        weight: 720,
-        color: subtitleColor,
-        maxWidth: textFullW
-      });
-    }
 
     var chipX0 = x + insetText;
     var mskStr = tracker.poekhaliMskClockDisplay || formatTime(new Date());
-    drawLiveChip(ctx, chipX0, chipTop, chipW, 'МСК', mskStr, 'info', chipH);
-    drawLiveChip(ctx, chipX0 + chipW + chipGap, chipTop, chipW, chip1Label, chip1Text, chip1Tone, chipH);
-    drawLiveChip(ctx, chipX0 + (chipW + chipGap) * 2, chipTop, chipW, chip2Label, chip2Text, chip2Tone, chipH);
-    drawLiveChip(ctx, chipX0 + (chipW + chipGap) * 3, chipTop, chipW, chip3Label, chip3Text, chip3Tone, chipH);
+    drawLiveChip(ctx, chipX0, chipTop, chipW, slopeLabel, slopeText, slopeTone, chipH);
+    drawLiveChip(ctx, chipX0 + chipW + chipGap, chipTop, chipW, 'МСК', mskStr, 'info', chipH);
+    drawLiveChip(ctx, chipX0 + (chipW + chipGap) * 2, chipTop, chipW, reachCaption, reachText, reachTone, chipH);
 
     if (hasRouteProgress) {
       drawLiveRouteProgressRail(ctx, x, railY, width, routeProgress, isPreview);
