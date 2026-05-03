@@ -1,8 +1,8 @@
-const CACHE_VERSION = 'v226';
+const CACHE_VERSION = 'v227';
 const CACHE_NAME = `shift-tracker-shell-${CACHE_VERSION}`;
 const NAVIGATION_FALLBACK_URL = '/index.html';
-const NETWORK_TIMEOUT_MS = 1200;
-const ASSET_NETWORK_TIMEOUT_MS = 1200;
+const NETWORK_TIMEOUT_MS = 4500;
+const ASSET_NETWORK_TIMEOUT_MS = 8000;
 const DOCS_ASSET_NETWORK_TIMEOUT_MS = 8000;
 const APP_SHELL_PATHS = new Set(['/', '/index.html']);
 const SEO_PAGE_PATHS = new Set([
@@ -428,6 +428,9 @@ async function networkFirstDocument(request) {
     }
   }
 
+  const lateDocument = await networkPromise;
+  if (lateDocument && lateDocument.ok) return lateDocument;
+
   console.warn('[SW] Navigation fallback page served (no cache, no network).');
   return createOfflineDocumentFallback();
 }
@@ -472,6 +475,9 @@ async function staleWhileRevalidate(request, event) {
     });
   }
 
+  const lateSwr = await networkPromise;
+  if (lateSwr && lateSwr.ok) return lateSwr;
+
   throw new Error('Asset unavailable');
 }
 
@@ -501,6 +507,9 @@ async function networkFirstStatic(request) {
       }
     });
   }
+
+  const lateStatic = await networkPromise;
+  if (lateStatic && lateStatic.ok) return lateStatic;
 
   throw new Error('Static asset unavailable');
 }
