@@ -702,33 +702,28 @@
       var payload = getOfflineBannerPayload();
       if (!payload) {
         offlineBannerDismissedKey = '';
+        lastOfflineToastKey = '';
         hideOfflineBanner(false);
         return;
       }
-      if (offlineBannerDismissedKey && offlineBannerDismissedKey === payload.key) {
-        hideOfflineBanner(false);
-        return;
-      }
-
       titleEl.textContent = payload.title;
       textEl.textContent = payload.text;
       syncEl.textContent = payload.statusText;
       syncEl.hidden = !payload.statusText || payload.statusText === payload.title;
-      bannerEl.classList.remove('is-danger', 'is-info');
-      bannerEl.classList.add(payload.tone === 'danger' ? 'is-danger' : 'is-info');
-      bannerEl.classList.remove('hidden');
-      bannerEl.setAttribute('aria-hidden', 'false');
-      if (offlineBannerVisibleKey !== payload.key) {
-        offlineBannerDismissedKey = '';
+
+      hideOfflineBanner(false);
+
+      if (payload.key !== lastOfflineToastKey) {
+        lastOfflineToastKey = payload.key;
+        var brief = payload.title;
+        if (payload.key === 'syncing') brief = 'Синхронизация…';
+        else if (payload.key === 'offline') brief = 'Нет сети';
+        else if (payload.key === 'offline-pending') brief = 'Оффлайн · есть очередь';
+        else if (String(payload.key || '').indexOf('error') === 0) brief = 'Не удалось синхронизировать';
+        else if (payload.key === 'pending') brief = 'Ждёт отправки на сервер';
+        var toastTone = payload.tone === 'danger' ? 'danger' : 'info';
+        enqueueAppToast(brief, toastTone, Math.min(payload.autoHideMs || 2400, 3200));
       }
-      offlineBannerVisibleKey = payload.key;
-      window.requestAnimationFrame(function() {
-        bannerEl.classList.add('is-visible');
-      });
-      clearOfflineBannerHideTimer();
-      offlineBannerHideTimer = setTimeout(function() {
-        hideOfflineBanner(true);
-      }, payload.autoHideMs || 5000);
     }
 
     function flushPendingSnapshot(source, callback, shouldRender) {
@@ -1918,6 +1913,10 @@
     }
     // ── Documentation & PDF Viewer — see scripts/docs-app.js ──
     var saveToastHideTimer = null;
+    var saveToastDoneTimer = null;
+    var appToastQueue = [];
+    var appToastBusy = false;
+    var lastOfflineToastKey = '';
     var ACTION_TOAST_CONFIG = {
       added: { text: 'Добавлено', tone: 'success' },
       saved: { text: 'Сохранено', tone: 'info' },
@@ -1938,7 +1937,33 @@
       return '✓';
     }
 
-    function showSaveToast(text, tone) {
+    function tryPumpAppToastQueue() {
+      if (appToastBusy) return;
+      if (!appToastQueue.length) return;
+      appToastBusy = true;
+      var item = appToastQueue.shift();
+      showSaveToastImmediate(item.text, item.tone, item.duration, function() {
+        appToastBusy = false;
+        tryPumpAppToastQueue();
+      });
+    }
+
+    function enqueueAppToast(text, tone, durationMs) {
+      var normalizedTone = normalizeToastTone(tone);
+      var dur = durationMs;
+      if (!isFinite(dur) || dur <= 0) dur = 1800;
+      dur = Math.max(900, Math.min(dur, 6200));
+      var brief = String(text || '').trim();
+      if (brief.length > 96) brief = brief.slice(0, 93) + '…';
+      appToastQueue.push({ text: brief || 'Готово', tone: normalizedTone, duration: dur });
+      tryPumpAppToastQueue();
+    }
+
+    if (typeof window !== 'undefined') {
+      window.enqueueAppToast = enqueueAppToast;
+    }
+
+    function showSaveToastImmediate(text, tone, durationMs, onDone) {
       var normalizedTone = normalizeToastTone(tone);
       var toast = document.getElementById('saveToast');
       if (!toast) {
@@ -1965,6 +1990,11 @@
       toast.classList.remove('is-visible');
       if (saveToastHideTimer) {
         clearTimeout(saveToastHideTimer);
+        saveToastHideTimer = null;
+      }
+      if (saveToastDoneTimer) {
+        clearTimeout(saveToastDoneTimer);
+        saveToastDoneTimer = null;
       }
 
       requestAnimationFrame(function() {
@@ -1973,9 +2003,19 @@
         });
       });
 
+      var hideAfter = Math.max(600, durationMs || 1800);
       saveToastHideTimer = setTimeout(function() {
+        saveToastHideTimer = null;
         toast.classList.remove('is-visible');
-      }, 1800);
+        saveToastDoneTimer = setTimeout(function() {
+          saveToastDoneTimer = null;
+          if (typeof onDone === 'function') onDone();
+        }, 260);
+      }, hideAfter);
+    }
+
+    function showSaveToast(text, tone) {
+      enqueueAppToast(text, tone, 1800);
     }
 
     function showActionToast(actionKey) {

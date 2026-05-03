@@ -626,6 +626,38 @@
       padding: 0;
     }
 
+    .poekhali-msk-clock {
+      position: absolute;
+      z-index: 2;
+      left: calc(max(10px, var(--safe-left)) + 44px + 10px);
+      top: max(10px, var(--safe-top));
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 1px;
+      min-height: 42px;
+      max-width: min(200px, calc(100vw - max(10px, var(--safe-left)) - max(10px, var(--safe-right)) - 190px));
+      pointer-events: none;
+    }
+
+    .poekhali-msk-clock-label {
+      font-size: 7.5px;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      color: var(--sub);
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    .poekhali-msk-clock-time {
+      font-size: 14px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+      line-height: 1.1;
+    }
+
     .poekhali-k-btn {
       top: max(10px, var(--safe-top));
       left: calc(max(10px, var(--safe-left)) + 52px);
@@ -1914,6 +1946,17 @@
         height: 40px;
       }
 
+      .poekhali-msk-clock {
+        left: calc(max(8px, var(--safe-left)) + 36px + 8px);
+        top: max(8px, var(--safe-top));
+        min-height: 40px;
+        max-width: min(188px, calc(100vw - max(8px, var(--safe-left)) - max(8px, var(--safe-right)) - 178px));
+      }
+
+      .poekhali-msk-clock-time {
+        font-size: 13px;
+      }
+
       .poekhali-k-btn {
         display: none;
       }
@@ -2004,6 +2047,21 @@
         left: max(8px, var(--safe-left));
         width: 36px;
         height: 40px;
+      }
+
+      .poekhali-msk-clock {
+        left: calc(max(8px, var(--safe-left)) + 36px + 6px);
+        top: max(8px, var(--safe-top));
+        min-height: 40px;
+        max-width: min(168px, calc(100vw - max(8px, var(--safe-left)) - max(8px, var(--safe-right)) - 168px));
+      }
+
+      .poekhali-msk-clock-label {
+        font-size: 7px;
+      }
+
+      .poekhali-msk-clock-time {
+        font-size: 12px;
       }
 
       .poekhali-k-btn {

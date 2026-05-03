@@ -2337,11 +2337,13 @@
       color: var(--toast-color);
       font-size: 13px;
       font-weight: 700;
-      line-height: 1;
+      line-height: 1.25;
       letter-spacing: 0.01em;
       opacity: 0;
       pointer-events: none;
-      white-space: nowrap;
+      white-space: normal;
+      max-width: min(94vw, 360px);
+      text-align: center;
       box-shadow: 0 8px 26px rgba(0, 0, 0, 0.38);
       transition: opacity 0.22s ease, transform 0.22s ease;
       z-index: calc(var(--layer-overlay) + 3);

@@ -130,8 +130,6 @@
   var LIVE_ALERT_AHEAD_M = 1000;
   var LIVE_ALERT_NEAR_M = 300;
   var LIVE_ALERT_VISIBLE_MS = 9000;
-  /** Canvas HUD height under top overlay buttons (MSK clock only). */
-  var POEKHALI_TOP_HUD_HEIGHT_PX = 46;
   var LIVE_ALERT_REPEAT_MS = 30000;
   var LIVE_ALERT_DANGER_REPEAT_MS = 12000;
   var PROD_AUDIT_MANUAL_CHECKS = [
@@ -321,6 +319,42 @@
     lastUpdatedAt: 0
   };
 
+  var gpsConnectionToastState = {
+    suppressUntil: 0,
+    hadErrorUi: false
+  };
+
+  function mapGpsStatusToBriefError(fullText) {
+    var v = String(fullText || '').trim();
+    if (v === 'НЕТ GPS') return 'Нет сигнала GPS';
+    if (v.indexOf('ВНЕ') === 0) return 'Точка вне карты';
+    if (v === 'МАРШРУТ') return 'Нужен маршрут или GPS';
+    if (v === 'КАРТА') return 'Карта недоступна';
+    if (v.indexOf('ПОИСК') === 0) return 'Ищем карту по координате…';
+    return 'Нет стабильной связи с GPS';
+  }
+
+  function maybeEnqueueGpsConnectionToast(fullText, tone) {
+    if (!isPoekhaliPanelActive()) return;
+    var enqueue = typeof window !== 'undefined' ? window.enqueueAppToast : null;
+    if (typeof enqueue !== 'function') return;
+    var now = Date.now();
+    if (now < gpsConnectionToastState.suppressUntil) return;
+
+    var hasError = tone === 'is-error';
+    if (hasError) {
+      if (!gpsConnectionToastState.hadErrorUi) {
+        gpsConnectionToastState.hadErrorUi = true;
+        enqueue(mapGpsStatusToBriefError(fullText), 'danger', 2800);
+      }
+      return;
+    }
+    if (gpsConnectionToastState.hadErrorUi) {
+      gpsConnectionToastState.hadErrorUi = false;
+      enqueue('GPS снова в норме', 'success', 2000);
+    }
+  }
+
   function byId(id) {
     return document.getElementById(id);
   }
@@ -366,6 +400,7 @@
     el.textContent = getGpsStatusDisplayText(value);
     el.classList.remove('is-live', 'is-error');
     if (tone) el.classList.add(tone);
+    maybeEnqueueGpsConnectionToast(value, tone);
   }
 
   function parseNumber(value) {
@@ -12118,15 +12153,15 @@
   }
 
   function getPoekhaliTopHudY() {
-    return Math.max(78, getPoekhaliTopControlsBottom() + 16);
+    return Math.max(68, getPoekhaliTopControlsBottom() + 8);
   }
 
   function getPoekhaliTopHudBottom() {
-    return getPoekhaliTopHudY() + POEKHALI_TOP_HUD_HEIGHT_PX;
+    return getPoekhaliTopHudY();
   }
 
   function getPoekhaliLiveSummaryTop() {
-    return getPoekhaliTopHudBottom() + 14;
+    return getPoekhaliTopHudBottom() + 10;
   }
 
   function getPoekhaliTopStackBottom() {
@@ -14955,34 +14990,14 @@
     var bandH = Math.max(5, Math.min(8, layout.xUnit * 0.82));
     var bandBottom = tickTop - 3;
     var bandTop = bandBottom - bandH;
-    var tagY = bandTop - 5;
 
     ctx.save();
     ctx.beginPath();
-    var clipTop = Math.min(tagY - 10, bandTop - 4);
+    var clipTop = bandTop - 4;
     ctx.rect(layout.viewportX + 6, clipTop, layout.viewportWidth - 12, Math.max(0, railY - clipTop));
     ctx.clip();
 
     fillRoundRect(ctx, barLeft, bandTop, span, bandH, Math.min(3, bandH / 2), isPreview ? 'rgba(91, 210, 255, 0.45)' : 'rgba(74, 222, 128, 0.42)');
-    ctx.fillStyle = isPreview ? 'rgba(147, 197, 253, 0.98)' : 'rgba(187, 247, 208, 0.96)';
-    ctx.fillRect(Math.round(headX) - 2, bandTop - 1, 5, bandH + 2);
-    ctx.fillStyle = 'rgba(148, 163, 184, 0.92)';
-    ctx.fillRect(Math.round(tailX) - 2, bandTop - 1, 5, bandH + 2);
-
-    drawText(ctx, 'Г', headX, tagY, {
-      size: 8,
-      weight: 850,
-      color: THEME.accentStrong,
-      align: 'center',
-      maxWidth: 22
-    });
-    drawText(ctx, 'Х', tailX, tagY, {
-      size: 8,
-      weight: 850,
-      color: THEME.sub,
-      align: 'center',
-      maxWidth: 22
-    });
     ctx.restore();
   }
 
@@ -16568,89 +16583,42 @@
     var allowedStr = activeRestriction && activeRestriction.speedKmh > 0 ? String(activeRestriction.speedKmh) : '—';
     var x = getPanelInset(w);
     var compact = w < 360;
-    var panelHeight = 60;
+    var panelHeight = 52;
     var panelWidth = w - x * 2;
-    var y = Math.min(layout.trackY + 58, h - layout.navReserve - 88);
-    y = Math.max(layout.trackY + 46, y);
+    var y = Math.min(layout.trackY + 52, h - layout.navReserve - 88);
+    y = Math.max(layout.trackY + 42, y);
     if (y + panelHeight > h - layout.navReserve - 30) {
-      y = Math.max(layout.trackY + 38, h - layout.navReserve - panelHeight - 30);
+      y = Math.max(layout.trackY + 36, h - layout.navReserve - panelHeight - 30);
     }
-    var splitAt = Math.round(x + panelWidth * 0.54);
-    var speedMidX = (x + splitAt) / 2;
-    var kmPkMidX = (splitAt + x + panelWidth) / 2;
+    var cx = x + panelWidth / 2;
 
     ctx.save();
-    drawPanel(ctx, x, y, panelWidth, panelHeight, 14, 'rgba(19, 19, 24, 0.78)', 'rgba(255, 255, 255, 0.08)');
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(splitAt + 0.5, y + 10);
-    ctx.lineTo(splitAt + 0.5, y + panelHeight - 10);
-    ctx.stroke();
+    drawPanel(ctx, x, y, panelWidth, panelHeight, 16, 'rgba(19, 19, 24, 0.82)', 'rgba(255, 255, 255, 0.09)');
 
-    drawText(ctx, compact ? 'ФАКТ · ДОПУСК' : 'ФАКТ · ДОПУСК', speedMidX, y + 14, {
+    drawText(ctx, 'ФАКТ | ДОПУСК', cx, y + 12, {
       size: compact ? 7 : 8,
       weight: 850,
       color: THEME.sub,
       align: 'center',
-      maxWidth: splitAt - x - 12
+      maxWidth: panelWidth - 20
     });
-    drawText(ctx, speedText + ' | ' + allowedStr, speedMidX, y + 34, {
-      size: compact ? 12 : 14,
+    var allowedLine = allowedStr === '—' ? '—' : allowedStr + ' км/ч';
+    drawText(ctx, speedText + ' км/ч | ' + allowedLine, cx, y + 28, {
+      size: compact ? 13 : 15,
       weight: 850,
       color: isOverspeed ? THEME.danger : THEME.text,
       align: 'center',
-      maxWidth: splitAt - x - 10
+      maxWidth: panelWidth - 16
     });
-
-    drawText(ctx, 'КМ', kmPkMidX, y + 14, {
-      size: compact ? 7 : 8,
-      weight: 850,
-      color: THEME.sub,
-      align: 'center'
-    });
-    drawText(ctx, km, kmPkMidX, y + 30, {
-      size: compact ? 13 : 14,
-      weight: 850,
-      color: THEME.text,
-      align: 'center'
-    });
-    drawText(ctx, 'ПК', kmPkMidX, y + 41, {
-      size: compact ? 7 : 8,
-      weight: 850,
-      color: THEME.sub,
-      align: 'center'
-    });
-    drawText(ctx, pk, kmPkMidX, y + 53, {
-      size: compact ? 13 : 14,
-      weight: 850,
+    var kmPkLine = km + ' км | ' + pk + ' пк';
+    drawText(ctx, kmPkLine, cx, y + 45, {
+      size: compact ? 12 : 13,
+      weight: 800,
       color: THEME.accentStrong,
-      align: 'center'
+      align: 'center',
+      maxWidth: panelWidth - 16
     });
     ctx.restore();
-  }
-
-  function drawTopHud(ctx, w, displayProjection) {
-    void displayProjection;
-    var now = new Date();
-    var inset = getPanelInset(w);
-    var x = inset;
-    var y = getPoekhaliTopHudY();
-    var width = w - inset * 2;
-    var height = POEKHALI_TOP_HUD_HEIGHT_PX;
-    drawPanel(ctx, x, y, width, height, 16, 'rgba(19, 19, 24, 0.72)', THEME.border);
-    drawText(ctx, 'МСК', x + width / 2, y + 14, {
-      size: 8,
-      weight: 850,
-      color: THEME.sub,
-      align: 'center'
-    });
-    drawText(ctx, formatTime(now), x + width / 2, y + 32, {
-      size: 15,
-      weight: 850,
-      color: THEME.text,
-      align: 'center'
-    });
   }
 
   function drawCanvas() {
@@ -16671,7 +16639,6 @@
     var displayProjection = getPreviewProjection();
     tracker.activeRestriction = null;
     tracker.nextRestriction = null;
-    drawTopHud(ctx, w, displayProjection);
     drawRouteStrip(ctx, w, h, displayProjection);
     if (!displayProjection) {
       drawCenteredStatus(ctx, w, h);
@@ -16878,6 +16845,31 @@
     });
   }
 
+  var poekhaliMskInterval = null;
+
+  function tickPoekhaliMskClock() {
+    var el = byId('poekhaliMskClockTime');
+    if (!el) return;
+    el.textContent = formatTime(new Date());
+  }
+
+  function startPoekhaliMskClock() {
+    tickPoekhaliMskClock();
+    if (poekhaliMskInterval && typeof window !== 'undefined') {
+      window.clearInterval(poekhaliMskInterval);
+    }
+    poekhaliMskInterval = typeof window !== 'undefined' && window.setInterval
+      ? window.setInterval(tickPoekhaliMskClock, 1000)
+      : null;
+  }
+
+  function stopPoekhaliMskClock() {
+    if (poekhaliMskInterval && typeof window !== 'undefined') {
+      window.clearInterval(poekhaliMskInterval);
+      poekhaliMskInterval = null;
+    }
+  }
+
   function startPoekhaliTrackerMode() {
     var wasActive = tracker.active;
     tracker.active = true;
@@ -16894,9 +16886,14 @@
       requestDraw();
     }
     startDrawLoop();
+    startPoekhaliMskClock();
+    gpsConnectionToastState.suppressUntil = Date.now() + 1100;
   }
 
   function stopPoekhaliTrackerMode() {
+    gpsConnectionToastState.suppressUntil = 0;
+    gpsConnectionToastState.hadErrorUi = false;
+    stopPoekhaliMskClock();
     clearAutoRunTimer();
     if (tracker.timerRunning) {
       tracker.timerElapsedMs = getTimerElapsed();
