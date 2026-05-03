@@ -14531,7 +14531,8 @@
     return;
   }
 
-  function drawLiveChip(ctx, x, y, width, label, value, tone) {
+  function drawLiveChip(ctx, x, y, width, label, value, tone, chipHeight) {
+    var h = chipHeight && chipHeight > 20 ? chipHeight : 32;
     var fill = tone === 'danger'
       ? 'rgba(244, 63, 94, 0.12)'
       : tone === 'warning'
@@ -14547,17 +14548,22 @@
         ? 'rgba(74, 222, 128, 0.24)'
         : 'rgba(56, 189, 248, 0.22)';
     var color = tone === 'success' ? THEME.green : tone === 'danger' ? THEME.danger : tone === 'warning' ? '#facc15' : THEME.accentStrong;
-    fillRoundRect(ctx, x, y, width, 32, 10, fill);
-    strokeRoundRect(ctx, x + 0.5, y + 0.5, width - 1, 31, 10, stroke);
-    drawText(ctx, label, x + width / 2, y + 11, {
-      size: 7,
+    fillRoundRect(ctx, x, y, width, h, 10, fill);
+    strokeRoundRect(ctx, x + 0.5, y + 0.5, width - 1, h - 1, 10, stroke);
+    var labelY = y + Math.round(h * 0.34);
+    var valueY = y + Math.round(h * 0.78);
+    var labelSize = h >= 36 ? 7.5 : 7;
+    var valueLen = String(value).length;
+    var valueSize = valueLen > 8 ? (h >= 36 ? 9 : 8) : valueLen > 5 ? (h >= 36 ? 10 : 9) : (h >= 36 ? 11 : 10);
+    drawText(ctx, label, x + width / 2, labelY, {
+      size: labelSize,
       weight: 850,
       color: THEME.sub,
       align: 'center',
       maxWidth: width - 8
     });
-    drawText(ctx, value, x + width / 2, y + 25, {
-      size: String(value).length > 5 ? 9 : 10,
+    drawText(ctx, value, x + width / 2, valueY, {
+      size: valueSize,
       weight: 850,
       color: color,
       align: 'center',
@@ -16583,41 +16589,36 @@
     var allowedStr = activeRestriction && activeRestriction.speedKmh > 0 ? String(activeRestriction.speedKmh) : '—';
     var x = getPanelInset(w);
     var compact = w < 360;
-    var panelHeight = 52;
+    var chipH = compact ? 36 : 38;
+    var gap = compact ? 5 : 6;
+    var hPad = 10;
+    var vPad = 10;
+    var panelHeight = vPad + chipH + vPad;
     var panelWidth = w - x * 2;
     var y = Math.min(layout.trackY + 52, h - layout.navReserve - 88);
     y = Math.max(layout.trackY + 42, y);
-    if (y + panelHeight > h - layout.navReserve - 30) {
-      y = Math.max(layout.trackY + 36, h - layout.navReserve - panelHeight - 30);
+    if (y + panelHeight > h - layout.navReserve - 26) {
+      y = Math.max(layout.trackY + 34, h - layout.navReserve - panelHeight - 26);
     }
-    var cx = x + panelWidth / 2;
+
+    var innerW = panelWidth - hPad * 2;
+    var chipW = (innerW - gap * 3) / 4;
+    var chipY = y + vPad;
+    var chipX0 = x + hPad;
+
+    var factTone = isOverspeed ? 'danger' : 'info';
+    var allowedTone = allowedStr === '—' ? 'warning' : 'info';
+    var factVal = speedText + ' км/ч';
+    var allowedVal = allowedStr === '—' ? '—' : allowedStr + ' км/ч';
+    var kmVal = km === '—' ? '—' : km + ' км';
+    var pkVal = pk === '—' ? '—' : pk + ' пк';
 
     ctx.save();
     drawPanel(ctx, x, y, panelWidth, panelHeight, 16, 'rgba(19, 19, 24, 0.82)', 'rgba(255, 255, 255, 0.09)');
-
-    drawText(ctx, 'ФАКТ | ДОПУСК', cx, y + 12, {
-      size: compact ? 7 : 8,
-      weight: 850,
-      color: THEME.sub,
-      align: 'center',
-      maxWidth: panelWidth - 20
-    });
-    var allowedLine = allowedStr === '—' ? '—' : allowedStr + ' км/ч';
-    drawText(ctx, speedText + ' км/ч | ' + allowedLine, cx, y + 28, {
-      size: compact ? 13 : 15,
-      weight: 850,
-      color: isOverspeed ? THEME.danger : THEME.text,
-      align: 'center',
-      maxWidth: panelWidth - 16
-    });
-    var kmPkLine = km + ' км | ' + pk + ' пк';
-    drawText(ctx, kmPkLine, cx, y + 45, {
-      size: compact ? 12 : 13,
-      weight: 800,
-      color: THEME.accentStrong,
-      align: 'center',
-      maxWidth: panelWidth - 16
-    });
+    drawLiveChip(ctx, chipX0, chipY, chipW, 'ФАКТ', factVal, factTone, chipH);
+    drawLiveChip(ctx, chipX0 + chipW + gap, chipY, chipW, 'ДОПУСК', allowedVal, allowedTone, chipH);
+    drawLiveChip(ctx, chipX0 + (chipW + gap) * 2, chipY, chipW, 'КМ', kmVal, 'info', chipH);
+    drawLiveChip(ctx, chipX0 + (chipW + gap) * 3, chipY, chipW, 'ПК', pkVal, 'info', chipH);
     ctx.restore();
   }
 
