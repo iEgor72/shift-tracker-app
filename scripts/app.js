@@ -1686,101 +1686,6 @@
       };
     }
 
-    function readPoekhaliShiftNumber(shift, key) {
-      if (typeof getShiftPoekhaliNumber === 'function') return getShiftPoekhaliNumber(shift, key);
-      var value = Number(shift && shift[key]);
-      return isFinite(value) ? Math.max(0, value) : 0;
-    }
-
-    function formatPoekhaliSalaryDistance(meters) {
-      if (typeof formatShiftPoekhaliDistance === 'function') {
-        return formatShiftPoekhaliDistance(meters) || '—';
-      }
-      var value = Math.max(0, Math.round(Number(meters) || 0));
-      if (!value) return '—';
-      return (value / 1000).toFixed(value >= 10000 ? 1 : 2).replace('.', ',') + ' км';
-    }
-
-    function formatPoekhaliSalarySpeed(speed) {
-      if (typeof formatShiftPoekhaliSpeed === 'function') {
-        return formatShiftPoekhaliSpeed(speed) || '—';
-      }
-      var value = Number(speed);
-      if (!isFinite(value) || value <= 0) return '—';
-      return (Math.round(value * 10) / 10).toString().replace('.', ',') + ' км/ч';
-    }
-
-    function buildPoekhaliMonthOpsSummary(monthShifts) {
-      var shifts = monthShifts || [];
-      var summary = {
-        runCount: 0,
-        distanceMeters: 0,
-        movingMs: 0,
-        durationMs: 0,
-        idleMs: 0,
-        maxSpeedKmh: 0,
-        warningsCount: 0,
-        alertCount: 0,
-        overspeedCount: 0,
-        overspeedDurationMs: 0,
-        overspeedDistanceMeters: 0
-      };
-
-      for (var i = 0; i < shifts.length; i++) {
-        var shift = shifts[i];
-        var distance = readPoekhaliShiftNumber(shift, 'poekhali_distance_m');
-        var duration = readPoekhaliShiftNumber(shift, 'poekhali_duration_ms');
-        var moving = readPoekhaliShiftNumber(shift, 'poekhali_moving_ms');
-        var hasRun = !!(shift && shift.poekhali_run_id) || distance > 0 || duration > 0;
-        if (hasRun) summary.runCount += 1;
-
-        summary.distanceMeters += distance;
-        summary.durationMs += duration;
-        summary.movingMs += moving;
-        summary.idleMs += readPoekhaliShiftNumber(shift, 'poekhali_idle_ms');
-        summary.maxSpeedKmh = Math.max(summary.maxSpeedKmh, readPoekhaliShiftNumber(shift, 'poekhali_max_speed_kmh'));
-        summary.warningsCount += readPoekhaliShiftNumber(shift, 'poekhali_warnings_count');
-        summary.alertCount += readPoekhaliShiftNumber(shift, 'poekhali_alert_count');
-        if (readPoekhaliShiftNumber(shift, 'poekhali_overspeed_max_kmh') > 0) summary.overspeedCount += 1;
-        summary.overspeedDurationMs += readPoekhaliShiftNumber(shift, 'poekhali_overspeed_duration_ms');
-        summary.overspeedDistanceMeters += readPoekhaliShiftNumber(shift, 'poekhali_overspeed_distance_m');
-
-      }
-
-      summary.technicalSpeedKmh = summary.movingMs > 0 && summary.distanceMeters > 0
-        ? (summary.distanceMeters / 1000) / (summary.movingMs / 3600000)
-        : 0;
-      return summary;
-    }
-
-    function renderPoekhaliSalarySummary(summary) {
-      var titleEl = document.getElementById('salaryPoekhaliTitle');
-      var badgeEl = document.getElementById('salaryPoekhaliBadge');
-      var distanceEl = document.getElementById('salaryPoekhaliDistance');
-      var techSpeedEl = document.getElementById('salaryPoekhaliTechSpeed');
-      var warningsEl = document.getElementById('salaryPoekhaliWarnings');
-      var overspeedEl = document.getElementById('salaryPoekhaliOverspeed');
-      var fuelEl = document.getElementById('salaryPoekhaliFuel');
-      if (!titleEl || !badgeEl || !distanceEl || !techSpeedEl || !warningsEl || !overspeedEl) return;
-      if (fuelEl) {
-        fuelEl.hidden = true;
-        fuelEl.textContent = '';
-      }
-
-      titleEl.textContent = summary.runCount
-        ? 'Записано ' + summary.runCount + ' смен'
-        : 'Нет записей';
-      badgeEl.textContent = String(summary.runCount);
-      distanceEl.textContent = formatPoekhaliSalaryDistance(summary.distanceMeters);
-      techSpeedEl.textContent = formatPoekhaliSalarySpeed(summary.technicalSpeedKmh);
-      warningsEl.textContent = summary.warningsCount || summary.alertCount
-        ? (summary.warningsCount + ' ПР' + (summary.alertCount ? ' · ' + summary.alertCount + ' сигн.' : ''))
-        : '—';
-      overspeedEl.textContent = summary.overspeedCount
-        ? (summary.overspeedCount + ' смен' + (summary.overspeedDistanceMeters ? ' · ' + formatPoekhaliSalaryDistance(summary.overspeedDistanceMeters) : ''))
-        : '—';
-    }
-
     function renderAverageShiftSummary(summary) {
       var averageEl = document.getElementById('dashboardAverageShift');
       if (!averageEl) return;
@@ -1817,7 +1722,6 @@
       var monthShifts = monthShiftSets.calculationShifts;
 
       var summary = buildSalarySummary(monthShifts, bounds);
-      var poekhaliSummary = buildPoekhaliMonthOpsSummary(monthShifts);
       renderMonthHeader('salaryMonthTitle', 'salaryMonthQuarter', 'salaryMonthTabs', currentYear, currentMonth, function(targetMonth) {
         if (targetMonth === currentMonth) return;
         triggerHapticSelection();
@@ -1841,7 +1745,6 @@
       if (salaryBaseTotal) salaryBaseTotal.textContent = formatRub(summary.baseAmount);
       if (salaryKomRow) salaryKomRow.classList.toggle('hidden', !(summary.komAmount > 0));
       if (salaryKom) salaryKom.textContent = formatRub(summary.komAmount);
-      renderPoekhaliSalarySummary(poekhaliSummary);
 
       var baseRows = [];
       baseRows.push(createSalaryRowHtml(

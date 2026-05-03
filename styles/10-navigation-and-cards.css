@@ -2796,103 +2796,6 @@
       margin: 8px 4px 16px;
     }
 
-    .salary-poekhali-card {
-      display: grid;
-      gap: 12px;
-      padding: 14px;
-    }
-
-    .salary-poekhali-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .salary-poekhali-kicker {
-      font-size: 10px;
-      line-height: 1;
-      font-weight: 900;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--sub);
-    }
-
-    .salary-poekhali-title {
-      margin-top: 5px;
-      font-size: 15px;
-      line-height: 1.25;
-      font-weight: 850;
-      color: var(--text);
-    }
-
-    .salary-poekhali-badge {
-      min-width: 36px;
-      min-height: 30px;
-      padding: 0 10px;
-      border-radius: 12px;
-      display: inline-grid;
-      place-items: center;
-      background: var(--accent-dim);
-      color: var(--accent-strong);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 14px;
-      font-weight: 800;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .salary-poekhali-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
-    }
-
-    .salary-poekhali-cell {
-      min-width: 0;
-      display: grid;
-      gap: 5px;
-      padding: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.035);
-    }
-
-    .salary-poekhali-cell span {
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-size: 10px;
-      line-height: 1;
-      font-weight: 900;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      color: var(--sub);
-    }
-
-    .salary-poekhali-cell strong {
-      min-width: 0;
-      overflow-wrap: anywhere;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      line-height: 1.15;
-      color: var(--text);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .salary-poekhali-note {
-      padding-top: 2px;
-      color: rgba(238, 242, 248, 0.62);
-      font-size: 12px;
-      line-height: 1.45;
-    }
-
-    @media (max-width: 380px) {
-      .salary-poekhali-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
     .salary-list {
       display: grid;
       gap: 0;
@@ -3315,22 +3218,6 @@
       display: grid;
       gap: 6px;
       min-width: 0;
-    }
-
-    .docs-nav-kicker {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      width: fit-content;
-      padding: 0;
-      border: 0;
-      background: transparent;
-      color: rgba(238, 242, 248, 0.46);
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      line-height: 1;
     }
 
     .docs-nav-title {
