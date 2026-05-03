@@ -751,14 +751,19 @@
       gridEl.innerHTML = html;
     }
 
-    function syncHomeHeroCarouselDots(viewport) {
+    function syncHomeHeroCarouselDots(viewport, forcedIdx) {
       if (!viewport) return;
       var dots = document.querySelectorAll('#homeHeroCarousel .home-hero-carousel-dot');
       if (!dots.length) return;
       var w = viewport.clientWidth;
       if (!w) return;
-      var idx = Math.round(viewport.scrollLeft / w);
-      idx = Math.max(0, Math.min(dots.length - 1, idx));
+      var idx;
+      if (forcedIdx !== undefined && forcedIdx !== null && isFinite(Number(forcedIdx))) {
+        idx = Math.max(0, Math.min(dots.length - 1, Number(forcedIdx)));
+      } else {
+        idx = Math.round(viewport.scrollLeft / w);
+        idx = Math.max(0, Math.min(dots.length - 1, idx));
+      }
       viewport.dataset.heroSlideIndex = String(idx);
       for (var i = 0; i < dots.length; i++) {
         var on = i === idx;
@@ -799,7 +804,7 @@
       window.requestAnimationFrame(function() {
         var w2 = viewport.clientWidth;
         if (w2) {
-          viewport.scrollLeft = prevIdx * w2;
+          viewport.scrollLeft = Math.round(prevIdx * w2);
         }
         syncHomeHeroCarouselDots(viewport);
         syncHomeHeroCarouselViewportHeight(viewport);
@@ -819,19 +824,48 @@
         }
       }
 
+      var heroCarouselHeightTimer = null;
+      function scheduleHeroCarouselHeightSync() {
+        if (heroCarouselHeightTimer) window.clearTimeout(heroCarouselHeightTimer);
+        heroCarouselHeightTimer = window.setTimeout(function() {
+          heroCarouselHeightTimer = null;
+          syncHomeHeroCarouselViewportHeight(viewport);
+        }, 140);
+      }
+
+      function flushHeroCarouselHeightSync() {
+        if (heroCarouselHeightTimer) {
+          window.clearTimeout(heroCarouselHeightTimer);
+          heroCarouselHeightTimer = null;
+        }
+        syncHomeHeroCarouselViewportHeight(viewport);
+      }
+
+      function afterProgrammaticSlideScroll() {
+        var smooth = !prefersReducedMotion();
+        window.setTimeout(function() {
+          syncHomeHeroCarouselDots(viewport);
+          flushHeroCarouselHeightSync();
+        }, smooth ? 240 : 0);
+      }
+
       var scrollRaf = null;
       viewport.addEventListener('scroll', function() {
         if (scrollRaf) return;
         scrollRaf = window.requestAnimationFrame(function() {
           scrollRaf = null;
           syncHomeHeroCarouselDots(viewport);
-          syncHomeHeroCarouselViewportHeight(viewport);
+          scheduleHeroCarouselHeightSync();
         });
       }, { passive: true });
 
       viewport.addEventListener('scrollend', function() {
+        if (heroCarouselHeightTimer) {
+          window.clearTimeout(heroCarouselHeightTimer);
+          heroCarouselHeightTimer = null;
+        }
         syncHomeHeroCarouselDots(viewport);
-        syncHomeHeroCarouselViewportHeight(viewport);
+        flushHeroCarouselHeightSync();
       });
 
       var dots = document.querySelectorAll('#homeHeroCarousel .home-hero-carousel-dot');
@@ -843,14 +877,12 @@
           if (!isFinite(idx)) idx = 0;
           var cw = viewport.clientWidth;
           if (!cw) return;
+          syncHomeHeroCarouselDots(viewport, idx);
           viewport.scrollTo({
             left: idx * cw,
             behavior: prefersReducedMotion() ? 'auto' : 'smooth'
           });
-          window.requestAnimationFrame(function() {
-            syncHomeHeroCarouselDots(viewport);
-            syncHomeHeroCarouselViewportHeight(viewport);
-          });
+          afterProgrammaticSlideScroll();
         });
       }
 
@@ -864,14 +896,12 @@
         var next = Math.max(0, Math.min(1, cur + dir));
         if (next === cur) return;
         e.preventDefault();
+        syncHomeHeroCarouselDots(viewport, next);
         viewport.scrollTo({
           left: next * cw,
           behavior: prefersReducedMotion() ? 'auto' : 'smooth'
         });
-        window.requestAnimationFrame(function() {
-          syncHomeHeroCarouselDots(viewport);
-          syncHomeHeroCarouselViewportHeight(viewport);
-        });
+        afterProgrammaticSlideScroll();
       });
 
       window.addEventListener('resize', function() {

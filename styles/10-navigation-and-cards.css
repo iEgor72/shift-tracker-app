@@ -244,18 +244,15 @@
       align-items: flex-start;
       overflow-x: auto;
       overflow-y: hidden;
-      scroll-snap-type: x mandatory;
-      scroll-behavior: smooth;
+      /* proximity — меньше «перелёта» и отскока, чем mandatory */
+      scroll-snap-type: x proximity;
       -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
+      scroll-padding-inline: 0;
+      /* не задаём scroll-behavior: здесь — у native swipe конфликтует с momentum */
       /* pan-x блокировал вертикальный скролл страницы при жесте с карусели */
       touch-action: pan-x pan-y;
       outline: none;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .home-hero-carousel-viewport {
-        scroll-behavior: auto;
-      }
     }
 
     .home-hero-carousel-slide {
@@ -264,7 +261,6 @@
       max-width: 100%;
       width: 100%;
       scroll-snap-align: start;
-      scroll-snap-stop: always;
       box-sizing: border-box;
       /* зазор между «экранами»: суммарно ~20px между карточками */
       padding-inline: 10px;
