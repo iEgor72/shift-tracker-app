@@ -4,8 +4,8 @@
   "description": "Электронный журнал для машинистов. Учёт смен, часов и топлива.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
+  "background_color": "#0C0C10",
+  "theme_color": "#0C0C10",
   "orientation": "portrait",
   "icons": [
     {
