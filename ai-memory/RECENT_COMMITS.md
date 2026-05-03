@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-03 22:07:37 +0000
+Generated: 2026-05-03 22:09:53 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `b7ecd3e` | 2026-05-03T22:09:48+00:00 | iEgor72 | fix(ui): sync displayed cache version |
+| `bd430b6` | 2026-05-03T22:07:42+00:00 | iEgor72 | chore(memory): refresh after trip expense cleanup |
 | `6ef4e3a` | 2026-05-03T22:07:31+00:00 | iEgor72 | fix(salary): hide trip expense field |
 | `063f95b` | 2026-05-03T22:05:41+00:00 | iEgor72 | chore(memory): refresh after salary field cleanup |
 | `4e80426` | 2026-05-03T22:05:26+00:00 | iEgor72 | fix(salary): hide unclear zone and BAM fields |
@@ -42,5 +44,3 @@ Generated: 2026-05-03 22:07:37 +0000
 | `63a90e5` | 2026-05-03T19:16:25+10:00 | iEgor72 | feat(poekhali): GPS error/recovery toasts, MSK in header, toast queue UX |
 | `ea574df` | 2026-05-03T19:01:36+10:00 | iEgor72 | feat(poekhali): train on rail scale, speed fact\|limit bar, hide Trip, direction bottom bar |
 | `28aa069` | 2026-05-03T18:51:19+10:00 | iEgor72 | feat(poekhali): compact MSK HUD, preview speed, train on km scale, align GPS toolbar |
-| `694ca90` | 2026-05-03T18:38:50+10:00 | iEgor72 | feat(shifts): open edit form on shift card tap instead of details |
-| `687c6d2` | 2026-05-03T18:32:47+10:00 | iEgor72 | fix(ui): shift actions menu edit item uses edit accent color |
