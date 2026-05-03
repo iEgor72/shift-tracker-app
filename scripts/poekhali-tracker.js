@@ -386,21 +386,19 @@
   }
 
   function syncGpsStatusDisplay() {
-    var el = byId('poekhaliGpsStatus');
-    if (!el) return;
-    el.textContent = getGpsStatusDisplayText(el.dataset.fullText || el.textContent || 'GPS');
+    syncPoekhaliLiveButton();
   }
 
   function setGpsStatus(text, tone) {
-    var el = byId('poekhaliGpsStatus');
+    var el = byId('btnPoekhaliLive');
     if (!el) return;
     var value = text || 'GPS';
     el.dataset.fullText = value;
-    el.title = value;
-    el.setAttribute('aria-label', value);
-    el.textContent = getGpsStatusDisplayText(value);
     el.classList.remove('is-live', 'is-error');
-    if (tone) el.classList.add(tone);
+    if (!(tracker.timerRunning || tracker.runStartPreparing)) {
+      if (tone === 'is-error') el.classList.add('is-error');
+    }
+    syncPoekhaliLiveButton();
     maybeEnqueueGpsConnectionToast(value, tone);
   }
 
@@ -11757,7 +11755,7 @@
   function scheduleAutoRunStart(reason, delayMs) {
     clearAutoRunTimer();
     if (!shouldAutoStartPoekhaliRun()) {
-      setTimerButton();
+      syncPoekhaliLiveButton();
       return;
     }
     var delay = isFinite(Number(delayMs)) ? Math.max(0, Number(delayMs)) : AUTO_RUN_START_DELAY_MS;
@@ -11769,10 +11767,10 @@
           reason: reason || 'auto'
         });
       } else {
-        setTimerButton();
+        syncPoekhaliLiveButton();
       }
     }, delay);
-    setTimerButton();
+    syncPoekhaliLiveButton();
   }
 
   function waitForRunStartReadiness(token) {
@@ -12129,10 +12127,9 @@
   function getPoekhaliTopControlsBottom() {
     var ids = [
       'btnPoekhaliBack',
-      'btnPoekhaliTimer',
+      'btnPoekhaliLive',
       'btnPoekhaliWay',
-      'btnPoekhaliMap',
-      'poekhaliGpsStatus'
+      'btnPoekhaliMap'
     ];
     var rootRect = getPoekhaliRootRect();
     var rootTop = rootRect && isFinite(rootRect.top) ? rootRect.top : 0;
@@ -12358,30 +12355,43 @@
     el.classList.toggle('is-live', tracker.directionSource === 'gps');
   }
 
-  function setTimerButton() {
-    var el = byId('btnPoekhaliTimer');
+  function syncPoekhaliLiveButton() {
+    var el = byId('btnPoekhaliLive');
     if (!el) return;
     var activeRun = getActiveRun();
     var details = getPoekhaliTrainDetails();
     delete el.dataset.controlLabel;
-    el.textContent = tracker.timerRunning || tracker.runStartPreparing ? '●' : activeRun ? 'II' : '●';
+
     el.classList.toggle('is-recording', !!tracker.timerRunning);
     el.classList.toggle('is-preparing', !!tracker.runStartPreparing);
     el.classList.toggle('is-paused', !tracker.timerRunning && !!activeRun);
     el.classList.toggle('is-blocked', !tracker.timerRunning && (!details || !details.hasShift || tracker.status === 'run-blocked'));
+
+    if (tracker.timerRunning || tracker.runStartPreparing) {
+      el.textContent = '●';
+    } else if (activeRun) {
+      el.textContent = 'II';
+    } else {
+      el.textContent = getGpsStatusDisplayText(el.dataset.fullText || el.textContent || 'GPS');
+    }
+
     var title = tracker.runStartPreparing
-      ? 'Автозапись запускается: готовлю карту, смену и GPS'
+      ? 'Запуск записи и GPS: готовлю карту и смену'
       : tracker.timerRunning
-        ? 'Запись идет ' + formatTimer(getTimerElapsed()) + '. Нажмите, чтобы открыть данные поездки'
+        ? 'Запись · GPS активен · ' + formatTimer(getTimerElapsed()) + '. Нажмите — данные поездки'
         : activeRun
-          ? 'Запись на паузе. При входе в Поехали продолжится автоматически'
+          ? 'Запись на паузе · GPS при возобновлении. Нажмите — данные поездки'
           : !details || !details.hasShift
-            ? 'Автозапись ждет выбранную смену'
+            ? 'Нажмите — GPS; запись после выбора смены в панели'
             : details.shift && details.shift.id && (tracker.autoRunSuppressedShiftId === String(details.shift.id) || hasFinishedRunForShift(details.shift.id))
-              ? 'Поездка завершена. Нажмите, чтобы начать новую запись вручную'
+              ? 'Поездка завершена. Нажмите — новая запись и GPS'
               : tracker.status === 'run-blocked'
                 ? (tracker.runStartMessage || 'Проверьте смену, маршрут и GPS')
-                : 'Автозапись включена. Нажмите, чтобы запустить сейчас';
+                : 'Нажмите — включить GPS и запись поездки';
+    var gpsHint = String(el.dataset.fullText || '').trim();
+    if (gpsHint && !tracker.timerRunning && !tracker.runStartPreparing) {
+      title = title + ' · ' + gpsHint;
+    }
     el.title = title;
     el.setAttribute('aria-label', title);
   }
@@ -12389,10 +12399,9 @@
   function updateModeButtons() {
     setDirectionButton();
     setText('btnPoekhaliWay', 'П ' + tracker.wayNumber);
-    setTimerButton();
+    syncPoekhaliLiveButton();
     setMapButton();
     setOpsButton();
-    syncGpsStatusDisplay();
     var wayBtn = byId('btnPoekhaliWay');
     var mapBtn = byId('btnPoekhaliMap');
     if (wayBtn) wayBtn.classList.add('is-hidden');
@@ -16717,10 +16726,9 @@
     drawBottomBar(ctx, w, h, displayProjection);
     setDirectionButton();
     setText('btnPoekhaliWay', 'П ' + tracker.wayNumber);
-    setTimerButton();
+    syncPoekhaliLiveButton();
     setMapButton();
     setOpsButton();
-    syncGpsStatusDisplay();
     var wayBtn = byId('btnPoekhaliWay');
     var mapBtn = byId('btnPoekhaliMap');
     if (wayBtn) wayBtn.classList.add('is-hidden');
@@ -16976,7 +16984,7 @@
     resetPoekhaliLiveAlert();
     stopWatchingGps();
     stopDrawLoop();
-    setTimerButton();
+    syncPoekhaliLiveButton();
   }
 
   function syncPoekhaliTrackerMode(shouldRun) {
@@ -17017,17 +17025,9 @@
       });
     }
 
-    var gpsBtn = byId('poekhaliGpsStatus');
-    if (gpsBtn) {
-      gpsBtn.addEventListener('click', function() {
-        if (shouldKeepGpsWatching()) startWatchingGps();
-        else requestPassiveGpsFix();
-      });
-    }
-
-    var timerBtn = byId('btnPoekhaliTimer');
-    if (timerBtn) {
-      timerBtn.addEventListener('click', function() {
+    var liveBtn = byId('btnPoekhaliLive');
+    if (liveBtn) {
+      liveBtn.addEventListener('click', function() {
         if (tracker.timerRunning || tracker.runStartPreparing) {
           closeMapPicker();
           openOpsSheet();
@@ -17035,6 +17035,7 @@
         }
         var details = getPoekhaliTrainDetails();
         if (!details || !details.hasShift) {
+          requestPassiveGpsFix();
           closeMapPicker();
           openOpsSheet();
           return;
