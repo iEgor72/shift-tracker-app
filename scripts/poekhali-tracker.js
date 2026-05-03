@@ -13644,6 +13644,54 @@
     return best;
   }
 
+  /**
+   * Binding speed limit while any part of the train occupies a zone — min speed among rules
+   * overlapping [tail..head]. Falls back to findActiveSpeedRule (locomotive point only).
+   */
+  function findTrainBindingSpeedRule(center, speedRules) {
+    if (!speedRules || !speedRules.length || !isFinite(center)) {
+      return findActiveSpeedRule(center, speedRules);
+    }
+    var trainLen = Math.max(1, Math.round(Number(getTrainLengthMeters()) || 1));
+    var dir = getCurrentCoordinateDirection();
+    var tail = center - dir * trainLen;
+    var head = center;
+    var lo = Math.min(tail, head);
+    var hi = Math.max(tail, head);
+
+    var best = null;
+    var bestSpeed = Infinity;
+
+    for (var i = 0; i < speedRules.length; i++) {
+      var rule = speedRules[i];
+      if (!rule) continue;
+      var rs = Number(rule.coordinate);
+      var re = Number(rule.end);
+      if (!isFinite(rs)) rs = 0;
+      if (!isFinite(re)) re = rs;
+      if (re < rs) {
+        var swap = rs;
+        rs = re;
+        re = swap;
+      }
+      if (re < lo || rs > hi) continue;
+      var overlap = Math.min(re, hi) - Math.max(rs, lo);
+      if (overlap < 1) continue;
+      var spd = getSpeedRuleValue(rule);
+      if (!isFinite(spd) || spd <= 0) continue;
+      if (!best || spd < bestSpeed - 0.05) {
+        best = rule;
+        bestSpeed = spd;
+        continue;
+      }
+      if (best && Math.abs(spd - bestSpeed) <= 0.05 && getSpeedRulePriority(rule) > getSpeedRulePriority(best)) {
+        best = rule;
+        bestSpeed = spd;
+      }
+    }
+    return best || findActiveSpeedRule(center, speedRules);
+  }
+
   function getSpeedRulePriority(rule) {
     if (!rule) return 0;
     if (rule.source === 'warning') return 50;
@@ -13744,7 +13792,7 @@
     var right = center + 250;
     var visibleObjects = getTrackObjectsInWindow(left, right, sector);
     var speedRules = getSpeedRulesInWindow(left, right, sector, visibleObjects);
-    return normalizeActiveRestriction(findActiveSpeedRule(center, speedRules), projection);
+    return normalizeActiveRestriction(findTrainBindingSpeedRule(center, speedRules), projection);
   }
 
   function findNextSpeedRule(center, speedRules) {
@@ -14905,9 +14953,9 @@
     var padBottom = hasRouteProgress ? 10 : 12;
     var textFullW = Math.max(72, width - insetText * 2);
     var headlineSize = liveAlert && w < 360 ? 13 : (w < 360 ? 15 : 17);
-    var textX = x + insetText;
 
     var headlineBaseline = y + padTop + 22;
+    var headlineCenterX = x + width / 2;
     var chipTop = y + padTop + 42;
     var chipH = w < 360 ? 34 : 36;
     var chipGap = w < 380 ? 5 : 6;
@@ -14930,10 +14978,11 @@
     if (liveAlert) {
       fillRoundRect(ctx, x + 9, y + 10, 4, panelHeight - 20, 4, liveAlert.level === 'danger' ? THEME.danger : '#facc15');
     }
-    drawText(ctx, headline, textX, headlineBaseline, {
+    drawText(ctx, headline, headlineCenterX, headlineBaseline, {
       size: headlineSize,
       weight: 850,
       color: headlineColor,
+      align: 'center',
       maxWidth: textFullW
     });
 
@@ -16509,7 +16558,7 @@
     var nextStation = resolveNextStationForProjection(projection);
     var nextNeutralMark = findNextRegimeControlMarkForDirection(center, sector, 'neutral');
     var nextWarning = findNextWarningForDirection(center, sector);
-    var activeSpeed = findActiveSpeedRule(center, speedRules);
+    var activeSpeed = findTrainBindingSpeedRule(center, speedRules);
     var nextRestriction = resolveNextRestrictionForProjection(projection);
     var routeProgress = resolveRouteProgressForProjection(projection);
     tracker.activeRestriction = normalizeActiveRestriction(activeSpeed, projection);
