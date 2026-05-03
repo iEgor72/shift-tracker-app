@@ -145,8 +145,8 @@
     bgDeep: '#090A0F',
     surface: '#131318',
     surfaceHi: '#1A1A22',
-    border: 'rgba(255, 255, 255, 0.08)',
-    borderHi: 'rgba(255, 255, 255, 0.14)',
+    border: 'rgba(255, 255, 255, 0.07)',
+    borderHi: 'rgba(255, 255, 255, 0.12)',
     text: '#EEF2F8',
     sub: '#8892A4',
     muted: '#3A4254',
@@ -316,7 +316,8 @@
     speedMps: 0,
     accuracy: 0,
     satellites: '—',
-    lastUpdatedAt: 0
+    lastUpdatedAt: 0,
+    poekhaliMskClockDisplay: ''
   };
 
   var gpsConnectionToastState = {
@@ -12161,7 +12162,7 @@
   }
 
   function getPoekhaliLiveSummaryTop() {
-    return getPoekhaliTopHudBottom() + 10;
+    return getPoekhaliTopHudBottom() + 12;
   }
 
   function getPoekhaliTopStackBottom() {
@@ -12202,13 +12203,13 @@
   function drawPanel(ctx, x, y, width, height, radius, fill, stroke) {
     ctx.save();
     ctx.shadowColor = THEME.shadow;
-    ctx.shadowBlur = 18;
-    ctx.shadowOffsetY = 10;
-    fillRoundRect(ctx, x, y, width, height, radius, fill || 'rgba(19, 19, 24, 0.82)');
+    ctx.shadowBlur = 14;
+    ctx.shadowOffsetY = 8;
+    fillRoundRect(ctx, x, y, width, height, radius, fill || 'rgba(26, 26, 34, 0.88)');
     ctx.shadowBlur = 0;
     ctx.shadowOffsetY = 0;
     ctx.lineWidth = 1;
-    strokeRoundRect(ctx, x + 0.5, y + 0.5, width - 1, height - 1, radius, stroke || THEME.border);
+    strokeRoundRect(ctx, x + 0.5, y + 0.5, width - 1, height - 1, radius, stroke || THEME.borderHi);
     ctx.restore();
   }
 
@@ -13026,20 +13027,20 @@
     var minY = getPoekhaliTopHudBottom() + 36;
     var y = Math.round(Math.max(minY, Math.min((h - panelHeight) / 2 - 4, h - panelHeight - 250)));
     var accent = tone === 'danger' ? THEME.danger : THEME.accent;
-    drawPanel(ctx, x, y, panelWidth, panelHeight, 18, 'rgba(19, 19, 24, 0.88)', THEME.borderHi);
+    drawPanel(ctx, x, y, panelWidth, panelHeight, 20, 'rgba(26, 26, 34, 0.9)', THEME.borderHi);
     fillRoundRect(ctx, x + 14, y + 14, 4, panelHeight - 28, 4, accent);
 
-    drawText(ctx, text, x + 30, y + 39, {
+    drawText(ctx, text, x + 30, y + 40, {
       size: Math.min(20, Math.max(17, w / 25)),
       weight: 800,
       color: THEME.text,
       maxWidth: panelWidth - 46
     });
     if (sub) {
-      drawText(ctx, sub, x + 30, y + 66, {
-        size: 12,
-        weight: 700,
-        color: THEME.sub,
+      drawText(ctx, sub, x + 30, y + 68, {
+        size: 13,
+        weight: 650,
+        color: 'rgba(154, 164, 182, 0.95)',
         maxWidth: panelWidth - 46
       });
     }
@@ -14539,7 +14540,7 @@
         ? 'rgba(250, 204, 21, 0.12)'
       : tone === 'success'
         ? 'rgba(74, 222, 128, 0.12)'
-        : 'rgba(56, 189, 248, 0.11)';
+        : 'rgba(56, 189, 248, 0.09)';
     var stroke = tone === 'danger'
       ? 'rgba(244, 63, 94, 0.24)'
       : tone === 'warning'
@@ -14829,7 +14830,8 @@
     var panelHeight = hasRouteProgress ? 70 : 52;
     var chipWidth = w < 360 ? 48 : 56;
     var chipGap = 6;
-    var chipsWidth = chipWidth * 3 + chipGap * 2;
+    var mskChipW = w < 360 ? 56 : 62;
+    var chipsWidth = mskChipW + chipGap * 3 + chipWidth * 3;
     var station = findStationContext(center, visibleObjects);
     var profilePoint = getCurrentProfilePoint(center, sector);
     var hasProfile = hasProfileForSector(sector);
@@ -14891,12 +14893,12 @@
         : 'info';
 
     var liveAlert = isPreview ? null : getCurrentPoekhaliLiveAlert();
-    var panelFill = 'rgba(12, 30, 48, 0.70)';
-    var panelStroke = 'rgba(56, 189, 248, 0.14)';
-    var labelColor = THEME.sub;
+    var panelFill = 'rgba(26, 26, 34, 0.82)';
+    var panelStroke = 'rgba(56, 189, 248, 0.18)';
+    var labelColor = 'rgba(136, 146, 164, 0.92)';
     var titleColor = THEME.text;
-    var subtitleColor = 'rgba(136, 146, 164, 0.78)';
-    var textX = x + 13;
+    var subtitleColor = 'rgba(154, 164, 182, 0.88)';
+    var textX = x + 16;
     if (liveAlert) {
       var dangerAlert = liveAlert.level === 'danger';
       blockLabel = dangerAlert ? 'КОНТРОЛЬ' : 'ВНИМАНИЕ';
@@ -14926,16 +14928,18 @@
       maxWidth: Math.max(84, width - chipsWidth - (liveAlert ? 42 : 34))
     });
     drawText(ctx, subtitle, textX, y + 48, {
-      size: navTarget ? 8.5 : 8,
-      weight: 750,
+      size: navTarget ? 9 : 8.5,
+      weight: 720,
       color: subtitleColor,
       maxWidth: Math.max(84, width - chipsWidth - (liveAlert ? 42 : 34))
     });
 
     var chipX = x + width - chipsWidth - 10;
-    drawLiveChip(ctx, chipX, y + 10, chipWidth, chip1Label, chip1Text, chip1Tone);
-    drawLiveChip(ctx, chipX + chipWidth + chipGap, y + 10, chipWidth, chip2Label, chip2Text, chip2Tone);
-    drawLiveChip(ctx, chipX + (chipWidth + chipGap) * 2, y + 10, chipWidth, chip3Label, chip3Text, chip3Tone);
+    var mskStr = tracker.poekhaliMskClockDisplay || formatTime(new Date());
+    drawLiveChip(ctx, chipX, y + 10, mskChipW, 'МСК', mskStr, 'info');
+    drawLiveChip(ctx, chipX + mskChipW + chipGap, y + 10, chipWidth, chip1Label, chip1Text, chip1Tone);
+    drawLiveChip(ctx, chipX + mskChipW + chipGap + chipWidth + chipGap, y + 10, chipWidth, chip2Label, chip2Text, chip2Tone);
+    drawLiveChip(ctx, chipX + mskChipW + chipGap + (chipWidth + chipGap) * 2, y + 10, chipWidth, chip3Label, chip3Text, chip3Tone);
     drawLiveRouteProgressRail(ctx, x, y, width, routeProgress, isPreview);
   }
 
@@ -16614,11 +16618,22 @@
     var pkVal = pk === '—' ? '—' : pk + ' пк';
 
     ctx.save();
-    drawPanel(ctx, x, y, panelWidth, panelHeight, 16, 'rgba(19, 19, 24, 0.82)', 'rgba(255, 255, 255, 0.09)');
+    drawPanel(ctx, x, y, panelWidth, panelHeight, 18, 'rgba(26, 26, 34, 0.86)', THEME.borderHi);
     drawLiveChip(ctx, chipX0, chipY, chipW, 'ФАКТ', factVal, factTone, chipH);
     drawLiveChip(ctx, chipX0 + chipW + gap, chipY, chipW, 'ДОПУСК', allowedVal, allowedTone, chipH);
     drawLiveChip(ctx, chipX0 + (chipW + gap) * 2, chipY, chipW, 'КМ', kmVal, 'info', chipH);
     drawLiveChip(ctx, chipX0 + (chipW + gap) * 3, chipY, chipW, 'ПК', pkVal, 'info', chipH);
+    ctx.restore();
+  }
+
+  function drawPoekhaliStandaloneMskChip(ctx, w, h) {
+    var inset = getPanelInset(w);
+    var mskChipW = w < 360 ? 56 : 62;
+    var top = getPoekhaliLiveSummaryTop();
+    var xRight = w - inset - mskChipW;
+    var mskStr = tracker.poekhaliMskClockDisplay || formatTime(new Date());
+    ctx.save();
+    drawLiveChip(ctx, xRight, top, mskChipW, 'МСК', mskStr, 'info');
     ctx.restore();
   }
 
@@ -16630,9 +16645,9 @@
     var h = tracker.height;
 
     ctx.clearRect(0, 0, w, h);
-    var bg = ctx.createLinearGradient(0, 0, 0, h);
-    bg.addColorStop(0, '#11131B');
-    bg.addColorStop(0.52, THEME.bg);
+    var bg = ctx.createLinearGradient(0, 0, w, h);
+    bg.addColorStop(0, '#14151f');
+    bg.addColorStop(0.42, THEME.bg);
     bg.addColorStop(1, THEME.bgDeep);
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, w, h);
@@ -16643,6 +16658,7 @@
     drawRouteStrip(ctx, w, h, displayProjection);
     if (!displayProjection) {
       drawCenteredStatus(ctx, w, h);
+      drawPoekhaliStandaloneMskChip(ctx, w, h);
     }
     drawBottomBar(ctx, w, h, displayProjection);
     setDirectionButton();
@@ -16849,9 +16865,8 @@
   var poekhaliMskInterval = null;
 
   function tickPoekhaliMskClock() {
-    var el = byId('poekhaliMskClockTime');
-    if (!el) return;
-    el.textContent = formatTime(new Date());
+    tracker.poekhaliMskClockDisplay = formatTime(new Date());
+    requestDraw();
   }
 
   function startPoekhaliMskClock() {
