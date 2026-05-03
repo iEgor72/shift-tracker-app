@@ -244,8 +244,7 @@
       align-items: flex-start;
       overflow-x: auto;
       overflow-y: hidden;
-      /* proximity — меньше «перелёта» и отскока, чем mandatory */
-      scroll-snap-type: x proximity;
+      scroll-snap-type: x mandatory;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior-x: contain;
       scroll-padding-inline: 0;

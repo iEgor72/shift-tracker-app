@@ -787,6 +787,28 @@
       else viewport.style.height = '';
     }
 
+    function snapHomeHeroCarouselToNearestPage(viewport) {
+      if (!viewport) return;
+      var slides = viewport.querySelectorAll('.home-hero-carousel-slide');
+      var count = slides.length;
+      if (!count) return;
+      var w = viewport.clientWidth;
+      if (!w) return;
+      var idx = Math.round(viewport.scrollLeft / w);
+      idx = Math.max(0, Math.min(count - 1, idx));
+      var target = idx * w;
+      if (Math.abs(viewport.scrollLeft - target) > 0.5) {
+        viewport.scrollLeft = target;
+      }
+    }
+
+    function finalizeHomeHeroCarouselScroll(viewport) {
+      if (!viewport) return;
+      snapHomeHeroCarouselToNearestPage(viewport);
+      syncHomeHeroCarouselDots(viewport);
+      syncHomeHeroCarouselViewportHeight(viewport);
+    }
+
     function syncHomeHeroCarouselLayout() {
       var viewport = document.getElementById('homeHeroCarouselViewport');
       if (!viewport) return;
@@ -806,8 +828,7 @@
         if (w2) {
           viewport.scrollLeft = Math.round(prevIdx * w2);
         }
-        syncHomeHeroCarouselDots(viewport);
-        syncHomeHeroCarouselViewportHeight(viewport);
+        finalizeHomeHeroCarouselScroll(viewport);
       });
     }
 
@@ -824,29 +845,28 @@
         }
       }
 
-      var heroCarouselHeightTimer = null;
-      function scheduleHeroCarouselHeightSync() {
-        if (heroCarouselHeightTimer) window.clearTimeout(heroCarouselHeightTimer);
-        heroCarouselHeightTimer = window.setTimeout(function() {
-          heroCarouselHeightTimer = null;
-          syncHomeHeroCarouselViewportHeight(viewport);
-        }, 140);
+      var heroCarouselSettleTimer = null;
+      function cancelHeroCarouselSettle() {
+        if (heroCarouselSettleTimer) {
+          window.clearTimeout(heroCarouselSettleTimer);
+          heroCarouselSettleTimer = null;
+        }
       }
 
-      function flushHeroCarouselHeightSync() {
-        if (heroCarouselHeightTimer) {
-          window.clearTimeout(heroCarouselHeightTimer);
-          heroCarouselHeightTimer = null;
-        }
-        syncHomeHeroCarouselViewportHeight(viewport);
+      function scheduleHeroCarouselSettle() {
+        cancelHeroCarouselSettle();
+        heroCarouselSettleTimer = window.setTimeout(function() {
+          heroCarouselSettleTimer = null;
+          finalizeHomeHeroCarouselScroll(viewport);
+        }, 90);
       }
 
       function afterProgrammaticSlideScroll() {
         var smooth = !prefersReducedMotion();
+        cancelHeroCarouselSettle();
         window.setTimeout(function() {
-          syncHomeHeroCarouselDots(viewport);
-          flushHeroCarouselHeightSync();
-        }, smooth ? 240 : 0);
+          finalizeHomeHeroCarouselScroll(viewport);
+        }, smooth ? 260 : 0);
       }
 
       var scrollRaf = null;
@@ -855,17 +875,13 @@
         scrollRaf = window.requestAnimationFrame(function() {
           scrollRaf = null;
           syncHomeHeroCarouselDots(viewport);
-          scheduleHeroCarouselHeightSync();
+          scheduleHeroCarouselSettle();
         });
       }, { passive: true });
 
       viewport.addEventListener('scrollend', function() {
-        if (heroCarouselHeightTimer) {
-          window.clearTimeout(heroCarouselHeightTimer);
-          heroCarouselHeightTimer = null;
-        }
-        syncHomeHeroCarouselDots(viewport);
-        flushHeroCarouselHeightSync();
+        cancelHeroCarouselSettle();
+        finalizeHomeHeroCarouselScroll(viewport);
       });
 
       var dots = document.querySelectorAll('#homeHeroCarousel .home-hero-carousel-dot');
