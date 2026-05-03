@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v246';
+const CACHE_VERSION = 'v247';
 const CACHE_NAME = `shift-tracker-shell-${CACHE_VERSION}`;
 const NAVIGATION_FALLBACK_URL = '/index.html';
 const NETWORK_TIMEOUT_MS = 4500;
@@ -164,13 +164,13 @@ self.addEventListener('fetch', (event) => {
   if (url.pathname.startsWith('/api/')) return;
 
   if (request.mode === 'navigate' || request.destination === 'document') {
-    event.respondWith(networkFirstDocument(request));
+    event.respondWith(networkFirstDocument(request, event));
     return;
   }
 
   if (isStaticAssetRequest(request, url)) {
     if (isShellCodeRequest(request, url) || isTrackerDataRequest(url)) {
-      event.respondWith(networkFirstStatic(request));
+      event.respondWith(staleWhileRevalidate(request, event));
       return;
     }
     event.respondWith(staleWhileRevalidate(request, event));
@@ -385,7 +385,7 @@ function withTimeout(promise, timeoutMs) {
   });
 }
 
-async function networkFirstDocument(request) {
+async function networkFirstDocument(request, event) {
   const cache = await caches.open(CACHE_NAME);
   const requestUrl = new URL(request.url);
   const pathname = requestUrl.pathname;
@@ -411,6 +411,13 @@ async function networkFirstDocument(request) {
       return response;
     })
     .catch(() => null);
+
+  if (cached && allowAppShellFallback) {
+    if (event && event.waitUntil) {
+      event.waitUntil(networkPromise.then(() => undefined));
+    }
+    return cached;
+  }
 
   const fastResponse = await withTimeout(networkPromise, NETWORK_TIMEOUT_MS);
   if (fastResponse) return fastResponse;
