@@ -1,46 +1,46 @@
 # Recent Commits
 
-Generated: 2026-04-28 23:54:23 +1000
+Generated: 2026-05-03 22:05:35 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `4e80426` | 2026-05-03T22:05:26+00:00 | iEgor72 | fix(salary): hide unclear zone and BAM fields |
+| `79e891c` | 2026-05-03T22:35:16+10:00 | iEgor72 | Revert "fix(pwa): suppress iOS PWA white splash flash with dark startup image" |
+| `6839f85` | 2026-05-03T22:27:09+10:00 | iEgor72 | chore(cache): bump shell cache to v254 after splash revert |
+| `4274554` | 2026-05-03T22:26:33+10:00 | iEgor72 | Revert "fix(pwa): generate per-device iOS splashes so the white frame is replaced by dark" |
+| `bb58eb6` | 2026-05-03T22:18:53+10:00 | iEgor72 | fix(pwa): generate per-device iOS splashes so the white frame is replaced by dark |
+| `1a4e8a0` | 2026-05-03T22:11:14+10:00 | iEgor72 | fix(boot): stop forcing standalone PWA reload on SW controllerchange |
+| `a9119ab` | 2026-05-03T22:07:11+10:00 | iEgor72 | fix(auth): redeem stored pwa-login-request on cold load |
+| `28db81b` | 2026-05-03T21:58:31+10:00 | iEgor72 | fix(pwa): suppress iOS PWA white splash flash with dark startup image |
+| `3c54179` | 2026-05-03T21:52:34+10:00 | iEgor72 | fix(boot): remove white flash before first paint |
+| `3da420c` | 2026-05-03T21:48:40+10:00 | iEgor72 | fix(boot): never paint auth gate when cached shell is available |
+| `a41c602` | 2026-05-03T21:37:23+10:00 | iEgor72 | fix(sw): serve cached shell instantly on slow network |
+| `3371b1e` | 2026-05-03T21:32:13+10:00 | iEgor72 | fix(ui): show shell cache version on its own line under user stats |
+| `453d414` | 2026-05-03T21:31:25+10:00 | iEgor72 | feat(ui): show shell cache version on home footer next to user stats |
+| `5f0154e` | 2026-05-03T21:29:11+10:00 | iEgor72 | fix(boot): load Telegram SDK last so offline shell is not blocked |
+| `843c6b9` | 2026-05-03T21:22:25+10:00 | iEgor72 | fix(home): remove hero carousel; keep norm row colors |
+| `72d8257` | 2026-05-03T21:19:33+10:00 | iEgor72 | fix(home): карусель всегда доезжает до слайда (mandatory + snap JS) |
+| `2fb7795` | 2026-05-03T21:16:20+10:00 | iEgor72 | fix(home): плавнее свайп карусели без рывков высоты и конфликта scroll-behavior |
+| `1f52255` | 2026-05-03T21:12:19+10:00 | iEgor72 | fix(home): без лишнего воздуха в хиро, скролл с карусели, цвета норм |
+| `725a507` | 2026-05-03T21:07:44+10:00 | iEgor72 | fix(home): зазор между слайдами карусели и общая высота хиро/календаря |
+| `312be90` | 2026-05-03T21:03:38+10:00 | iEgor72 | fix(home): отступ и одинаковый размер точек карусели |
+| `1ad7d27` | 2026-05-03T21:01:48+10:00 | iEgor72 | feat(home): карусель часы ↔ календарь и блок последней смены ниже |
+| `6684270` | 2026-05-03T20:55:25+10:00 | iEgor72 | feat(poekhali): одна строка GPS со спутниками и раздельными цветами точки записи |
+| `84243d1` | 2026-05-03T20:45:10+10:00 | iEgor72 | fix(poekhali): не открывать панель Поехали с кнопки GPS/записи |
+| `603032c` | 2026-05-03T20:36:09+10:00 | iEgor72 | feat(poekhali): объединить GPS и запись в одну кнопку «Поехали» |
+| `d36a53c` | 2026-05-03T20:30:02+10:00 | iEgor72 | ui: drop salary Poekhali month card and docs «Выберите раздел» kicker |
+| `3bd493a` | 2026-05-03T20:24:47+10:00 | iEgor72 | fix(poekhali): center HUD headline; align ДОПУСК with train-wide speed limit |
+| `1596cbd` | 2026-05-03T20:18:49+10:00 | iEgor72 | ui(poekhali): minimal live HUD — headline + slope/time/reach chips |
+| `ab84b9b` | 2026-05-03T20:09:11+10:00 | iEgor72 | ui(poekhali): relax live HUD layout — full-width text, metric row below |
+| `51c23f6` | 2026-05-03T20:00:10+10:00 | iEgor72 | fix(tg): blank mini-app WebView — drop risky auth CSS hide, defer SDK, skip SW |
+| `8cbe34c` | 2026-05-03T19:55:25+10:00 | iEgor72 | fix(sw): tolerate slow mobile networks for Telegram WebView |
+| `30ed90e` | 2026-05-03T19:49:57+10:00 | iEgor72 | feat(poekhali): align HUD with app chrome and card surfaces |
+| `8453f72` | 2026-05-03T19:43:24+10:00 | iEgor72 | fix(poekhali): center MSK clock in header gutter |
+| `ff146fb` | 2026-05-03T19:41:02+10:00 | iEgor72 | fix(poekhali): metric chips row and MSK clock typography |
+| `63a90e5` | 2026-05-03T19:16:25+10:00 | iEgor72 | feat(poekhali): GPS error/recovery toasts, MSK in header, toast queue UX |
+| `ea574df` | 2026-05-03T19:01:36+10:00 | iEgor72 | feat(poekhali): train on rail scale, speed fact\|limit bar, hide Trip, direction bottom bar |
+| `28aa069` | 2026-05-03T18:51:19+10:00 | iEgor72 | feat(poekhali): compact MSK HUD, preview speed, train on km scale, align GPS toolbar |
+| `694ca90` | 2026-05-03T18:38:50+10:00 | iEgor72 | feat(shifts): open edit form on shift card tap instead of details |
+| `687c6d2` | 2026-05-03T18:32:47+10:00 | iEgor72 | fix(ui): shift actions menu edit item uses edit accent color |
+| `1b115a8` | 2026-04-28T23:55:08+10:00 | iEgor72 | chore(memory): record shift detail release |
 | `10cfcb4` | 2026-04-28T23:54:23+10:00 | iEgor72 | feat(shifts): simplify shift detail view |
-| `0f80d4b` | 2026-04-28T23:36:02+10:00 | iEgor72 | chore(memory): record successful docs deploy |
-| `7ad16a5` | 2026-04-28T23:29:30+10:00 | iEgor72 | chore(memory): record deploy access blocker |
-| `2f4365a` | 2026-04-28T23:28:07+10:00 | iEgor72 | chore(memory): record post-commit update |
-| `a15fff9` | 2026-04-28T23:27:46+10:00 | iEgor72 | chore(memory): record docs release |
-| `962df2c` | 2026-04-28T23:27:15+10:00 | iEgor72 | feat(docs): add folders 9 and 10 |
-| `b7a6600` | 2026-04-27T00:36:34Z | iEgor72 | fix(auth): simplify login copy |
-| `b7c0cb8` | 2026-04-27T00:31:57Z | iEgor72 | fix(auth): keep a single browser login flow |
-| `4d9d8b6` | 2026-04-27T00:25:17Z | iEgor72 | fix(auth): add bot-confirmed PWA login fallback |
-| `86a4f00` | 2026-04-27T00:17:28Z | iEgor72 | fix(auth): restore standalone PWA telegram login |
-| `43f5ba8` | 2026-04-27T09:58:44+10:00 | iEgor72 | fix(auth): simplify telegram login gate |
-| `b121f90` | 2026-04-27T09:33:37+10:00 | iEgor72 | fix(shifts): improve detail readability |
-| `791297c` | 2026-04-27T09:19:57+10:00 | iEgor72 | feat(shifts): open details from cards |
-| `316d4b9` | 2026-04-27T09:08:32+10:00 | iEgor72 | fix(shifts): arrange train details in card |
-| `c66152d` | 2026-04-27T08:45:23+10:00 | iEgor72 | chore(pwa): update app icon |
-| `b72b039` | 2026-04-27T08:33:06+10:00 | iEgor72 | fix(shifts): hide placeholder train composition |
-| `b67d010` | 2026-04-27T08:21:20+10:00 | iEgor72 | fix(poekhali): stabilize live trip mode |
-| `beb016e` | 2026-04-26T16:15:24Z | iEgor72 | Revert "fix(poekhali): orient head by train vector" |
-| `2621acd` | 2026-04-26T16:10:02Z | iEgor72 | fix(poekhali): orient head by train vector |
-| `1339f58` | 2026-04-26T16:02:30Z | iEgor72 | fix(poekhali): orient train head and tighten layout |
-| `c7259c9` | 2026-04-26T15:45:50Z | iEgor72 | feat(ui): make offline notice floating and dismissible |
-| `38a5058` | 2026-04-26T15:30:53Z | iEgor72 | fix(poekhali): measure top stack in local coordinates |
-| `82fe975` | 2026-04-26T15:26:14Z | iEgor72 | fix(poekhali): relayout on offline banner toggle |
-| `0738639` | 2026-04-26T15:13:06Z | iEgor72 | fix(poekhali): unify top stack layout |
-| `7a1e3d2` | 2026-04-26T15:02:24Z | iEgor72 | fix(poekhali): place route below top hud |
-| `c0a1637` | 2026-04-26T15:00:09Z | iEgor72 | fix(poekhali): anchor hud below control row |
-| `8c62cb9` | 2026-04-26T14:55:30Z | iEgor72 | fix(poekhali): add more top spacing below controls |
-| `8cc498e` | 2026-04-26T14:33:55Z | iEgor72 | fix(pwa): refresh standalone shell after sw update |
-| `f9bf393` | 2026-04-26T14:21:10Z | iEgor72 | fix(poekhali): respect telegram safe area at top |
-| `2f9486d` | 2026-04-26T13:46:32Z | iEgor72 | refactor(poekhali): make map sheet state-driven overlay |
-| `104e7e7` | 2026-04-26T13:43:41Z | iEgor72 | fix(ui): block tap-through and disable app selection |
-| `93f0c4a` | 2026-04-26T13:37:46Z | iEgor72 | fix(poekhali): prevent map sheet reopen and selection |
-| `df94ef4` | 2026-04-26T13:32:04Z | iEgor72 | fix(poekhali): force canvas startup redraw |
-| `9f4dbd1` | 2026-04-26T21:49:10+10:00 | iEgor72 | feat: release poekhali mode |
-| `c631e1b` | 2026-04-25T08:06:39+10:00 | iEgor72 | chore(memory): refresh after legacy cleanup |
-| `bca0195` | 2026-04-25T08:06:25+10:00 | iEgor72 | refactor: remove legacy runtime dead code |
-| `379ec2e` | 2026-04-24T02:18:32Z | iEgor72 | fix(home): merge latest shift into calendar card |
-| `32b8524` | 2026-04-24T02:14:28Z | iEgor72 | feat(home): restore latest shift card |
-| `4112eb6` | 2026-04-23T18:26:10Z | iEgor72 | fix(home): move calendar legend into header |
-| `01fbdce` | 2026-04-23T18:18:37Z | iEgor72 | fix(home): keep calendar arrows white |
