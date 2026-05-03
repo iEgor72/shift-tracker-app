@@ -77,8 +77,7 @@
       }
     })();
   </script>
-  <!-- defer: runs before other deferred bundles at end of body; async injection raced auth/init -->
-  <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Telegram SDK загружается последним defer в конце body — иначе офлайн ждёт таймаут telegram.org и блокирует весь bootstrap -->
   <style>
     html, body {
       margin: 0;
@@ -1237,5 +1236,6 @@
   <script src="/scripts/utils/haptics.js" defer></script>
   <script src="/scripts/press-feedback.js" defer></script>
   <script src="/scripts/nav-debug.js" defer></script>
+  <script defer src="https://telegram.org/js/telegram-web-app.js" id="telegram-webapp-sdk"></script>
 </body>
 </html>

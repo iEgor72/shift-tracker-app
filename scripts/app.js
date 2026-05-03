@@ -1,10 +1,29 @@
-﻿    // ── Telegram WebApp Init ──
-    try {
-      if (window.Telegram && Telegram.WebApp) {
-        Telegram.WebApp.ready();
-        Telegram.WebApp.expand();
+﻿    // ── Telegram WebApp chrome (не блокировать bootstrap: SDK подключается последним defer в index.html)
+    function applyTelegramWebAppChrome() {
+      try {
+        if (window.Telegram && Telegram.WebApp) {
+          Telegram.WebApp.ready();
+          Telegram.WebApp.expand();
+        }
+      } catch (e) {
+        console.warn('TG SDK init error:', e);
       }
-    } catch(e) { console.warn('TG SDK init error:', e); }
+      try {
+        if (typeof window.__settleSafeAreaInsets === 'function') {
+          window.__settleSafeAreaInsets();
+        }
+      } catch (e2) {}
+    }
+
+    applyTelegramWebAppChrome();
+
+    (function hookTelegramSdkLoad() {
+      var el = document.getElementById('telegram-webapp-sdk');
+      if (!el || el.dataset.shellHook === '1') return;
+      el.dataset.shellHook = '1';
+      el.addEventListener('load', applyTelegramWebAppChrome);
+      el.addEventListener('error', applyTelegramWebAppChrome);
+    })();
 
     // ── Constants — see scripts/app-constants.js ──
     // ── State ──
