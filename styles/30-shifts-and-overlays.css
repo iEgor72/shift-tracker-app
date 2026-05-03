@@ -893,6 +893,16 @@
       background: var(--accent-dim);
     }
 
+    /* Same edit accent as .btn-edit-action (#fbbf24 + amber tint) */
+    .shift-actions-item.is-edit {
+      color: #fbbf24;
+    }
+
+    .shift-actions-item.is-edit:hover,
+    .shift-actions-item.is-edit:active {
+      background: rgba(245, 158, 11, 0.14);
+    }
+
     .shift-actions-item.is-danger { color: var(--danger); }
     .shift-actions-item.is-danger:hover { background: rgba(244, 63, 94, 0.08); }
 

@@ -1790,7 +1790,7 @@
           '</span>' +
           '<span class="shift-actions-item-label">Поехали</span>' +
         '</button>' +
-        '<button class="shift-actions-item" type="button" data-action="edit" data-id="' + safeShiftId + '" role="menuitem">' +
+        '<button class="shift-actions-item is-edit" type="button" data-action="edit" data-id="' + safeShiftId + '" role="menuitem">' +
           '<span class="shift-actions-item-icon" aria-hidden="true">' +
             '<svg viewBox="0 0 24 24" focusable="false">' +
               '<path fill="currentColor" d="M3 17.25V21h3.75L18.3 9.45l-3.75-3.75L3 17.25Zm2.92 2.33H5v-.92l9.55-9.55.92.92-9.55 9.55ZM20.7 7.04a1 1 0 0 0 0-1.41l-2.33-2.33a1 1 0 0 0-1.42 0l-1.13 1.13 3.75 3.75 1.13-1.14Z"></path>' +
