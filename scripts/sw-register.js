@@ -72,24 +72,18 @@
       initialController = activeController;
       return;
     }
-    if (isStandalonePwa()) {
-      try {
-        if (window.sessionStorage && sessionStorage.getItem(STANDALONE_RELOAD_FLAG) === '1') {
-          sessionStorage.removeItem(STANDALONE_RELOAD_FLAG);
-          console.info('[SW] Controller updated in standalone; reload already consumed.');
-          return;
-        }
-        if (window.sessionStorage) {
-          sessionStorage.setItem(STANDALONE_RELOAD_FLAG, '1');
-        }
-      } catch (error) {}
-      console.info('[SW] Controller updated in standalone; reloading to apply fresh shell.');
-      window.location.reload();
-      return;
-    }
-    // Keep current session stable and avoid startup flicker; new controller
-    // will be naturally used on next navigation.
-    console.info('[SW] Controller updated; reload deferred to next navigation.');
+    // Never call window.location.reload() here, even in standalone PWA:
+    // the reload paints a brief white frame between unload and re-paint.
+    // The next cold launch already gets the fresh cached shell because
+    // the SW now serves shell assets cache-first and refreshes them in the
+    // background. Keep the current session stable and let the new shell
+    // be picked up the next time the user opens the app.
+    try {
+      if (window.sessionStorage) {
+        sessionStorage.removeItem(STANDALONE_RELOAD_FLAG);
+      }
+    } catch (error) {}
+    console.info('[SW] Controller updated; new shell will be used on next launch.');
   });
 
   function refreshServiceWorker(registration) {
