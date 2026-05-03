@@ -198,70 +198,56 @@
           <div class="month-tabs" id="homeMonthTabs" aria-label="Месяцы квартала"></div>
         </div>
 
-        <div class="home-hero-carousel" id="homeHeroCarousel">
-          <div class="home-hero-carousel-viewport" id="homeHeroCarouselViewport" tabindex="0" aria-roledescription="carousel" aria-label="Отработано и календарь смен">
-              <div class="home-hero-carousel-slide" id="homeHeroSlideHours" aria-label="Отработано">
-                <div class="dashboard-card">
-                  <div class="dashboard-head">
-                    <div class="dashboard-eyebrow">Отработано</div>
-                    <div class="dashboard-value"><span id="statWorked">0 ч</span></div>
-                  </div>
-                  <div class="progress-track">
-                    <div class="progress-fill" id="dashboardProgressFill"></div>
-                    <span class="progress-marker progress-marker-today hidden" id="dashboardProgressTodayMarker" aria-hidden="true"></span>
-                    <span class="progress-marker progress-marker-month hidden" id="dashboardProgressMonthMarker" aria-hidden="true"></span>
-                  </div>
-                  <div class="dashboard-norms" aria-live="polite">
-                    <div class="dashboard-norm-item dashboard-norm-item--today">
-                      <span class="dashboard-norm-label">Норма на сегодня</span>
-                      <span class="dashboard-norm-value" id="statNormToday">—</span>
-                    </div>
-                    <div class="dashboard-norm-item dashboard-norm-item--month">
-                      <span class="dashboard-norm-label">Норма месяца</span>
-                      <span class="dashboard-norm-value" id="statNormMonth">—</span>
-                    </div>
-                  </div>
-                  <div class="dashboard-sub" id="statDiff">Осталось —</div>
-                  <div class="dashboard-meta-grid" aria-live="polite">
-                    <div class="dashboard-meta-item dashboard-month-income">
-                      <span class="dashboard-month-income-label" id="dashboardMonthIncomeLabel">За месяц</span>
-                      <span class="dashboard-month-income-value" id="dashboardMonthIncomeValue">—</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="home-hero-carousel-slide" id="homeHeroSlideCalendar" aria-label="Календарь смен">
-                <section class="home-calendar-card home-calendar-card--hero-slide" aria-label="Календарь смен">
-                  <div class="home-calendar-card-head">
-                    <div>
-                      <div class="home-calendar-card-title">Календарь смен</div>
-                    </div>
-                    <div class="home-calendar-legend" aria-hidden="true">
-                      <span class="home-calendar-legend-item"><span class="home-calendar-legend-dot is-day"></span>Дневная</span>
-                      <span class="home-calendar-legend-item"><span class="home-calendar-legend-dot is-night"></span>Ночная</span>
-                      <span class="home-calendar-legend-item"><span class="home-calendar-legend-arrows">← →</span>Переход через полночь</span>
-                    </div>
-                  </div>
-                  <div class="home-calendar-weekdays" aria-hidden="true">
-                    <span>Пн</span>
-                    <span>Вт</span>
-                    <span>Ср</span>
-                    <span>Чт</span>
-                    <span>Пт</span>
-                    <span>Сб</span>
-                    <span>Вс</span>
-                  </div>
-                  <div class="home-calendar-grid" id="homeCalendarGrid"></div>
-                </section>
-              </div>
+        <div class="dashboard-card">
+          <div class="dashboard-head">
+            <div class="dashboard-eyebrow">Отработано</div>
+            <div class="dashboard-value"><span id="statWorked">0 ч</span></div>
           </div>
-          <div class="home-hero-carousel-dots" role="tablist" aria-label="Экран главной страницы">
-            <button type="button" class="home-hero-carousel-dot is-active" role="tab" aria-selected="true" tabindex="0" data-slide-index="0" aria-label="Отработано"></button>
-            <button type="button" class="home-hero-carousel-dot" role="tab" aria-selected="false" tabindex="-1" data-slide-index="1" aria-label="Календарь смен"></button>
+          <div class="progress-track">
+            <div class="progress-fill" id="dashboardProgressFill"></div>
+            <span class="progress-marker progress-marker-today hidden" id="dashboardProgressTodayMarker" aria-hidden="true"></span>
+            <span class="progress-marker progress-marker-month hidden" id="dashboardProgressMonthMarker" aria-hidden="true"></span>
+          </div>
+          <div class="dashboard-norms" aria-live="polite">
+            <div class="dashboard-norm-item dashboard-norm-item--today">
+              <span class="dashboard-norm-label">Норма на сегодня</span>
+              <span class="dashboard-norm-value" id="statNormToday">—</span>
+            </div>
+            <div class="dashboard-norm-item dashboard-norm-item--month">
+              <span class="dashboard-norm-label">Норма месяца</span>
+              <span class="dashboard-norm-value" id="statNormMonth">—</span>
+            </div>
+          </div>
+          <div class="dashboard-sub" id="statDiff">Осталось —</div>
+          <div class="dashboard-meta-grid" aria-live="polite">
+            <div class="dashboard-meta-item dashboard-month-income">
+              <span class="dashboard-month-income-label" id="dashboardMonthIncomeLabel">За месяц</span>
+              <span class="dashboard-month-income-value" id="dashboardMonthIncomeValue">—</span>
+            </div>
           </div>
         </div>
 
-        <section class="home-calendar-card home-calendar-follow" aria-label="Последняя смена">
+        <section class="home-calendar-card" aria-label="Календарь смен">
+          <div class="home-calendar-card-head">
+            <div>
+              <div class="home-calendar-card-title">Календарь смен</div>
+            </div>
+            <div class="home-calendar-legend" aria-hidden="true">
+              <span class="home-calendar-legend-item"><span class="home-calendar-legend-dot is-day"></span>Дневная</span>
+              <span class="home-calendar-legend-item"><span class="home-calendar-legend-dot is-night"></span>Ночная</span>
+              <span class="home-calendar-legend-item"><span class="home-calendar-legend-arrows">← →</span>Переход через полночь</span>
+            </div>
+          </div>
+          <div class="home-calendar-weekdays" aria-hidden="true">
+            <span>Пн</span>
+            <span>Вт</span>
+            <span>Ср</span>
+            <span>Чт</span>
+            <span>Пт</span>
+            <span>Сб</span>
+            <span>Вс</span>
+          </div>
+          <div class="home-calendar-grid" id="homeCalendarGrid"></div>
           <div class="home-calendar-latest-shift">
             <div class="section-header home-calendar-latest-shift-header" id="homeShiftsHeader">Последняя смена</div>
             <div id="homeShiftsList"></div>
