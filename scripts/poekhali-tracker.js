@@ -12165,8 +12165,13 @@
     return getPoekhaliTopHudBottom() + 12;
   }
 
+  /** Vertical space reserved below live summary top (must cover max drawApkLiveSummary height + route rail). */
+  function getPoekhaliLiveSummaryReservedHeight() {
+    return 142;
+  }
+
   function getPoekhaliTopStackBottom() {
-    return getPoekhaliLiveSummaryTop() + 70;
+    return getPoekhaliLiveSummaryTop() + getPoekhaliLiveSummaryReservedHeight();
   }
 
   function roundRectPath(ctx, x, y, width, height, radius) {
@@ -14641,11 +14646,10 @@
     return 'маршрут ' + formatRouteProgressPct(routeProgress.progressPct) + ' · ост. ' + formatDistanceLabel(routeProgress.remainingMeters || 0) + (eta ? ' · ' + eta : '') + ' · ' + toName;
   }
 
-  function drawLiveRouteProgressRail(ctx, x, y, width, routeProgress, isPreview) {
+  function drawLiveRouteProgressRail(ctx, x, railY, width, routeProgress, isPreview) {
     if (!routeProgress || !isFinite(routeProgress.distanceMeters)) return;
     var progress = Math.max(0, Math.min(100, Number(routeProgress.progressPct) || 0));
     var railX = x + 13;
-    var railY = y + 61;
     var railWidth = Math.max(48, width - 26);
     var fillWidth = railWidth * progress / 100;
     var fill = routeProgress.status === 'after'
@@ -14807,6 +14811,23 @@
     return label;
   }
 
+  function splitLiveHudSubtitle(subtitle) {
+    var s = String(subtitle || '').trim();
+    if (!s) return { line1: '', line2: '' };
+    var parts = s.split(/\s*·\s*/).map(function(part) {
+      return part.trim();
+    }).filter(Boolean);
+    if (parts.length <= 2) return { line1: s, line2: '' };
+    if (parts.length === 3) {
+      return { line1: parts[0] + ' · ' + parts[1], line2: parts[2] };
+    }
+    var mid = Math.ceil(parts.length / 2);
+    return {
+      line1: parts.slice(0, mid).join(' · '),
+      line2: parts.slice(mid).join(' · ')
+    };
+  }
+
   function formatLiveNavigationTargetSubtitle(target, locationTitle) {
     if (!target) return '';
     var distance = Math.max(0, Math.round(Number(target.distanceMeters) || 0));
@@ -14827,11 +14848,6 @@
     var y = getPoekhaliLiveSummaryTop();
     var width = w - x * 2;
     var hasRouteProgress = !!(routeProgress && isFinite(routeProgress.distanceMeters));
-    var panelHeight = hasRouteProgress ? 70 : 52;
-    var chipWidth = w < 360 ? 48 : 56;
-    var chipGap = 6;
-    var mskChipW = w < 360 ? 56 : 62;
-    var chipsWidth = mskChipW + chipGap * 3 + chipWidth * 3;
     var station = findStationContext(center, visibleObjects);
     var profilePoint = getCurrentProfilePoint(center, sector);
     var hasProfile = hasProfileForSector(sector);
@@ -14898,7 +14914,7 @@
     var labelColor = 'rgba(136, 146, 164, 0.92)';
     var titleColor = THEME.text;
     var subtitleColor = 'rgba(154, 164, 182, 0.88)';
-    var textX = x + 16;
+    var insetText = 16;
     if (liveAlert) {
       var dangerAlert = liveAlert.level === 'danger';
       blockLabel = dangerAlert ? 'КОНТРОЛЬ' : 'ВНИМАНИЕ';
@@ -14909,38 +14925,80 @@
       labelColor = dangerAlert ? 'rgba(251, 113, 133, 0.86)' : 'rgba(250, 204, 21, 0.82)';
       titleColor = dangerAlert ? '#fecdd3' : '#fef3c7';
       subtitleColor = dangerAlert ? 'rgba(254, 205, 211, 0.84)' : 'rgba(254, 243, 199, 0.82)';
-      textX = x + 20;
+      insetText = 20;
+    }
+
+    var subtitleSplit = splitLiveHudSubtitle(subtitle);
+    var hasSub2 = !!subtitleSplit.line2;
+    var padTop = 12;
+    var padBottom = hasRouteProgress ? 10 : 12;
+    var textFullW = Math.max(72, width - insetText * 2);
+    var titleSize = liveAlert && w < 360 ? 12 : (navTarget ? (w < 360 ? 14 : 16) : 13);
+    var subSize = navTarget ? 10 : 9;
+    var textX = x + insetText;
+
+    var labelBaseline = y + padTop + 9;
+    var titleBaseline = y + padTop + 26;
+    var sub1Baseline = y + padTop + 42;
+    var sub2Baseline = y + padTop + 56;
+    var chipTop = y + padTop + (hasSub2 ? 68 : 52);
+    var chipH = w < 360 ? 34 : 36;
+    var chipGap = w < 380 ? 5 : 6;
+    var chipsInner = width - insetText * 2;
+    var chipW = (chipsInner - chipGap * 3) / 4;
+    if (chipW < 42 && chipGap > 4) {
+      chipGap = 4;
+      chipW = (chipsInner - chipGap * 3) / 4;
+    }
+    chipW = Math.max(38, chipW);
+
+    var railY = chipTop + chipH + 6;
+    var chipsBottom = chipTop + chipH;
+    var panelHeight = chipsBottom + padBottom - y;
+    if (hasRouteProgress) {
+      panelHeight = railY + 5 + 10 - y;
     }
 
     drawPanel(ctx, x, y, width, panelHeight, 16, panelFill, panelStroke);
     if (liveAlert) {
       fillRoundRect(ctx, x + 9, y + 10, 4, panelHeight - 20, 4, liveAlert.level === 'danger' ? THEME.danger : '#facc15');
     }
-    drawText(ctx, blockLabel, textX, y + 17, {
+    drawText(ctx, blockLabel, textX, labelBaseline, {
       size: 8,
       weight: 850,
       color: labelColor
     });
-    drawText(ctx, title, textX, y + 35, {
-      size: liveAlert && w < 360 ? 12 : (navTarget ? (w < 360 ? 13 : 15) : 13),
+    drawText(ctx, title, textX, titleBaseline, {
+      size: titleSize,
       weight: 850,
       color: titleColor,
-      maxWidth: Math.max(84, width - chipsWidth - (liveAlert ? 42 : 34))
+      maxWidth: textFullW
     });
-    drawText(ctx, subtitle, textX, y + 48, {
-      size: navTarget ? 9 : 8.5,
+    drawText(ctx, subtitleSplit.line1 || subtitle, textX, sub1Baseline, {
+      size: subSize,
       weight: 720,
       color: subtitleColor,
-      maxWidth: Math.max(84, width - chipsWidth - (liveAlert ? 42 : 34))
+      maxWidth: textFullW
     });
+    if (subtitleSplit.line2) {
+      drawText(ctx, subtitleSplit.line2, textX, sub2Baseline, {
+        size: subSize,
+        weight: 720,
+        color: subtitleColor,
+        maxWidth: textFullW
+      });
+    }
 
-    var chipX = x + width - chipsWidth - 10;
+    var chipX0 = x + insetText;
     var mskStr = tracker.poekhaliMskClockDisplay || formatTime(new Date());
-    drawLiveChip(ctx, chipX, y + 10, mskChipW, 'МСК', mskStr, 'info');
-    drawLiveChip(ctx, chipX + mskChipW + chipGap, y + 10, chipWidth, chip1Label, chip1Text, chip1Tone);
-    drawLiveChip(ctx, chipX + mskChipW + chipGap + chipWidth + chipGap, y + 10, chipWidth, chip2Label, chip2Text, chip2Tone);
-    drawLiveChip(ctx, chipX + mskChipW + chipGap + (chipWidth + chipGap) * 2, y + 10, chipWidth, chip3Label, chip3Text, chip3Tone);
-    drawLiveRouteProgressRail(ctx, x, y, width, routeProgress, isPreview);
+    drawLiveChip(ctx, chipX0, chipTop, chipW, 'МСК', mskStr, 'info', chipH);
+    drawLiveChip(ctx, chipX0 + chipW + chipGap, chipTop, chipW, chip1Label, chip1Text, chip1Tone, chipH);
+    drawLiveChip(ctx, chipX0 + (chipW + chipGap) * 2, chipTop, chipW, chip2Label, chip2Text, chip2Tone, chipH);
+    drawLiveChip(ctx, chipX0 + (chipW + chipGap) * 3, chipTop, chipW, chip3Label, chip3Text, chip3Tone, chipH);
+
+    if (hasRouteProgress) {
+      drawLiveRouteProgressRail(ctx, x, railY, width, routeProgress, isPreview);
+    }
   }
 
   function drawApkSceneBackground(ctx, layout) {
