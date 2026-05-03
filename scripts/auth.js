@@ -884,9 +884,15 @@
             initDataWaitMs = silent ? 5500 : 5000;
           }
         } catch (e) {}
-        authBootstrapPromise = authenticateWithTelegramWebApp(timeoutMs, {
-          waitBudgetMs: initDataWaitMs
-        })
+        var hasPendingPwaRequest = !!getStoredPwaLoginRequestId();
+        var pwaPollPromise = hasPendingPwaRequest
+          ? pollPwaLoginRequest('', timeoutMs)
+          : Promise.resolve(null);
+        authBootstrapPromise = pwaPollPromise
+          .then(function(user) {
+            if (user) return user;
+            return authenticateWithTelegramWebApp(timeoutMs, { waitBudgetMs: initDataWaitMs });
+          })
           .then(function(user) {
             if (user) return user;
             return restoreSession(timeoutMs);
