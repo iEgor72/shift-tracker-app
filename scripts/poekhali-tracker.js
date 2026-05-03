@@ -12093,7 +12093,7 @@
   function getPoekhaliTopControlsBottom() {
     var ids = [
       'btnPoekhaliBack',
-      'btnPoekhaliDirection',
+      'btnPoekhaliTimer',
       'btnPoekhaliWay',
       'btnPoekhaliMap',
       'poekhaliGpsStatus'
@@ -12103,7 +12103,7 @@
     var maxBottom = 0;
     for (var i = 0; i < ids.length; i++) {
       var el = byId(ids[i]);
-      if (!el) continue;
+      if (!el || el.classList.contains('is-hidden') || el.hasAttribute('hidden')) continue;
       var rect = el.getBoundingClientRect ? el.getBoundingClientRect() : null;
       if (!rect) continue;
       var localBottom = rect.bottom - rootTop;
@@ -12290,7 +12290,7 @@
 
   function setOpsButton() {
     var el = byId('btnPoekhaliOps');
-    if (!el) return;
+    if (!el || el.hasAttribute('hidden')) return;
     var details = getPoekhaliTrainDetails();
     var warnings = getCurrentWarnings().length;
     var width = tracker.width || (typeof window !== 'undefined' ? window.innerWidth : 0);
@@ -14936,33 +14936,39 @@
   }
 
   /**
-   * Horizontal band on the km/picket axis: train head at current line coordinate, tail by train length.
+   * Same head/tail geometry as profile train (drawApkTrain); drawn above the km axis like riding on the rail.
    */
-  function drawTrainKmScaleProjection(ctx, layout, center) {
-    var trainLen = getTrainLengthMeters();
-    if (!isFinite(trainLen) || trainLen <= 0) return;
+  function drawTrainKmScaleProjection(ctx, layout, center, isPreview) {
+    var details = getPoekhaliTrainDetails();
+    var trainMeters = Math.max(1, Math.round(Number(details && details.lengthMeters) || getTrainLengthMeters()));
     var dir = getCurrentCoordinateDirection();
-    var tailCoord = center - dir * trainLen;
+    var tailCoord = center - dir * trainMeters;
     var headX = coordinateToApkX(center, center, layout);
     var tailX = coordinateToApkX(tailCoord, center, layout);
-    var left = Math.min(headX, tailX);
-    var right = Math.max(headX, tailX);
-    var vx0 = layout.viewportX + 10;
-    var vx1 = layout.viewportRight - 10;
-    left = clamp(left, vx0, vx1);
-    right = clamp(right, vx0, vx1);
-    if (right - left < 3) return;
+    var barLeft = Math.min(headX, tailX);
+    var barRight = Math.max(headX, tailX);
+    var span = barRight - barLeft;
+    if (!isFinite(span) || span < 2) return;
 
     var railY = layout.trackY;
-    var bandTop = railY + 36;
-    var bandH = 5;
-    var tagY = railY + 50;
+    var tickTop = railY - 15;
+    var bandH = Math.max(5, Math.min(8, layout.xUnit * 0.82));
+    var bandBottom = tickTop - 3;
+    var bandTop = bandBottom - bandH;
+    var tagY = bandTop - 5;
+
     ctx.save();
-    fillRoundRect(ctx, left, bandTop, right - left, bandH, 3, 'rgba(56, 189, 248, 0.38)');
-    ctx.fillStyle = 'rgba(147, 197, 253, 0.98)';
+    ctx.beginPath();
+    var clipTop = Math.min(tagY - 10, bandTop - 4);
+    ctx.rect(layout.viewportX + 6, clipTop, layout.viewportWidth - 12, Math.max(0, railY - clipTop));
+    ctx.clip();
+
+    fillRoundRect(ctx, barLeft, bandTop, span, bandH, Math.min(3, bandH / 2), isPreview ? 'rgba(91, 210, 255, 0.45)' : 'rgba(74, 222, 128, 0.42)');
+    ctx.fillStyle = isPreview ? 'rgba(147, 197, 253, 0.98)' : 'rgba(187, 247, 208, 0.96)';
     ctx.fillRect(Math.round(headX) - 2, bandTop - 1, 5, bandH + 2);
     ctx.fillStyle = 'rgba(148, 163, 184, 0.92)';
     ctx.fillRect(Math.round(tailX) - 2, bandTop - 1, 5, bandH + 2);
+
     drawText(ctx, 'Г', headX, tagY, {
       size: 8,
       weight: 850,
@@ -14980,7 +14986,7 @@
     ctx.restore();
   }
 
-  function drawApkKmGrid(ctx, layout, center, bounds, sector) {
+  function drawApkKmGrid(ctx, layout, center, bounds, sector, isPreview) {
     var first = Math.ceil(bounds.left / 100) * 100;
     var railY = layout.trackY;
     var kmLabelY = railY + 35;
@@ -15052,7 +15058,7 @@
         });
       }
     }
-    drawTrainKmScaleProjection(ctx, layout, center);
+    drawTrainKmScaleProjection(ctx, layout, center, !!isPreview);
     ctx.restore();
   }
 
@@ -16487,7 +16493,7 @@
     drawApkProfileGrid(ctx, layout);
     drawApkTrackerHeader(ctx, layout, center, sector, visibleObjects);
     drawApkProfileLegend(ctx, layout);
-    drawApkKmGrid(ctx, layout, center, bounds, sector);
+    drawApkKmGrid(ctx, layout, center, bounds, sector, isPreview);
     drawApkProfile(ctx, layout, center, sector, bounds);
 
     drawApkStations(ctx, layout, center, sector, visibleObjects, isPreview, labelLayout);
@@ -16552,80 +16558,75 @@
   function drawBottomBar(ctx, w, h, displayProjection) {
     var projection = displayProjection || tracker.projection;
     var layout = getApkTrackerLayout(w, h);
-    var isPreview = !!(projection && projection.preview);
     var speed = tracker.speedMps * 3.6;
     var speedText = tracker.speedMeters ? speed.toFixed(2) : String(Math.round(speed));
-    var sector = projection && isRealNumber(projection.sector) ? projection.sector : '—';
     var coordinate = projection && isRealNumber(projection.lineCoordinate) ? projection.lineCoordinate : NaN;
     var km = isRealNumber(coordinate) ? String(Math.floor(coordinate / 1000)) : '—';
     var pk = isRealNumber(coordinate) ? String(Math.floor((((Math.round(coordinate) % 1000) + 1000) % 1000) / 100) + 1) : '—';
-    var sats = tracker.satellites || '—';
-    var accuracy = isFinite(tracker.accuracy) && tracker.accuracy > 0 ? Math.round(tracker.accuracy) : '—';
-    var accuracyText = accuracy === '—' ? '—' : accuracy + ' м';
     var activeRestriction = tracker.activeRestriction || resolveActiveRestrictionForProjection(projection);
-    var restrictionText = activeRestriction ? activeRestriction.label : '—';
-    var restrictionColor = activeRestriction && activeRestriction.source === 'warning'
-      ? THEME.danger
-      : activeRestriction && activeRestriction.source === 'document'
-        ? (activeRestriction.conflict ? '#facc15' : THEME.accentStrong)
-      : activeRestriction && activeRestriction.source === 'regime'
-        ? '#fb923c'
-      : activeRestriction
-        ? THEME.text
-        : THEME.sub;
     var isOverspeed = activeRestriction && activeRestriction.speedKmh > 0 && speed > activeRestriction.speedKmh + 1;
+    var allowedStr = activeRestriction && activeRestriction.speedKmh > 0 ? String(activeRestriction.speedKmh) : '—';
     var x = getPanelInset(w);
-    var panelHeight = 50;
+    var compact = w < 360;
+    var panelHeight = 60;
     var panelWidth = w - x * 2;
     var y = Math.min(layout.trackY + 58, h - layout.navReserve - 88);
     y = Math.max(layout.trackY + 46, y);
     if (y + panelHeight > h - layout.navReserve - 30) {
       y = Math.max(layout.trackY + 38, h - layout.navReserve - panelHeight - 30);
     }
-    var metricCount = 4;
-    var colWidth = panelWidth / metricCount;
-    var compact = w < 360;
+    var splitAt = Math.round(x + panelWidth * 0.54);
+    var speedMidX = (x + splitAt) / 2;
+    var kmPkMidX = (splitAt + x + panelWidth) / 2;
 
     ctx.save();
     drawPanel(ctx, x, y, panelWidth, panelHeight, 14, 'rgba(19, 19, 24, 0.78)', 'rgba(255, 255, 255, 0.08)');
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
     ctx.lineWidth = 1;
-    for (var i = 1; i < metricCount; i++) {
-      var dividerX = Math.round(x + colWidth * i) + 0.5;
-      ctx.beginPath();
-      ctx.moveTo(dividerX, y + 10);
-      ctx.lineTo(dividerX, y + panelHeight - 10);
-      ctx.stroke();
-    }
-    function drawMetric(index, label, value, color) {
-      var cellX = x + colWidth * index;
-      var centerX = cellX + colWidth / 2;
-      drawText(ctx, label, centerX, y + 18, {
-        size: compact ? 7 : 8,
-        weight: 850,
-        color: THEME.sub,
-        align: 'center',
-        maxWidth: colWidth - 8
-      });
-      drawText(ctx, value, centerX, y + 39, {
-        size: compact && String(value).length > 4 ? 13 : 15,
-        weight: 850,
-        color: color || THEME.text,
-        align: 'center',
-        maxWidth: colWidth - 8
-      });
-    }
-    if (isPreview) {
-      drawMetric(0, compact ? 'КМ/Ч' : 'СКОРОСТЬ', speedText, isOverspeed ? THEME.danger : THEME.text);
-      drawMetric(1, 'КМ', km, THEME.text);
-      drawMetric(2, 'ПК', pk, THEME.accentStrong);
-      drawMetric(3, 'GPS', tracker.status === 'offtrack' ? 'ВНЕ' : 'НЕТ', THEME.danger);
-    } else {
-      drawMetric(0, compact ? 'СКОР.' : 'СКОРОСТЬ', speedText, isOverspeed ? THEME.danger : THEME.text);
-      drawMetric(1, compact ? 'УЧ.' : 'УЧАСТОК', formatSectorShortName(sector), THEME.text);
-      drawMetric(2, compact ? 'ТОЧН.' : 'ТОЧНОСТЬ', accuracyText, tracker.status === 'gps-live' ? THEME.green : THEME.text);
-      drawMetric(3, 'ОГР.', restrictionText, restrictionColor);
-    }
+    ctx.beginPath();
+    ctx.moveTo(splitAt + 0.5, y + 10);
+    ctx.lineTo(splitAt + 0.5, y + panelHeight - 10);
+    ctx.stroke();
+
+    drawText(ctx, compact ? 'ФАКТ · ДОПУСК' : 'ФАКТ · ДОПУСК', speedMidX, y + 14, {
+      size: compact ? 7 : 8,
+      weight: 850,
+      color: THEME.sub,
+      align: 'center',
+      maxWidth: splitAt - x - 12
+    });
+    drawText(ctx, speedText + ' | ' + allowedStr, speedMidX, y + 34, {
+      size: compact ? 12 : 14,
+      weight: 850,
+      color: isOverspeed ? THEME.danger : THEME.text,
+      align: 'center',
+      maxWidth: splitAt - x - 10
+    });
+
+    drawText(ctx, 'КМ', kmPkMidX, y + 14, {
+      size: compact ? 7 : 8,
+      weight: 850,
+      color: THEME.sub,
+      align: 'center'
+    });
+    drawText(ctx, km, kmPkMidX, y + 30, {
+      size: compact ? 13 : 14,
+      weight: 850,
+      color: THEME.text,
+      align: 'center'
+    });
+    drawText(ctx, 'ПК', kmPkMidX, y + 41, {
+      size: compact ? 7 : 8,
+      weight: 850,
+      color: THEME.sub,
+      align: 'center'
+    });
+    drawText(ctx, pk, kmPkMidX, y + 53, {
+      size: compact ? 13 : 14,
+      weight: 850,
+      color: THEME.accentStrong,
+      align: 'center'
+    });
     ctx.restore();
   }
 
@@ -16946,14 +16947,6 @@
       mapBtn.addEventListener('click', function() {
         closeOpsSheet();
         openMapPicker();
-      });
-    }
-
-    var opsBtn = byId('btnPoekhaliOps');
-    if (opsBtn) {
-      opsBtn.addEventListener('click', function() {
-        closeMapPicker();
-        openOpsSheet();
       });
     }
 
