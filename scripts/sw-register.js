@@ -4,6 +4,24 @@
     return;
   }
 
+  function isLikelyTelegramEmbeddedWebView() {
+    try {
+      return /Telegram/i.test(navigator.userAgent || '');
+    } catch (error) {
+      return false;
+    }
+  }
+
+  if (isLikelyTelegramEmbeddedWebView()) {
+    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+      registrations.forEach(function(registration) {
+        registration.unregister().catch(function() {});
+      });
+    }).catch(function() {});
+    console.info('[SW] Skipped in Telegram WebView (unregistered workers). Scripts load directly from network.');
+    return;
+  }
+
   var initialController = navigator.serviceWorker.controller;
   var SW_URL = '/sw.js';
   var STANDALONE_RELOAD_FLAG = 'shift_tracker_sw_standalone_reload_v1';

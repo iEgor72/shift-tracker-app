@@ -806,7 +806,13 @@
       var opts = options || {};
       var waitBudgetMs = opts.waitBudgetMs;
       if (typeof waitBudgetMs !== 'number' || waitBudgetMs <= 0) {
-        waitBudgetMs = Math.max(1200, Math.min(3000, (typeof timeoutMs === 'number' ? timeoutMs : 1200) + 600));
+        var padded = (typeof timeoutMs === 'number' ? timeoutMs : 1200) + 600;
+        try {
+          if (/Telegram/i.test(navigator.userAgent || '')) {
+            padded = Math.max(padded, 4500);
+          }
+        } catch (e) {}
+        waitBudgetMs = Math.max(1200, Math.min(6500, padded));
       }
 
       return waitForTelegramInitData(waitBudgetMs).then(function(initData) {
@@ -872,8 +878,14 @@
 
       if (!authBootstrapPromise) {
         if (!silent) showAuthGate('prod', 'pending');
+        var initDataWaitMs = silent ? 2600 : 1600;
+        try {
+          if (/Telegram/i.test(navigator.userAgent || '')) {
+            initDataWaitMs = silent ? 5500 : 5000;
+          }
+        } catch (e) {}
         authBootstrapPromise = authenticateWithTelegramWebApp(timeoutMs, {
-          waitBudgetMs: silent ? 2600 : 1600
+          waitBudgetMs: initDataWaitMs
         })
           .then(function(user) {
             if (user) return user;
