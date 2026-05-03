@@ -12376,13 +12376,13 @@
     }
 
     var title = tracker.runStartPreparing
-      ? 'Запуск записи и GPS: готовлю карту и смену'
+      ? 'Запуск записи и GPS: готовлю карту и смену. Нажмите — отменить подготовку'
       : tracker.timerRunning
-        ? 'Запись · GPS активен · ' + formatTimer(getTimerElapsed()) + '. Нажмите — данные поездки'
+        ? 'Запись · GPS активен · ' + formatTimer(getTimerElapsed()) + '. Нажмите — пауза'
         : activeRun
-          ? 'Запись на паузе · GPS при возобновлении. Нажмите — данные поездки'
+          ? 'Запись на паузе · GPS при возобновлении. Нажмите — продолжить'
           : !details || !details.hasShift
-            ? 'Нажмите — GPS; запись после выбора смены в панели'
+            ? 'Нажмите — пробить GPS; смену и детали поездки — кнопка направления «АВТО» внизу'
             : details.shift && details.shift.id && (tracker.autoRunSuppressedShiftId === String(details.shift.id) || hasFinishedRunForShift(details.shift.id))
               ? 'Поездка завершена. Нажмите — новая запись и GPS'
               : tracker.status === 'run-blocked'
@@ -17028,16 +17028,14 @@
     var liveBtn = byId('btnPoekhaliLive');
     if (liveBtn) {
       liveBtn.addEventListener('click', function() {
+        closeMapPicker();
         if (tracker.timerRunning || tracker.runStartPreparing) {
-          closeMapPicker();
-          openOpsSheet();
+          setTimerRunning(false);
           return;
         }
         var details = getPoekhaliTrainDetails();
         if (!details || !details.hasShift) {
           requestPassiveGpsFix();
-          closeMapPicker();
-          openOpsSheet();
           return;
         }
         setTimerRunning(true);
