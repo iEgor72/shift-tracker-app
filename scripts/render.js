@@ -768,6 +768,20 @@
       }
     }
 
+    function syncHomeHeroCarouselViewportHeight(viewport) {
+      if (!viewport) return;
+      var slides = viewport.querySelectorAll('.home-hero-carousel-slide');
+      if (!slides.length) return;
+      var w = viewport.clientWidth;
+      if (!w) return;
+      var idx = Math.round(viewport.scrollLeft / w);
+      idx = Math.max(0, Math.min(slides.length - 1, idx));
+      var slide = slides[idx];
+      var h = slide ? slide.offsetHeight : 0;
+      if (h > 0) viewport.style.height = Math.ceil(h) + 'px';
+      else viewport.style.height = '';
+    }
+
     function syncHomeHeroCarouselLayout() {
       var viewport = document.getElementById('homeHeroCarouselViewport');
       if (!viewport) return;
@@ -777,27 +791,18 @@
       var w = viewport.clientWidth;
       var prevIdx = w ? Math.round(viewport.scrollLeft / Math.max(1, w)) : 0;
 
+      viewport.style.height = '';
       for (var s = 0; s < slides.length; s++) {
         slides[s].style.minHeight = '';
       }
 
       window.requestAnimationFrame(function() {
-        var maxH = 0;
-        for (var j = 0; j < slides.length; j++) {
-          var h = slides[j].offsetHeight;
-          if (h > maxH) maxH = h;
-        }
-        if (maxH >= 96) {
-          var ceilH = Math.ceil(maxH);
-          for (var k = 0; k < slides.length; k++) {
-            slides[k].style.minHeight = ceilH + 'px';
-          }
-        }
         var w2 = viewport.clientWidth;
         if (w2) {
           viewport.scrollLeft = prevIdx * w2;
         }
         syncHomeHeroCarouselDots(viewport);
+        syncHomeHeroCarouselViewportHeight(viewport);
       });
     }
 
@@ -820,11 +825,13 @@
         scrollRaf = window.requestAnimationFrame(function() {
           scrollRaf = null;
           syncHomeHeroCarouselDots(viewport);
+          syncHomeHeroCarouselViewportHeight(viewport);
         });
       }, { passive: true });
 
       viewport.addEventListener('scrollend', function() {
         syncHomeHeroCarouselDots(viewport);
+        syncHomeHeroCarouselViewportHeight(viewport);
       });
 
       var dots = document.querySelectorAll('#homeHeroCarousel .home-hero-carousel-dot');
@@ -842,6 +849,7 @@
           });
           window.requestAnimationFrame(function() {
             syncHomeHeroCarouselDots(viewport);
+            syncHomeHeroCarouselViewportHeight(viewport);
           });
         });
       }
@@ -862,6 +870,7 @@
         });
         window.requestAnimationFrame(function() {
           syncHomeHeroCarouselDots(viewport);
+          syncHomeHeroCarouselViewportHeight(viewport);
         });
       });
 

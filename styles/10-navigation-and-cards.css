@@ -241,12 +241,14 @@
       min-width: 0;
       display: flex;
       flex-direction: row;
+      align-items: flex-start;
       overflow-x: auto;
       overflow-y: hidden;
       scroll-snap-type: x mandatory;
       scroll-behavior: smooth;
       -webkit-overflow-scrolling: touch;
-      touch-action: pan-x;
+      /* pan-x блокировал вертикальный скролл страницы при жесте с карусели */
+      touch-action: pan-x pan-y;
       outline: none;
     }
 
@@ -264,39 +266,16 @@
       scroll-snap-align: start;
       scroll-snap-stop: always;
       box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
       /* зазор между «экранами»: суммарно ~20px между карточками */
       padding-inline: 10px;
     }
 
     .home-hero-carousel-slide .dashboard-card {
       margin-bottom: 0;
-      flex: 1 1 auto;
-      min-height: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 14px;
     }
 
     .home-calendar-card.home-calendar-card--hero-slide {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
       margin-bottom: 0;
-      flex: 1 1 auto;
-      min-height: 0;
-    }
-
-    .home-calendar-card--hero-slide .home-calendar-card-head,
-    .home-calendar-card--hero-slide .home-calendar-weekdays {
-      flex: 0 0 auto;
-    }
-
-    .home-calendar-card--hero-slide .home-calendar-grid {
-      flex: 1 1 auto;
-      min-height: 0;
     }
 
     .home-calendar-follow .home-calendar-latest-shift {
@@ -2509,6 +2488,42 @@
       justify-items: center;
       text-align: center;
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 8px 18px rgba(0, 0, 0, 0.10);
+    }
+
+    .dashboard-norm-item--today {
+      border-color: rgba(56, 189, 248, 0.32);
+      background:
+        linear-gradient(180deg, rgba(56, 189, 248, 0.14), rgba(56, 189, 248, 0.05)),
+        var(--card-hi);
+      box-shadow:
+        inset 0 1px 0 rgba(56, 189, 248, 0.12),
+        0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .dashboard-norm-item--today .dashboard-norm-label {
+      color: rgba(165, 220, 255, 0.88);
+    }
+
+    .dashboard-norm-item--today .dashboard-norm-value {
+      color: var(--accent-strong);
+    }
+
+    .dashboard-norm-item--month {
+      border-color: rgba(244, 114, 182, 0.34);
+      background:
+        linear-gradient(180deg, rgba(244, 114, 182, 0.12), rgba(244, 114, 182, 0.045)),
+        var(--card-hi);
+      box-shadow:
+        inset 0 1px 0 rgba(244, 114, 182, 0.10),
+        0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .dashboard-norm-item--month .dashboard-norm-label {
+      color: rgba(251, 191, 216, 0.88);
+    }
+
+    .dashboard-norm-item--month .dashboard-norm-value {
+      color: var(--holiday);
     }
 
     .dashboard-norm-label {
