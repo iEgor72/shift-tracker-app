@@ -626,19 +626,20 @@
       padding: 0;
     }
 
+    /* Полоса между «Назад» и REC/GPS: блок тянется по ширине и центрирует МСК+время */
     .poekhali-msk-clock {
       position: absolute;
       z-index: 2;
       left: calc(max(10px, var(--safe-left)) + 44px + 10px);
+      right: calc(max(10px, var(--safe-right)) + 196px);
       top: max(10px, var(--safe-top));
       box-sizing: border-box;
       height: 42px;
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
+      align-items: center;
       justify-content: center;
       gap: 2px;
-      max-width: min(200px, calc(100vw - max(10px, var(--safe-left)) - max(10px, var(--safe-right)) - 190px));
       pointer-events: none;
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     }
@@ -650,6 +651,8 @@
       color: var(--sub);
       text-transform: uppercase;
       line-height: 1;
+      text-align: center;
+      width: 100%;
     }
 
     .poekhali-msk-clock-time {
@@ -659,6 +662,8 @@
       letter-spacing: 0.03em;
       color: var(--text);
       line-height: 1;
+      text-align: center;
+      width: 100%;
     }
 
     .poekhali-k-btn {
@@ -1951,9 +1956,9 @@
 
       .poekhali-msk-clock {
         left: calc(max(8px, var(--safe-left)) + 36px + 8px);
+        right: calc(max(8px, var(--safe-right)) + 172px);
         top: max(8px, var(--safe-top));
         height: 40px;
-        max-width: min(188px, calc(100vw - max(8px, var(--safe-left)) - max(8px, var(--safe-right)) - 178px));
       }
 
       .poekhali-msk-clock-time {
@@ -2054,9 +2059,9 @@
 
       .poekhali-msk-clock {
         left: calc(max(8px, var(--safe-left)) + 36px + 6px);
+        right: calc(max(8px, var(--safe-right)) + 158px);
         top: max(8px, var(--safe-top));
         height: 40px;
-        max-width: min(168px, calc(100vw - max(8px, var(--safe-left)) - max(8px, var(--safe-right)) - 168px));
       }
 
       .poekhali-msk-clock-label {
