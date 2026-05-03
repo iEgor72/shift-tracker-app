@@ -1,6 +1,6 @@
 # Worktree Status
 
-Generated: 2026-05-03 22:05:35 +0000
+Generated: 2026-05-03 22:07:37 +0000
 
 ## git status -sb
 ```text
@@ -21,15 +21,15 @@ Generated: 2026-05-03 22:05:35 +0000
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          4e80426 [origin/main] fix(salary): hide unclear zone and BAM fields
+* main                                          6ef4e3a [origin/main] fix(salary): hide trip expense field
 ```
 
 ## HEAD
 ```text
-4e80426 fix(salary): hide unclear zone and BAM fields
+6ef4e3a fix(salary): hide trip expense field
  ai-memory/CHANGELOG.md           |  8 ++++++++
- ai-memory/sessions/2026-05-03.md |  2 ++
- index.html                       | 21 ---------------------
+ ai-memory/sessions/2026-05-03.md |  1 +
+ index.html                       | 14 --------------
  sw.js                            |  2 +-
- 4 files changed, 11 insertions(+), 22 deletions(-)
+ 4 files changed, 10 insertions(+), 15 deletions(-)
 ```

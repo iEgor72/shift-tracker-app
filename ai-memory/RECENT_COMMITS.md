@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-03 22:05:35 +0000
+Generated: 2026-05-03 22:07:37 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `6ef4e3a` | 2026-05-03T22:07:31+00:00 | iEgor72 | fix(salary): hide trip expense field |
+| `063f95b` | 2026-05-03T22:05:41+00:00 | iEgor72 | chore(memory): refresh after salary field cleanup |
 | `4e80426` | 2026-05-03T22:05:26+00:00 | iEgor72 | fix(salary): hide unclear zone and BAM fields |
 | `79e891c` | 2026-05-03T22:35:16+10:00 | iEgor72 | Revert "fix(pwa): suppress iOS PWA white splash flash with dark startup image" |
 | `6839f85` | 2026-05-03T22:27:09+10:00 | iEgor72 | chore(cache): bump shell cache to v254 after splash revert |
@@ -42,5 +44,3 @@ Generated: 2026-05-03 22:05:35 +0000
 | `28aa069` | 2026-05-03T18:51:19+10:00 | iEgor72 | feat(poekhali): compact MSK HUD, preview speed, train on km scale, align GPS toolbar |
 | `694ca90` | 2026-05-03T18:38:50+10:00 | iEgor72 | feat(shifts): open edit form on shift card tap instead of details |
 | `687c6d2` | 2026-05-03T18:32:47+10:00 | iEgor72 | fix(ui): shift actions menu edit item uses edit accent color |
-| `1b115a8` | 2026-04-28T23:55:08+10:00 | iEgor72 | chore(memory): record shift detail release |
-| `10cfcb4` | 2026-04-28T23:54:23+10:00 | iEgor72 | feat(shifts): simplify shift detail view |

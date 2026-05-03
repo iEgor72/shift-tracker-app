@@ -1,14 +1,14 @@
 # Project State
 
 <!-- AUTO_STATUS:START -->
-Generated: 2026-05-03 22:05:35 +0000
+Generated: 2026-05-03 22:07:37 +0000
 
 ## Repository Snapshot
 - Local repo path: `/opt/bloknot-mashinista`
 - Project memory path: `/opt/bloknot-mashinista/ai-memory`
 - Branch: `main`
-- HEAD: `4e80426`
-- Last commit: `4e80426 fix(salary): hide unclear zone and BAM fields`
+- HEAD: `6ef4e3a`
+- Last commit: `6ef4e3a fix(salary): hide trip expense field`
 
 ## Git Remote
 ```text
@@ -29,7 +29,7 @@ origin	https://github.com/iEgor72/bloknot-mashinista.git (push)
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          4e80426 [origin/main] fix(salary): hide unclear zone and BAM fields
+* main                                          6ef4e3a [origin/main] fix(salary): hide trip expense field
 ```
 
 ## Worktree
