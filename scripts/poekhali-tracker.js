@@ -10,7 +10,7 @@
   var APK_ANGLE_MULTIPLIER = 0.22;
   var APK_LABEL_FOCUS_RADIUS_M = 720;
   var APK_LABEL_CONTEXT_RADIUS_M = 1500;
-  var POEKHALI_DIAGNOSTIC_VERSION = 'v207';
+  var POEKHALI_DIAGNOSTIC_VERSION = 'v208';
   var REMOTE_MAP_SOURCE_ENABLED = false;
   var BACKUP_SCHEMA_VERSION = 1;
   var TRAIN_LOCO_LENGTH_M = 51;
@@ -11750,16 +11750,12 @@
   }
 
   function shouldAutoStartPoekhaliRun() {
+    // Never start a new GPS/run flow implicitly on mode entry or visibility change.
+    // Mobile PWA/WebView can show a native geolocation prompt; combining that with
+    // auto preparation makes the screen look frozen. User tap is required.
     if (!tracker.active || tracker.timerRunning || tracker.runStartPreparing) return false;
     if (isPageHidden()) return false;
-    if (tracker.status === 'run-blocked' && tracker.runStartMessage) return false;
-    var details = getPoekhaliTrainDetails();
-    if (!details || !details.hasShift) return false;
-    var shiftId = details.shift && details.shift.id ? String(details.shift.id) : '';
-    if (getActiveRun()) return true;
-    if (shiftId && tracker.autoRunSuppressedShiftId === shiftId) return false;
-    if (shiftId && hasFinishedRunForShift(shiftId)) return false;
-    return true;
+    return !!getActiveRun();
   }
 
   function scheduleAutoRunStart(reason, delayMs) {
@@ -12223,23 +12219,37 @@
     tracker.gpsError = '';
     setGpsStatus('GPS', '');
 
+    var passiveDone = false;
+    var passiveTimer = window.setTimeout(function() {
+      if (passiveDone) return;
+      passiveDone = true;
+      tracker.passiveGpsInFlight = false;
+      handleGpsError({ code: 3, message: 'GPS не ответил' });
+      stopWatchingGps();
+    }, Math.max(12000, Number(GPS_START_OPTIONS.timeout) || 25000));
+
+    function finishPassive(position, error) {
+      if (passiveDone) return;
+      passiveDone = true;
+      if (passiveTimer) window.clearTimeout(passiveTimer);
+      tracker.passiveGpsInFlight = false;
+      if (position) handlePosition(position);
+      else handleGpsError(error || { code: 2, message: 'GPS недоступен' });
+      stopWatchingGps();
+    }
+
     // In offline PWA this direct browser call must happen before any run/route/server
     // checks, otherwise the user can tap GPS and see no permission prompt at all.
     if (navigator.geolocation) {
       try {
         navigator.geolocation.getCurrentPosition(function(position) {
-          tracker.passiveGpsInFlight = false;
-          handlePosition(position);
-          stopWatchingGps();
+          finishPassive(position, null);
         }, function(error) {
-          tracker.passiveGpsInFlight = false;
-          handleGpsError(error);
-          stopWatchingGps();
+          finishPassive(null, error);
         }, GPS_START_OPTIONS);
         return;
       } catch (error) {
-        tracker.passiveGpsInFlight = false;
-        handleGpsError(error);
+        finishPassive(null, error);
         return;
       }
     }
@@ -12247,9 +12257,7 @@
     var token = ++tracker.gpsPollToken;
     tracker.gpsPollInFlight = true;
     if (!requestTelegramLocationPoll(token)) {
-      tracker.passiveGpsInFlight = false;
-      tracker.gpsPollInFlight = false;
-      handleGpsError({ code: 2, message: 'GPS недоступен' });
+      finishPassive(null, { code: 2, message: 'GPS недоступен' });
     }
   }
 
