@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-04 07:56:20 +0000
+Generated: 2026-05-04 08:26:03 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `20a5d8e` | 2026-05-04T08:26:00+00:00 | iEgor72 | fix(poekhali): keep Hurmuli profile orientation |
+| `1b86db4` | 2026-05-04T07:56:28+00:00 | iEgor72 | chore(memory): refresh after GPS deadlock fix |
 | `8a222f1` | 2026-05-04T07:56:17+00:00 | iEgor72 | fix(poekhali): avoid GPS startup deadlock |
 | `b8c06bb` | 2026-05-04T07:51:32+00:00 | iEgor72 | chore(memory): refresh after GPS probe split |
 | `93d2c1d` | 2026-05-04T07:51:20+00:00 | iEgor72 | fix(poekhali): separate GPS probe from run start |
@@ -42,5 +44,3 @@ Generated: 2026-05-04 07:56:20 +0000
 | `5f0154e` | 2026-05-03T21:29:11+10:00 | iEgor72 | fix(boot): load Telegram SDK last so offline shell is not blocked |
 | `843c6b9` | 2026-05-03T21:22:25+10:00 | iEgor72 | fix(home): remove hero carousel; keep norm row colors |
 | `72d8257` | 2026-05-03T21:19:33+10:00 | iEgor72 | fix(home): карусель всегда доезжает до слайда (mandatory + snap JS) |
-| `2fb7795` | 2026-05-03T21:16:20+10:00 | iEgor72 | fix(home): плавнее свайп карусели без рывков высоты и конфликта scroll-behavior |
-| `1f52255` | 2026-05-03T21:12:19+10:00 | iEgor72 | fix(home): без лишнего воздуха в хиро, скролл с карусели, цвета норм |
