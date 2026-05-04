@@ -10,7 +10,7 @@
   var APK_ANGLE_MULTIPLIER = 0.22;
   var APK_LABEL_FOCUS_RADIUS_M = 720;
   var APK_LABEL_CONTEXT_RADIUS_M = 1500;
-  var POEKHALI_DIAGNOSTIC_VERSION = 'v199';
+  var POEKHALI_DIAGNOSTIC_VERSION = 'v200';
   var REMOTE_MAP_SOURCE_ENABLED = false;
   var BACKUP_SCHEMA_VERSION = 1;
   var TRAIN_LOCO_LENGTH_M = 51;
@@ -80,14 +80,14 @@
   var GPS_HIDDEN_POLL_INTERVAL_MS = 60000;
   var GPS_ERROR_POLL_INTERVAL_MS = 30000;
   var GPS_ACTIVE_OPTIONS = {
-    enableHighAccuracy: false,
-    maximumAge: 15000,
-    timeout: 15000
+    enableHighAccuracy: true,
+    maximumAge: 5000,
+    timeout: 20000
   };
   var GPS_START_OPTIONS = {
-    enableHighAccuracy: false,
-    maximumAge: 5000,
-    timeout: 12000
+    enableHighAccuracy: true,
+    maximumAge: 0,
+    timeout: 25000
   };
   var GPS_HIDDEN_OPTIONS = {
     enableHighAccuracy: false,
@@ -11776,15 +11776,17 @@
     if (first.ready || first.reason !== 'no-position' || !shouldKeepGpsWatching()) {
       return Promise.resolve(first);
     }
+    requestGpsPoll();
     return new Promise(function(resolve) {
       var startedAt = Date.now();
+      var maxWaitMs = Math.max(28000, (Number(GPS_START_OPTIONS.timeout) || 0) + 3500);
       function check() {
         if (!tracker.runStartPreparing || tracker.runStartToken !== token || tracker.timerRunning || !tracker.active) {
           resolve(null);
           return;
         }
         var next = getRunStartReadiness();
-        if (next.ready || next.reason !== 'no-position' || Date.now() - startedAt >= 6500) {
+        if (next.ready || next.reason !== 'no-position' || Date.now() - startedAt >= maxWaitMs) {
           resolve(next);
           return;
         }
