@@ -10,7 +10,7 @@
   var APK_ANGLE_MULTIPLIER = 0.22;
   var APK_LABEL_FOCUS_RADIUS_M = 720;
   var APK_LABEL_CONTEXT_RADIUS_M = 1500;
-  var POEKHALI_DIAGNOSTIC_VERSION = 'v201';
+  var POEKHALI_DIAGNOSTIC_VERSION = 'v202';
   var REMOTE_MAP_SOURCE_ENABLED = false;
   var BACKUP_SCHEMA_VERSION = 1;
   var TRAIN_LOCO_LENGTH_M = 51;
@@ -169,6 +169,7 @@
     passiveGpsInFlight: false,
     gpsPollTimer: null,
     gpsPollInFlight: false,
+    telegramLocationInFlight: false,
     gpsPollToken: 0,
     gpsPollLastAt: 0,
     assetPromise: null,
@@ -11971,6 +11972,109 @@
     }
   }
 
+  function getTelegramLocationManager() {
+    try {
+      var webApp = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+      if (!webApp || !webApp.LocationManager) return null;
+      if (typeof webApp.isVersionAtLeast === 'function' && !webApp.isVersionAtLeast('8.0')) return null;
+      return webApp.LocationManager;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function hasAnyGpsProvider() {
+    return !!((navigator && navigator.geolocation) || getTelegramLocationManager());
+  }
+
+  function convertTelegramLocationToPosition(location) {
+    if (!location) return null;
+    var lat = Number(location.latitude);
+    var lon = Number(location.longitude);
+    if (!isFinite(lat) || !isFinite(lon)) return null;
+    var accuracy = Number(location.horizontal_accuracy);
+    var speed = Number(location.speed);
+    var heading = Number(location.course);
+    var altitude = Number(location.altitude);
+    return {
+      timestamp: Date.now(),
+      coords: {
+        latitude: lat,
+        longitude: lon,
+        accuracy: isFinite(accuracy) && accuracy > 0 ? accuracy : 0,
+        altitude: isFinite(altitude) ? altitude : null,
+        altitudeAccuracy: null,
+        heading: isFinite(heading) ? heading : null,
+        speed: isFinite(speed) ? speed : null,
+        telegramLocation: true
+      }
+    };
+  }
+
+  function requestTelegramLocationPoll(token) {
+    var manager = getTelegramLocationManager();
+    if (!manager || tracker.telegramLocationInFlight) return false;
+    tracker.telegramLocationInFlight = true;
+    tracker.gpsPollLastAt = Date.now();
+    var completed = false;
+    var timeoutMs = Math.max(12000, Math.min(30000, Number(GPS_START_OPTIONS.timeout) || 25000));
+    var timeoutTimer = window.setTimeout(function() {
+      finish(null, { code: 3, message: 'Telegram GPS не ответил' });
+    }, timeoutMs);
+
+    function finish(position, error) {
+      if (completed || token !== tracker.gpsPollToken) return;
+      completed = true;
+      if (timeoutTimer) {
+        window.clearTimeout(timeoutTimer);
+        timeoutTimer = null;
+      }
+      tracker.telegramLocationInFlight = false;
+      tracker.gpsPollInFlight = false;
+      if (position) {
+        handlePosition(position);
+        scheduleGpsPoll(getGpsPollIntervalMs(false));
+        return;
+      }
+      handleGpsError(error || {
+        code: manager.isAccessRequested && !manager.isAccessGranted ? 1 : 2,
+        message: 'Telegram не отдал координату'
+      });
+      scheduleGpsPoll(getGpsPollIntervalMs(true));
+    }
+
+    function requestLocationAfterInit() {
+      if (token !== tracker.gpsPollToken) return;
+      try {
+        if (!manager.isLocationAvailable) {
+          finish(null, { code: 2, message: 'Telegram LocationManager недоступен' });
+          return;
+        }
+        manager.getLocation(function(location) {
+          finish(convertTelegramLocationToPosition(location), location ? null : {
+            code: manager.isAccessRequested && !manager.isAccessGranted ? 1 : 2,
+            message: 'Telegram не отдал координату'
+          });
+        });
+      } catch (error) {
+        finish(null, error);
+      }
+    }
+
+    try {
+      if (!manager.isInited) {
+        manager.init(requestLocationAfterInit);
+      } else {
+        requestLocationAfterInit();
+      }
+      return true;
+    } catch (error) {
+      if (timeoutTimer) window.clearTimeout(timeoutTimer);
+      tracker.telegramLocationInFlight = false;
+      return false;
+    }
+  }
+
   function scheduleGpsPoll(delayMs) {
     clearGpsPollTimer();
     if (!shouldKeepGpsWatching()) return;
@@ -11986,20 +12090,33 @@
       stopWatchingGps();
       return;
     }
-    if (!navigator.geolocation) {
+    if (!hasAnyGpsProvider()) {
       tracker.gpsFixState = 'unsupported';
       tracker.gpsSatellitesCount = null;
-      tracker.gpsError = 'GPS недоступен в браузере';
+      tracker.gpsError = 'GPS недоступен в браузере и Telegram';
       tracker.status = 'gps-unsupported';
       setGpsStatus('НЕТ GPS', 'is-error');
       requestDraw();
       return;
     }
-    if (tracker.gpsPollInFlight) return;
+    if (tracker.gpsPollInFlight || tracker.telegramLocationInFlight) return;
 
     tracker.gpsPollInFlight = true;
     tracker.gpsPollLastAt = Date.now();
     var token = ++tracker.gpsPollToken;
+
+    // Telegram Mini Apps have a native LocationManager; in Telegram WebView it is
+    // often more reliable than navigator.geolocation and requests the Telegram
+    // location permission explicitly.
+    if (requestTelegramLocationPoll(token)) return;
+
+    if (!navigator.geolocation) {
+      tracker.gpsPollInFlight = false;
+      handleGpsError({ code: 2, message: 'GPS недоступен в браузере' });
+      scheduleGpsPoll(getGpsPollIntervalMs(true));
+      return;
+    }
+
     try {
       navigator.geolocation.getCurrentPosition(function(position) {
         if (token !== tracker.gpsPollToken) return;
@@ -12023,23 +12140,23 @@
 
   function startWatchingGps() {
     if (!shouldKeepGpsWatching()) return;
-    if (!navigator.geolocation) {
+    if (!hasAnyGpsProvider()) {
       tracker.gpsFixState = 'unsupported';
       tracker.gpsSatellitesCount = null;
-      tracker.gpsError = 'GPS недоступен в браузере';
+      tracker.gpsError = 'GPS недоступен в браузере и Telegram';
       tracker.status = 'gps-unsupported';
       setGpsStatus('НЕТ GPS', 'is-error');
       requestDraw();
       return;
     }
-    if (tracker.watchId !== null || tracker.gpsPollTimer !== null || tracker.gpsPollInFlight) return;
+    if (tracker.watchId !== null || tracker.gpsPollTimer !== null || tracker.gpsPollInFlight || tracker.telegramLocationInFlight) return;
 
     tracker.status = tracker.assetsLoaded ? 'waiting' : 'loading';
     tracker.gpsError = '';
     tracker.runStartMessage = '';
     setGpsStatus('GPS', '');
 
-    if (typeof navigator.geolocation.watchPosition === 'function') {
+    if (navigator.geolocation && typeof navigator.geolocation.watchPosition === 'function') {
       try {
         tracker.watchId = navigator.geolocation.watchPosition(function(position) {
           handlePosition(position);
@@ -12064,6 +12181,7 @@
     clearGpsPollTimer();
     tracker.gpsPollToken += 1;
     tracker.gpsPollInFlight = false;
+    tracker.telegramLocationInFlight = false;
     if (tracker.watchId !== null && navigator.geolocation) {
       try {
         navigator.geolocation.clearWatch(tracker.watchId);
