@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-04 04:39:00 +0000
+Generated: 2026-05-04 04:43:08 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `2f34e98` | 2026-05-04T04:43:06+00:00 | iEgor72 | fix(poekhali): use live GPS watch |
+| `3a61745` | 2026-05-04T04:39:12+00:00 | iEgor72 | chore(memory): refresh after poekhali GPS fix |
 | `a7b25e4` | 2026-05-04T04:38:36+00:00 | iEgor72 | fix(poekhali): make GPS startup more reliable |
 | `60b5f85` | 2026-05-03T22:09:56+00:00 | iEgor72 | chore(memory): refresh after cache version sync |
 | `b7ecd3e` | 2026-05-03T22:09:48+00:00 | iEgor72 | fix(ui): sync displayed cache version |
@@ -42,5 +44,3 @@ Generated: 2026-05-04 04:39:00 +0000
 | `8cbe34c` | 2026-05-03T19:55:25+10:00 | iEgor72 | fix(sw): tolerate slow mobile networks for Telegram WebView |
 | `30ed90e` | 2026-05-03T19:49:57+10:00 | iEgor72 | feat(poekhali): align HUD with app chrome and card surfaces |
 | `8453f72` | 2026-05-03T19:43:24+10:00 | iEgor72 | fix(poekhali): center MSK clock in header gutter |
-| `ff146fb` | 2026-05-03T19:41:02+10:00 | iEgor72 | fix(poekhali): metric chips row and MSK clock typography |
-| `63a90e5` | 2026-05-03T19:16:25+10:00 | iEgor72 | feat(poekhali): GPS error/recovery toasts, MSK in header, toast queue UX |

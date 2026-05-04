@@ -1,14 +1,14 @@
 # Project State
 
 <!-- AUTO_STATUS:START -->
-Generated: 2026-05-04 04:38:59 +0000
+Generated: 2026-05-04 04:43:08 +0000
 
 ## Repository Snapshot
 - Local repo path: `/opt/bloknot-mashinista`
 - Project memory path: `/opt/bloknot-mashinista/ai-memory`
 - Branch: `main`
-- HEAD: `a7b25e4`
-- Last commit: `a7b25e4 fix(poekhali): make GPS startup more reliable`
+- HEAD: `2f34e98`
+- Last commit: `2f34e98 fix(poekhali): use live GPS watch`
 
 ## Git Remote
 ```text
@@ -29,7 +29,7 @@ origin	https://github.com/iEgor72/bloknot-mashinista.git (push)
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          a7b25e4 [origin/main] fix(poekhali): make GPS startup more reliable
+* main                                          2f34e98 [origin/main] fix(poekhali): use live GPS watch
 ```
 
 ## Worktree
