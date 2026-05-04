@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-04 06:14:03 +0000
+Generated: 2026-05-04 07:45:36 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `a79f23b` | 2026-05-04T07:45:33+00:00 | iEgor72 | fix(poekhali): probe GPS before run checks |
+| `1ecd8a0` | 2026-05-04T06:14:08+00:00 | iEgor72 | chore(memory): refresh after BAM profile sign fix |
 | `0e99643` | 2026-05-04T06:14:00+00:00 | iEgor72 | fix(poekhali): invert BAM profile signs |
 | `655591c` | 2026-05-04T05:49:27+00:00 | iEgor72 | chore(memory): refresh after rail km display fix |
 | `7581def` | 2026-05-04T05:49:20+00:00 | iEgor72 | fix(poekhali): display rail km and pickets |
@@ -42,5 +44,3 @@ Generated: 2026-05-04 06:14:03 +0000
 | `312be90` | 2026-05-03T21:03:38+10:00 | iEgor72 | fix(home): отступ и одинаковый размер точек карусели |
 | `1ad7d27` | 2026-05-03T21:01:48+10:00 | iEgor72 | feat(home): карусель часы ↔ календарь и блок последней смены ниже |
 | `6684270` | 2026-05-03T20:55:25+10:00 | iEgor72 | feat(poekhali): одна строка GPS со спутниками и раздельными цветами точки записи |
-| `84243d1` | 2026-05-03T20:45:10+10:00 | iEgor72 | fix(poekhali): не открывать панель Поехали с кнопки GPS/записи |
-| `603032c` | 2026-05-03T20:36:09+10:00 | iEgor72 | feat(poekhali): объединить GPS и запись в одну кнопку «Поехали» |
