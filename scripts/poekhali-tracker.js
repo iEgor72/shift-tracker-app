@@ -10,7 +10,7 @@
   var APK_ANGLE_MULTIPLIER = 0.22;
   var APK_LABEL_FOCUS_RADIUS_M = 720;
   var APK_LABEL_CONTEXT_RADIUS_M = 1500;
-  var POEKHALI_DIAGNOSTIC_VERSION = 'v205';
+  var POEKHALI_DIAGNOSTIC_VERSION = 'v206';
   var REMOTE_MAP_SOURCE_ENABLED = false;
   var BACKUP_SCHEMA_VERSION = 1;
   var TRAIN_LOCO_LENGTH_M = 51;
@@ -12208,24 +12208,48 @@
 
   function requestPassiveGpsFix() {
     if (!tracker.active || tracker.timerRunning || tracker.runStartPreparing || tracker.passiveGpsInFlight) return;
-    if (!navigator.geolocation || isPageHidden()) return;
+    if (isPageHidden()) return;
+    if (!hasAnyGpsProvider()) {
+      tracker.gpsFixState = 'unsupported';
+      tracker.gpsSatellitesCount = null;
+      tracker.gpsError = 'GPS недоступен в PWA/браузере';
+      tracker.status = 'gps-unsupported';
+      setGpsStatus('НЕТ GPS', 'is-error');
+      requestDraw();
+      return;
+    }
     tracker.passiveGpsInFlight = true;
     tracker.status = tracker.assetsLoaded ? 'waiting' : 'loading';
     tracker.gpsError = '';
     setGpsStatus('GPS', '');
-    try {
-      navigator.geolocation.getCurrentPosition(function(position) {
-        tracker.passiveGpsInFlight = false;
-        handlePosition(position);
-        stopWatchingGps();
-      }, function(error) {
+
+    // In offline PWA this direct browser call must happen before any run/route/server
+    // checks, otherwise the user can tap GPS and see no permission prompt at all.
+    if (navigator.geolocation) {
+      try {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          tracker.passiveGpsInFlight = false;
+          handlePosition(position);
+          stopWatchingGps();
+        }, function(error) {
+          tracker.passiveGpsInFlight = false;
+          handleGpsError(error);
+          stopWatchingGps();
+        }, GPS_START_OPTIONS);
+        return;
+      } catch (error) {
         tracker.passiveGpsInFlight = false;
         handleGpsError(error);
-        stopWatchingGps();
-      }, GPS_START_OPTIONS);
-    } catch (error) {
+        return;
+      }
+    }
+
+    var token = ++tracker.gpsPollToken;
+    tracker.gpsPollInFlight = true;
+    if (!requestTelegramLocationPoll(token)) {
       tracker.passiveGpsInFlight = false;
-      handleGpsError(error);
+      tracker.gpsPollInFlight = false;
+      handleGpsError({ code: 2, message: 'GPS недоступен' });
     }
   }
 
@@ -17302,11 +17326,11 @@
           setTimerRunning(false);
           return;
         }
+        // Always ask/probe GPS first. This must work in offline PWA even when
+        // shift/run preparation later fails because network or map data is unavailable.
+        requestPassiveGpsFix();
         var details = getPoekhaliTrainDetails();
-        if (!details || !details.hasShift) {
-          requestPassiveGpsFix();
-          return;
-        }
+        if (!details || !details.hasShift) return;
         setTimerRunning(true);
       });
     }
