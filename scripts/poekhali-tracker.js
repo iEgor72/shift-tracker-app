@@ -10,7 +10,7 @@
   var APK_ANGLE_MULTIPLIER = 0.22;
   var APK_LABEL_FOCUS_RADIUS_M = 720;
   var APK_LABEL_CONTEXT_RADIUS_M = 1500;
-  var POEKHALI_DIAGNOSTIC_VERSION = 'v206';
+  var POEKHALI_DIAGNOSTIC_VERSION = 'v207';
   var REMOTE_MAP_SOURCE_ENABLED = false;
   var BACKUP_SCHEMA_VERSION = 1;
   var TRAIN_LOCO_LENGTH_M = 51;
@@ -17326,11 +17326,18 @@
           setTimerRunning(false);
           return;
         }
-        // Always ask/probe GPS first. This must work in offline PWA even when
-        // shift/run preparation later fails because network or map data is unavailable.
-        requestPassiveGpsFix();
         var details = getPoekhaliTrainDetails();
-        if (!details || !details.hasShift) return;
+        if (!details || !details.hasShift) {
+          requestPassiveGpsFix();
+          return;
+        }
+        // Do not combine permission probing with run startup in one tap: on mobile
+        // WebView/PWA it can freeze the screen behind the native location flow.
+        // First tap gets/refreshes a GPS point, next tap starts the trip once a point exists.
+        if (!tracker.lastLocation || !tracker.projection || !tracker.projection.onTrack) {
+          requestPassiveGpsFix();
+          return;
+        }
         setTimerRunning(true);
       });
     }
