@@ -10,7 +10,7 @@
   var APK_ANGLE_MULTIPLIER = 0.22;
   var APK_LABEL_FOCUS_RADIUS_M = 720;
   var APK_LABEL_CONTEXT_RADIUS_M = 1500;
-  var POEKHALI_DIAGNOSTIC_VERSION = 'v200';
+  var POEKHALI_DIAGNOSTIC_VERSION = 'v201';
   var REMOTE_MAP_SOURCE_ENABLED = false;
   var BACKUP_SCHEMA_VERSION = 1;
   var TRAIN_LOCO_LENGTH_M = 51;
@@ -12032,13 +12032,32 @@
       requestDraw();
       return;
     }
-    if (tracker.gpsPollTimer !== null || tracker.gpsPollInFlight) return;
+    if (tracker.watchId !== null || tracker.gpsPollTimer !== null || tracker.gpsPollInFlight) return;
 
     tracker.status = tracker.assetsLoaded ? 'waiting' : 'loading';
     tracker.gpsError = '';
     tracker.runStartMessage = '';
     setGpsStatus('GPS', '');
-    scheduleGpsPoll(0);
+
+    if (typeof navigator.geolocation.watchPosition === 'function') {
+      try {
+        tracker.watchId = navigator.geolocation.watchPosition(function(position) {
+          handlePosition(position);
+        }, function(error) {
+          handleGpsError(error);
+          if (shouldKeepGpsWatching() && tracker.gpsPollTimer === null && !tracker.gpsPollInFlight) {
+            scheduleGpsPoll(getGpsPollIntervalMs(true));
+          }
+        }, getGpsPollOptions());
+      } catch (error) {
+        tracker.watchId = null;
+        handleGpsError(error);
+      }
+    }
+
+    // watchPosition keeps Android/Telegram WebView GPS warm; polling remains a fallback
+    // and helps recover from WebView implementations that stop watch callbacks.
+    scheduleGpsPoll(tracker.watchId !== null ? GPS_START_POLL_INTERVAL_MS : 0);
   }
 
   function stopWatchingGps() {
@@ -12074,7 +12093,7 @@
         tracker.passiveGpsInFlight = false;
         handleGpsError(error);
         stopWatchingGps();
-      }, GPS_IDLE_OPTIONS);
+      }, GPS_START_OPTIONS);
     } catch (error) {
       tracker.passiveGpsInFlight = false;
       handleGpsError(error);
@@ -12389,7 +12408,11 @@
     if (!tracker.lastLocation && tracker.passiveGpsInFlight) return 'поиск…';
     var n = tracker.gpsSatellitesCount;
     if (n != null && isFinite(n)) return String(Math.max(0, Math.floor(n)));
-    if (tracker.lastLocation && fs === 'ok') return '—';
+    if (tracker.lastLocation && fs === 'ok') {
+      var acc = Number(tracker.accuracy);
+      if (isFinite(acc) && acc > 0) return '±' + Math.round(acc) + 'м';
+      return 'точка';
+    }
     return '—';
   }
 
@@ -12466,7 +12489,7 @@
                 : 'Нажмите — включить GPS и запись поездки';
     title +=
       ' Точка: красная — запись; янтарная — подготовка; жёлтый «II» — пауза; серая — запись выключена.' +
-      ' Справа одной строкой «GPS · …»: цветом показано качество приёма (зелёный / жёлтый / красный / серый); после точки число спутников или короткий статус («—», если браузер число не сообщает).';
+      ' Справа одной строкой «GPS · …»: цветом показано качество приёма (зелёный / жёлтый / красный / серый); после точки точность GPS ±м; число спутников показывается только если браузер его реально отдаёт.';
     var gpsHint = String(el.dataset.fullText || '').trim();
     if (gpsHint && !tracker.timerRunning && !tracker.runStartPreparing) {
       title = title + ' Карта/маршрут: ' + gpsHint + '.';
