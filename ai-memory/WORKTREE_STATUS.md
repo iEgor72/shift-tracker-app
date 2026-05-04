@@ -1,6 +1,6 @@
 # Worktree Status
 
-Generated: 2026-05-04 07:51:23 +0000
+Generated: 2026-05-04 07:56:20 +0000
 
 ## git status -sb
 ```text
@@ -21,16 +21,16 @@ Generated: 2026-05-04 07:51:23 +0000
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          93d2c1d [origin/main] fix(poekhali): separate GPS probe from run start
+* main                                          8a222f1 [origin/main] fix(poekhali): avoid GPS startup deadlock
 ```
 
 ## HEAD
 ```text
-93d2c1d fix(poekhali): separate GPS probe from run start
- ai-memory/CHANGELOG.md           |  8 ++++++++
+8a222f1 fix(poekhali): avoid GPS startup deadlock
+ ai-memory/CHANGELOG.md           |  8 +++++++
  ai-memory/sessions/2026-05-04.md |  1 +
  scripts/app-constants.js         |  2 +-
- scripts/poekhali-tracker.js      | 17 ++++++++++++-----
+ scripts/poekhali-tracker.js      | 48 +++++++++++++++++++++++-----------------
  sw.js                            |  2 +-
- 5 files changed, 23 insertions(+), 7 deletions(-)
+ 5 files changed, 39 insertions(+), 22 deletions(-)
 ```

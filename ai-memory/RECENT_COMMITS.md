@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-04 07:51:23 +0000
+Generated: 2026-05-04 07:56:20 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `8a222f1` | 2026-05-04T07:56:17+00:00 | iEgor72 | fix(poekhali): avoid GPS startup deadlock |
+| `b8c06bb` | 2026-05-04T07:51:32+00:00 | iEgor72 | chore(memory): refresh after GPS probe split |
 | `93d2c1d` | 2026-05-04T07:51:20+00:00 | iEgor72 | fix(poekhali): separate GPS probe from run start |
 | `8c22c00` | 2026-05-04T07:45:41+00:00 | iEgor72 | chore(memory): refresh after offline GPS fix |
 | `a79f23b` | 2026-05-04T07:45:33+00:00 | iEgor72 | fix(poekhali): probe GPS before run checks |
@@ -42,5 +44,3 @@ Generated: 2026-05-04 07:51:23 +0000
 | `72d8257` | 2026-05-03T21:19:33+10:00 | iEgor72 | fix(home): карусель всегда доезжает до слайда (mandatory + snap JS) |
 | `2fb7795` | 2026-05-03T21:16:20+10:00 | iEgor72 | fix(home): плавнее свайп карусели без рывков высоты и конфликта scroll-behavior |
 | `1f52255` | 2026-05-03T21:12:19+10:00 | iEgor72 | fix(home): без лишнего воздуха в хиро, скролл с карусели, цвета норм |
-| `725a507` | 2026-05-03T21:07:44+10:00 | iEgor72 | fix(home): зазор между слайдами карусели и общая высота хиро/календаря |
-| `312be90` | 2026-05-03T21:03:38+10:00 | iEgor72 | fix(home): отступ и одинаковый размер точек карусели |
