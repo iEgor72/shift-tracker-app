@@ -10,7 +10,7 @@
   var APK_ANGLE_MULTIPLIER = 0.22;
   var APK_LABEL_FOCUS_RADIUS_M = 720;
   var APK_LABEL_CONTEXT_RADIUS_M = 1500;
-  var POEKHALI_DIAGNOSTIC_VERSION = 'v209';
+  var POEKHALI_DIAGNOSTIC_VERSION = 'v210';
   var REMOTE_MAP_SOURCE_ENABLED = false;
   var BACKUP_SCHEMA_VERSION = 1;
   var TRAIN_LOCO_LENGTH_M = 51;
@@ -13259,12 +13259,10 @@
   }
 
   function shouldInvertProfileForDirection(sector) {
-    var key = getSectorKey(sector);
-    // Sector 18 around Hurmuli has a verified raw profile sign: do not flip it.
-    // Broad BAM inversion was wrong here (it turned the Hurmuli uphill into descent).
-    if (key === '18') return false;
-    // Other BAM sections keep the direction-based correction until individually verified.
-    return !tracker.even && isBamProfileContext(sector);
+    // XML profile grade is stored by increasing ЭК coordinate. The driver needs
+    // uphill/downhill by train movement direction. For even direction the train
+    // moves toward lower coordinates, so the operational sign must be flipped.
+    return getCurrentCoordinateDirection() < 0;
   }
 
   function getEffectiveProfileGrade(point, sector) {
@@ -14766,7 +14764,7 @@
       var point = source[i];
       if (coordinate <= point.start) break;
       var length = Math.min(coordinate, point.end) - point.start;
-      if (length > 0) total += getProfileDeltaForLength(getEffectiveProfileGrade(point, sector), length, layout.direction);
+      if (length > 0) total += getProfileDeltaForLength(getEffectiveProfileGrade(point, sector), length, 1);
       if (coordinate <= point.end) break;
     }
     return total;
@@ -15984,7 +15982,7 @@
       weighted += overlap * getEffectiveProfileGrade(source[i], sector);
       length += overlap;
     }
-    return length > 0 ? layout.direction * weighted / length : 0;
+    return length > 0 ? weighted / length : 0;
   }
 
   function collectTrainProfilePath(center, sector, layout, trainMeters) {
