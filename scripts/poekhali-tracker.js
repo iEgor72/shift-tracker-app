@@ -10,7 +10,7 @@
   var APK_ANGLE_MULTIPLIER = 0.22;
   var APK_LABEL_FOCUS_RADIUS_M = 720;
   var APK_LABEL_CONTEXT_RADIUS_M = 1500;
-  var POEKHALI_DIAGNOSTIC_VERSION = 'v208';
+  var POEKHALI_DIAGNOSTIC_VERSION = 'v209';
   var REMOTE_MAP_SOURCE_ENABLED = false;
   var BACKUP_SCHEMA_VERSION = 1;
   var TRAIN_LOCO_LENGTH_M = 51;
@@ -13259,10 +13259,12 @@
   }
 
   function shouldInvertProfileForDirection(sector) {
-    // In the imported BAM electronic map the profile grade sign is opposite
-    // to the operational uphill/downhill sense around Hurmuli and adjacent BAM sections.
-    // Invert the sign for BAM regardless of even/odd direction.
-    return isBamProfileContext(sector);
+    var key = getSectorKey(sector);
+    // Sector 18 around Hurmuli has a verified raw profile sign: do not flip it.
+    // Broad BAM inversion was wrong here (it turned the Hurmuli uphill into descent).
+    if (key === '18') return false;
+    // Other BAM sections keep the direction-based correction until individually verified.
+    return !tracker.even && isBamProfileContext(sector);
   }
 
   function getEffectiveProfileGrade(point, sector) {
