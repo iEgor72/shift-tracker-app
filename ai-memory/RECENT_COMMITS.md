@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-04 08:26:03 +0000
+Generated: 2026-05-04 09:25:35 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `536f101` | 2026-05-04T09:25:32+00:00 | iEgor72 | fix(poekhali): show profile by travel direction |
+| `036ac26` | 2026-05-04T08:26:09+00:00 | iEgor72 | chore(memory): refresh after Hurmuli profile fix |
 | `20a5d8e` | 2026-05-04T08:26:00+00:00 | iEgor72 | fix(poekhali): keep Hurmuli profile orientation |
 | `1b86db4` | 2026-05-04T07:56:28+00:00 | iEgor72 | chore(memory): refresh after GPS deadlock fix |
 | `8a222f1` | 2026-05-04T07:56:17+00:00 | iEgor72 | fix(poekhali): avoid GPS startup deadlock |
@@ -42,5 +44,3 @@ Generated: 2026-05-04 08:26:03 +0000
 | `3371b1e` | 2026-05-03T21:32:13+10:00 | iEgor72 | fix(ui): show shell cache version on its own line under user stats |
 | `453d414` | 2026-05-03T21:31:25+10:00 | iEgor72 | feat(ui): show shell cache version on home footer next to user stats |
 | `5f0154e` | 2026-05-03T21:29:11+10:00 | iEgor72 | fix(boot): load Telegram SDK last so offline shell is not blocked |
-| `843c6b9` | 2026-05-03T21:22:25+10:00 | iEgor72 | fix(home): remove hero carousel; keep norm row colors |
-| `72d8257` | 2026-05-03T21:19:33+10:00 | iEgor72 | fix(home): карусель всегда доезжает до слайда (mandatory + snap JS) |
