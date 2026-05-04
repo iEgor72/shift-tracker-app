@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-04 05:49:23 +0000
+Generated: 2026-05-04 06:14:03 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `0e99643` | 2026-05-04T06:14:00+00:00 | iEgor72 | fix(poekhali): invert BAM profile signs |
+| `655591c` | 2026-05-04T05:49:27+00:00 | iEgor72 | chore(memory): refresh after rail km display fix |
 | `7581def` | 2026-05-04T05:49:20+00:00 | iEgor72 | fix(poekhali): display rail km and pickets |
 | `492a266` | 2026-05-04T05:10:38+00:00 | iEgor72 | chore(memory): refresh after BAM profile fix |
 | `062c31a` | 2026-05-04T05:10:30+00:00 | iEgor72 | fix(poekhali): invert BAM odd profile |
@@ -42,5 +44,3 @@ Generated: 2026-05-04 05:49:23 +0000
 | `6684270` | 2026-05-03T20:55:25+10:00 | iEgor72 | feat(poekhali): одна строка GPS со спутниками и раздельными цветами точки записи |
 | `84243d1` | 2026-05-03T20:45:10+10:00 | iEgor72 | fix(poekhali): не открывать панель Поехали с кнопки GPS/записи |
 | `603032c` | 2026-05-03T20:36:09+10:00 | iEgor72 | feat(poekhali): объединить GPS и запись в одну кнопку «Поехали» |
-| `d36a53c` | 2026-05-03T20:30:02+10:00 | iEgor72 | ui: drop salary Poekhali month card and docs «Выберите раздел» kicker |
-| `3bd493a` | 2026-05-03T20:24:47+10:00 | iEgor72 | fix(poekhali): center HUD headline; align ДОПУСК with train-wide speed limit |
