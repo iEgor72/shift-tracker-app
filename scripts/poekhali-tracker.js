@@ -10,7 +10,7 @@
   var APK_ANGLE_MULTIPLIER = 0.22;
   var APK_LABEL_FOCUS_RADIUS_M = 720;
   var APK_LABEL_CONTEXT_RADIUS_M = 1500;
-  var POEKHALI_DIAGNOSTIC_VERSION = 'v210';
+  var POEKHALI_DIAGNOSTIC_VERSION = 'v211';
   var REMOTE_MAP_SOURCE_ENABLED = false;
   var BACKUP_SCHEMA_VERSION = 1;
   var TRAIN_LOCO_LENGTH_M = 51;
@@ -1023,6 +1023,15 @@
   }
 
   function getCurrentCoordinateDirection() {
+    var routeSuggestion = null;
+    try {
+      routeSuggestion = tracker.assetsLoaded ? getShiftRouteSuggestion() : null;
+    } catch (error) {
+      routeSuggestion = null;
+    }
+    if (routeSuggestion && routeSuggestion.status === 'ready' && routeSuggestion.even !== null && routeSuggestion.even !== undefined) {
+      return getCoordinateDirectionForEven(routeSuggestion.even);
+    }
     return getCoordinateDirectionForEven(tracker.even);
   }
 
@@ -1309,7 +1318,11 @@
     var sameWay = suggestion.wayNumber &&
       getWayNumberFromObjectFileKey(suggestion.fromStation && suggestion.fromStation.fileKey) === suggestion.wayNumber &&
       getWayNumberFromObjectFileKey(suggestion.toStation && suggestion.toStation.fileKey) === suggestion.wayNumber;
+    var sameSector = getSectorKey(suggestion.fromStation && suggestion.fromStation.sector) === getSectorKey(suggestion.toStation && suggestion.toStation.sector);
+    // Names like Комсомольск exist in several map sectors; for a shift route prefer
+    // the station pair on the same sector before using parity/file heuristics.
     return suggestion.confidence * 1000000 +
+      (sameSector ? 250000 : 0) +
       getRouteObjectFileScore(suggestion.fromStation, suggestion.even) * 1000 +
       getRouteObjectFileScore(suggestion.toStation, suggestion.even) * 1000 +
       (sameWay ? 5000 : 0) +
