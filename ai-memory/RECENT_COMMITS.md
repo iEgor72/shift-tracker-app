@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-04 09:25:35 +0000
+Generated: 2026-05-04 22:29:44 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `68bb435` | 2026-05-04T22:29:41+00:00 | iEgor72 | fix(poekhali): orient map by matched route |
+| `5036d06` | 2026-05-04T09:25:41+00:00 | iEgor72 | chore(memory): refresh after travel profile fix |
 | `536f101` | 2026-05-04T09:25:32+00:00 | iEgor72 | fix(poekhali): show profile by travel direction |
 | `036ac26` | 2026-05-04T08:26:09+00:00 | iEgor72 | chore(memory): refresh after Hurmuli profile fix |
 | `20a5d8e` | 2026-05-04T08:26:00+00:00 | iEgor72 | fix(poekhali): keep Hurmuli profile orientation |
@@ -42,5 +44,3 @@ Generated: 2026-05-04 09:25:35 +0000
 | `3da420c` | 2026-05-03T21:48:40+10:00 | iEgor72 | fix(boot): never paint auth gate when cached shell is available |
 | `a41c602` | 2026-05-03T21:37:23+10:00 | iEgor72 | fix(sw): serve cached shell instantly on slow network |
 | `3371b1e` | 2026-05-03T21:32:13+10:00 | iEgor72 | fix(ui): show shell cache version on its own line under user stats |
-| `453d414` | 2026-05-03T21:31:25+10:00 | iEgor72 | feat(ui): show shell cache version on home footer next to user stats |
-| `5f0154e` | 2026-05-03T21:29:11+10:00 | iEgor72 | fix(boot): load Telegram SDK last so offline shell is not blocked |
