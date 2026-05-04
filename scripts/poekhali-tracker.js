@@ -10,7 +10,7 @@
   var APK_ANGLE_MULTIPLIER = 0.22;
   var APK_LABEL_FOCUS_RADIUS_M = 720;
   var APK_LABEL_CONTEXT_RADIUS_M = 1500;
-  var POEKHALI_DIAGNOSTIC_VERSION = 'v203';
+  var POEKHALI_DIAGNOSTIC_VERSION = 'v204';
   var REMOTE_MAP_SOURCE_ENABLED = false;
   var BACKUP_SCHEMA_VERSION = 1;
   var TRAIN_LOCO_LENGTH_M = 51;
@@ -3708,7 +3708,7 @@
     if (!match) return null;
     var pkText = match[2] || match[3] || match[4] || match[5] || '';
     return {
-      coordinate: coordinateFromKmPkMeter(match[1], pkText || 1, match[6] || 0),
+      coordinate: coordinateFromKmPkMeter(match[1], pkText || 0, match[6] || 0),
       length: match[0].length,
       label: source.slice(0, match[0].length).trim()
     };
@@ -3905,8 +3905,8 @@
       mapId: String(sample.mapId || fallbackMapId || getLearningMapScope()),
       sector: sector,
       coordinate: roundedCoordinate,
-      km: Math.floor(roundedCoordinate / 1000),
-      pk: Math.floor(meters / 100) + 1,
+      km: getRailKmPkParts(roundedCoordinate).km,
+      pk: getRailKmPkParts(roundedCoordinate).pk,
       lat: lat,
       lon: lon,
       altitude: sample.altitude !== null && sample.altitude !== undefined && sample.altitude !== '' && isFinite(Number(sample.altitude)) ? Number(sample.altitude) : null,
@@ -3962,8 +3962,8 @@
       runId: String(sample.runId || ''),
       nearestSector: isRealNumber(nearestSector) ? nearestSector : null,
       nearestCoordinate: roundedNearestCoordinate,
-      nearestKm: roundedNearestCoordinate === null ? null : Math.floor(roundedNearestCoordinate / 1000),
-      nearestPk: meters === null ? null : Math.floor(meters / 100) + 1,
+      nearestKm: roundedNearestCoordinate === null ? null : getRailKmPkParts(roundedNearestCoordinate).km,
+      nearestPk: roundedNearestCoordinate === null ? null : getRailKmPkParts(roundedNearestCoordinate).pk,
       ts: isFinite(Number(sample.ts)) ? Number(sample.ts) : Date.now()
     };
   }
@@ -9880,7 +9880,7 @@
       titleInput.maxLength = 80;
       titleInput.value = currentUserSection.title || '';
       var startKmInput = createNumberInput(startParts.km, 0, 9999, 1);
-      var startPkInput = createNumberInput(startParts.pk, 1, 10, 1);
+      var startPkInput = createNumberInput(startParts.pk, 0, 9, 1);
       var startMeterInput = createNumberInput(startParts.meter, 0, 99, 1);
       var referenceSelect = document.createElement('select');
       var emptyReferenceOption = document.createElement('option');
@@ -10093,7 +10093,7 @@
       var entityCoordinate = editingItem ? Number(editingItem.coordinate) : defaultCoordinate;
       var entityParts = coordinateToKmPkMeter(entityCoordinate);
       var coordKmInput = createNumberInput(entityParts.km, 0, 9999, 1);
-      var coordPkInput = createNumberInput(entityParts.pk, 1, 10, 1);
+      var coordPkInput = createNumberInput(entityParts.pk, 0, 9, 1);
       var coordMeterInput = createNumberInput(entityParts.meter, 0, 99, 1);
       var lengthInput = createNumberInput(editingItem ? Math.max(0, Math.round(Number(editingItem.length) || 0)) : 0, 0, 100000, 1);
       var speedInput = createNumberInput(editingItem && editingKind === 'speed' ? Math.round(Number(editingItem.speed) || 60) : 60, 1, 200, 1);
@@ -10561,9 +10561,9 @@
       sectorSelect.appendChild(option);
     }
     var startKmInput = createNumberInput(startKmPk.km, 0, 9999, 1);
-    var startPkInput = createNumberInput(startKmPk.pk, 1, 10, 1);
+    var startPkInput = createNumberInput(startKmPk.pk, 0, 9, 1);
     var endKmInput = createNumberInput(endKmPk.km, 0, 9999, 1);
-    var endPkInput = createNumberInput(endKmPk.pk, 1, 10, 1);
+    var endPkInput = createNumberInput(endKmPk.pk, 0, 9, 1);
     var speedInput = createNumberInput(editing ? editing.speed : 40, 1, 200, 1);
     var noteInput = document.createElement('input');
     noteInput.type = 'text';
@@ -11663,12 +11663,23 @@
     });
   }
 
+  function getRailKmPkParts(value) {
+    if (!isFinite(value)) return { km: null, pk: null, meters: null };
+    var coordinate = Math.max(0, Math.round(value));
+    var meters = coordinate % 1000;
+    return {
+      // ЭК хранит метры после предыдущего километрового знака: 3749+373
+      // в рабочей записи отображается как 3750 км 3 пк.
+      km: Math.floor(coordinate / 1000) + 1,
+      pk: Math.floor(meters / 100),
+      meters: meters
+    };
+  }
+
   function formatLineCoordinate(value) {
     if (!isFinite(value)) return '—';
-    var coordinate = Math.max(0, Math.round(value));
-    var km = Math.floor(coordinate / 1000);
-    var meters = coordinate % 1000;
-    return km + ' км ' + (Math.floor(meters / 100) + 1) + ' пк';
+    var parts = getRailKmPkParts(value);
+    return parts.km + ' км ' + parts.pk + ' пк';
   }
 
   function formatTimer(ms) {
@@ -13149,9 +13160,10 @@
 
   function coordinateToKmPk(value) {
     var coordinate = Math.max(0, Math.round(Number(value) || 0));
+    var parts = getRailKmPkParts(coordinate);
     return {
-      km: Math.floor(coordinate / 1000),
-      pk: Math.floor((coordinate % 1000) / 100) + 1
+      km: parts.km,
+      pk: parts.pk
     };
   }
 
@@ -13166,9 +13178,9 @@
   }
 
   function coordinateFromKmPk(km, pk) {
-    var numericKm = Math.max(0, Math.round(Number(km) || 0));
-    var numericPk = Math.max(1, Math.min(10, Math.round(Number(pk) || 1)));
-    return numericKm * 1000 + (numericPk - 1) * 100;
+    var numericKm = Math.max(1, Math.round(Number(km) || 1));
+    var numericPk = Math.max(0, Math.min(9, Math.round(Number(pk) || 0)));
+    return (numericKm - 1) * 1000 + numericPk * 100;
   }
 
   function coordinateFromKmPkMeter(km, pk, meter) {
@@ -15371,7 +15383,7 @@
       }
 
       if (!major && coord >= currentKmStart && coord < currentKmStart + 1000) {
-        var pk = Math.floor((coord - currentKmStart) / 100) + 1;
+        var pk = Math.floor((coord - currentKmStart) / 100);
         if (half || (layout.xUnit > 9 && pk % 2)) {
           drawText(ctx, String(pk), x, pkLabelY + (pk % 2 ? 0 : 9), {
           size: 7,
@@ -15389,7 +15401,7 @@
         });
       }
       if (major) {
-        drawText(ctx, String(Math.floor(coord / 1000)), x, kmLabelY, {
+        drawText(ctx, String(getRailKmPkParts(coord).km), x, kmLabelY, {
           size: 10,
           weight: 850,
           color: 'rgba(238, 242, 248, 0.68)',
@@ -16614,7 +16626,7 @@
       ctx.moveTo(x, plotTop);
       ctx.lineTo(x, speedBottom);
       ctx.stroke();
-      drawText(ctx, String(Math.floor(km / 1000)), x, trackY + 36, {
+      drawText(ctx, String(getRailKmPkParts(km).km), x, trackY + 36, {
         size: 10,
         weight: 750,
         color: 'rgba(238, 242, 248, 0.62)',
@@ -16900,8 +16912,9 @@
     var speed = tracker.speedMps * 3.6;
     var speedText = tracker.speedMeters ? speed.toFixed(2) : String(Math.round(speed));
     var coordinate = projection && isRealNumber(projection.lineCoordinate) ? projection.lineCoordinate : NaN;
-    var km = isRealNumber(coordinate) ? String(Math.floor(coordinate / 1000)) : '—';
-    var pk = isRealNumber(coordinate) ? String(Math.floor((((Math.round(coordinate) % 1000) + 1000) % 1000) / 100) + 1) : '—';
+    var railParts = isRealNumber(coordinate) ? getRailKmPkParts(coordinate) : null;
+    var km = railParts ? String(railParts.km) : '—';
+    var pk = railParts ? String(railParts.pk) : '—';
     var activeRestriction = tracker.activeRestriction || resolveActiveRestrictionForProjection(projection);
     var isOverspeed = activeRestriction && activeRestriction.speedKmh > 0 && speed > activeRestriction.speedKmh + 1;
     var allowedStr = activeRestriction && activeRestriction.speedKmh > 0 ? String(activeRestriction.speedKmh) : '—';
