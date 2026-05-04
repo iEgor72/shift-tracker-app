@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-04 04:43:08 +0000
+Generated: 2026-05-04 04:45:51 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `51c1151` | 2026-05-04T04:45:49+00:00 | iEgor72 | fix(poekhali): use Telegram native location |
+| `5e7deaa` | 2026-05-04T04:43:13+00:00 | iEgor72 | chore(memory): refresh after live GPS watch |
 | `2f34e98` | 2026-05-04T04:43:06+00:00 | iEgor72 | fix(poekhali): use live GPS watch |
 | `3a61745` | 2026-05-04T04:39:12+00:00 | iEgor72 | chore(memory): refresh after poekhali GPS fix |
 | `a7b25e4` | 2026-05-04T04:38:36+00:00 | iEgor72 | fix(poekhali): make GPS startup more reliable |
@@ -42,5 +44,3 @@ Generated: 2026-05-04 04:43:08 +0000
 | `ab84b9b` | 2026-05-03T20:09:11+10:00 | iEgor72 | ui(poekhali): relax live HUD layout — full-width text, metric row below |
 | `51c23f6` | 2026-05-03T20:00:10+10:00 | iEgor72 | fix(tg): blank mini-app WebView — drop risky auth CSS hide, defer SDK, skip SW |
 | `8cbe34c` | 2026-05-03T19:55:25+10:00 | iEgor72 | fix(sw): tolerate slow mobile networks for Telegram WebView |
-| `30ed90e` | 2026-05-03T19:49:57+10:00 | iEgor72 | feat(poekhali): align HUD with app chrome and card surfaces |
-| `8453f72` | 2026-05-03T19:43:24+10:00 | iEgor72 | fix(poekhali): center MSK clock in header gutter |
