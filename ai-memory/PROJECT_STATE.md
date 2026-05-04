@@ -1,14 +1,14 @@
 # Project State
 
 <!-- AUTO_STATUS:START -->
-Generated: 2026-05-04 05:10:33 +0000
+Generated: 2026-05-04 05:49:23 +0000
 
 ## Repository Snapshot
 - Local repo path: `/opt/bloknot-mashinista`
 - Project memory path: `/opt/bloknot-mashinista/ai-memory`
 - Branch: `main`
-- HEAD: `062c31a`
-- Last commit: `062c31a fix(poekhali): invert BAM odd profile`
+- HEAD: `7581def`
+- Last commit: `7581def fix(poekhali): display rail km and pickets`
 
 ## Git Remote
 ```text
@@ -29,7 +29,7 @@ origin	https://github.com/iEgor72/bloknot-mashinista.git (push)
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          062c31a [origin/main] fix(poekhali): invert BAM odd profile
+* main                                          7581def [origin/main] fix(poekhali): display rail km and pickets
 ```
 
 ## Worktree

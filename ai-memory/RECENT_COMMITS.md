@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-04 05:10:33 +0000
+Generated: 2026-05-04 05:49:23 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `7581def` | 2026-05-04T05:49:20+00:00 | iEgor72 | fix(poekhali): display rail km and pickets |
+| `492a266` | 2026-05-04T05:10:38+00:00 | iEgor72 | chore(memory): refresh after BAM profile fix |
 | `062c31a` | 2026-05-04T05:10:30+00:00 | iEgor72 | fix(poekhali): invert BAM odd profile |
 | `56235b3` | 2026-05-04T04:45:54+00:00 | iEgor72 | chore(memory): refresh after Telegram location fix |
 | `51c1151` | 2026-05-04T04:45:49+00:00 | iEgor72 | fix(poekhali): use Telegram native location |
@@ -42,5 +44,3 @@ Generated: 2026-05-04 05:10:33 +0000
 | `603032c` | 2026-05-03T20:36:09+10:00 | iEgor72 | feat(poekhali): объединить GPS и запись в одну кнопку «Поехали» |
 | `d36a53c` | 2026-05-03T20:30:02+10:00 | iEgor72 | ui: drop salary Poekhali month card and docs «Выберите раздел» kicker |
 | `3bd493a` | 2026-05-03T20:24:47+10:00 | iEgor72 | fix(poekhali): center HUD headline; align ДОПУСК with train-wide speed limit |
-| `1596cbd` | 2026-05-03T20:18:49+10:00 | iEgor72 | ui(poekhali): minimal live HUD — headline + slope/time/reach chips |
-| `ab84b9b` | 2026-05-03T20:09:11+10:00 | iEgor72 | ui(poekhali): relax live HUD layout — full-width text, metric row below |
