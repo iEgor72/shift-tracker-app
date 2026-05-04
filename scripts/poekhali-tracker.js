@@ -10,7 +10,7 @@
   var APK_ANGLE_MULTIPLIER = 0.22;
   var APK_LABEL_FOCUS_RADIUS_M = 720;
   var APK_LABEL_CONTEXT_RADIUS_M = 1500;
-  var POEKHALI_DIAGNOSTIC_VERSION = 'v202';
+  var POEKHALI_DIAGNOSTIC_VERSION = 'v203';
   var REMOTE_MAP_SOURCE_ENABLED = false;
   var BACKUP_SCHEMA_VERSION = 1;
   var TRAIN_LOCO_LENGTH_M = 51;
@@ -13195,12 +13195,43 @@
     return (rounded > 0 ? '+' : '') + rounded.toFixed(1) + '‰';
   }
 
+  function isBamProfileContext(sector) {
+    var map = tracker.currentMap || {};
+    var mapText = String([map.id, map.title, map.sourceName].join(' ')).toLowerCase();
+    if (mapText.indexOf('bam') !== -1 || mapText.indexOf('бам') !== -1) return true;
+
+    var objects = getTrackObjectsForSector(sector);
+    for (var i = 0; i < objects.length; i++) {
+      var objectText = String([objects[i].name, objects[i].fileKey, objects[i].sourceCode, objects[i].sourceName].join(' ')).toLowerCase();
+      if (objectText.indexOf('bam') !== -1 || objectText.indexOf('бам') !== -1) return true;
+    }
+
+    var regimes = getRegimeProfilePointsForSector(sector);
+    for (var r = 0; r < regimes.length; r++) {
+      var regimeText = String([regimes[r].sourceCode, regimes[r].sourceName, regimes[r].sourcePath].join(' ')).toLowerCase();
+      if (regimeText.indexOf('bam') !== -1 || regimeText.indexOf('бам') !== -1) return true;
+    }
+    return false;
+  }
+
+  function shouldInvertProfileForDirection(sector) {
+    return !tracker.even && isBamProfileContext(sector);
+  }
+
+  function getEffectiveProfileGrade(point, sector) {
+    if (!point || !isFinite(point.grade)) return NaN;
+    return shouldInvertProfileForDirection(sector !== undefined && sector !== null ? sector : point.sector)
+      ? -Number(point.grade)
+      : Number(point.grade);
+  }
+
   function formatProfileGradeLabel(point) {
     if (!point || !isFinite(point.grade)) return '—';
+    var grade = getEffectiveProfileGrade(point, point.sector);
     if (point.gradeSigned === false) {
-      return '±' + Math.abs(Math.round(point.grade * 10) / 10).toFixed(1) + '‰';
+      return '±' + Math.abs(Math.round(grade * 10) / 10).toFixed(1) + '‰';
     }
-    return formatGradeLabel(point.grade);
+    return formatGradeLabel(grade);
   }
 
   function drawStatusRow(ctx, x, y, width, label, value, tone) {
@@ -14686,7 +14717,7 @@
       var point = source[i];
       if (coordinate <= point.start) break;
       var length = Math.min(coordinate, point.end) - point.start;
-      if (length > 0) total += getProfileDeltaForLength(point.grade, length, layout.direction);
+      if (length > 0) total += getProfileDeltaForLength(getEffectiveProfileGrade(point, sector), length, layout.direction);
       if (coordinate <= point.end) break;
     }
     return total;
@@ -15131,7 +15162,7 @@
     var regimeProfile = profilePoint && profilePoint.regime || (!hasProfile && hasRegimeProfileForSector(sector));
     var slopeLabel = rawDraft ? 'GPS' : userSection ? 'GPS' : (profilePoint && profilePoint.regime ? 'РК' : (hasProfile ? 'УКЛОН' : (regimeProfile ? 'РК' : 'ПРОФ')));
     var slopeText = (rawDraft || userSection) && profilePoint && profilePoint.altitudeMissing ? 'ЛИН.' : (hasProfile && profilePoint ? formatProfileGradeLabel(profilePoint) : (hasProfile ? '—' : (regimeProfile ? 'ЕСТЬ' : 'НЕТ')));
-    var slopeTone = rawDraft ? 'warning' : userSection ? 'success' : (profilePoint && profilePoint.regime ? 'warning' : (hasProfile ? (profilePoint && profilePoint.grade >= 0 ? 'success' : 'info') : (regimeProfile ? 'warning' : 'danger')));
+    var slopeTone = rawDraft ? 'warning' : userSection ? 'success' : (profilePoint && profilePoint.regime ? 'warning' : (hasProfile ? (profilePoint && getEffectiveProfileGrade(profilePoint, sector) >= 0 ? 'success' : 'info') : (regimeProfile ? 'warning' : 'danger')));
     var navTarget = resolveLiveNavigationTarget(projection, activeSpeed, nextWarning, nextRestriction, nextSignal, nextStation, routeProgress);
     if (navTarget) {
       title = formatLiveNavigationTargetTitle(navTarget) || title;
@@ -15901,7 +15932,7 @@
     for (var i = 0; i < source.length; i++) {
       var overlap = Math.min(maxCoordinate, source[i].end) - Math.max(minCoordinate, source[i].start);
       if (overlap <= 0) continue;
-      weighted += overlap * source[i].grade;
+      weighted += overlap * getEffectiveProfileGrade(source[i], sector);
       length += overlap;
     }
     return length > 0 ? layout.direction * weighted / length : 0;
@@ -16188,7 +16219,7 @@
       if (end - start < (isPreview ? 260 : 220)) continue;
       var mid = (start + end) / 2;
       var x = coordinateToApkX(mid, center, layout);
-      var grade = segments[i].grade;
+      var grade = getEffectiveProfileGrade(segments[i], sector);
       var distance = getRangeDistanceFromCenter(start, end, center);
       var meaningful = Math.abs(grade) >= 1.2 || distance <= APK_LABEL_FOCUS_RADIUS_M;
       if (!meaningful || distance > APK_LABEL_CONTEXT_RADIUS_M) continue;
