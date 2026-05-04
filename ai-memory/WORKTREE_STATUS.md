@@ -1,6 +1,6 @@
 # Worktree Status
 
-Generated: 2026-05-04 04:45:51 +0000
+Generated: 2026-05-04 05:10:33 +0000
 
 ## git status -sb
 ```text
@@ -21,16 +21,16 @@ Generated: 2026-05-04 04:45:51 +0000
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          51c1151 [origin/main] fix(poekhali): use Telegram native location
+* main                                          062c31a [origin/main] fix(poekhali): invert BAM odd profile
 ```
 
 ## HEAD
 ```text
-51c1151 fix(poekhali): use Telegram native location
- ai-memory/CHANGELOG.md           |   8 +++
- ai-memory/sessions/2026-05-04.md |   1 +
- scripts/app-constants.js         |   2 +-
- scripts/poekhali-tracker.js      | 134 ++++++++++++++++++++++++++++++++++++---
- sw.js                            |   2 +-
- 5 files changed, 137 insertions(+), 10 deletions(-)
+062c31a fix(poekhali): invert BAM odd profile
+ ai-memory/CHANGELOG.md           |  8 +++++++
+ ai-memory/sessions/2026-05-04.md |  1 +
+ scripts/app-constants.js         |  2 +-
+ scripts/poekhali-tracker.js      | 45 +++++++++++++++++++++++++++++++++-------
+ sw.js                            |  2 +-
+ 5 files changed, 49 insertions(+), 9 deletions(-)
 ```

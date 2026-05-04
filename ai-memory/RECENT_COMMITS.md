@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-04 04:45:51 +0000
+Generated: 2026-05-04 05:10:33 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `062c31a` | 2026-05-04T05:10:30+00:00 | iEgor72 | fix(poekhali): invert BAM odd profile |
+| `56235b3` | 2026-05-04T04:45:54+00:00 | iEgor72 | chore(memory): refresh after Telegram location fix |
 | `51c1151` | 2026-05-04T04:45:49+00:00 | iEgor72 | fix(poekhali): use Telegram native location |
 | `5e7deaa` | 2026-05-04T04:43:13+00:00 | iEgor72 | chore(memory): refresh after live GPS watch |
 | `2f34e98` | 2026-05-04T04:43:06+00:00 | iEgor72 | fix(poekhali): use live GPS watch |
@@ -42,5 +44,3 @@ Generated: 2026-05-04 04:45:51 +0000
 | `3bd493a` | 2026-05-03T20:24:47+10:00 | iEgor72 | fix(poekhali): center HUD headline; align ДОПУСК with train-wide speed limit |
 | `1596cbd` | 2026-05-03T20:18:49+10:00 | iEgor72 | ui(poekhali): minimal live HUD — headline + slope/time/reach chips |
 | `ab84b9b` | 2026-05-03T20:09:11+10:00 | iEgor72 | ui(poekhali): relax live HUD layout — full-width text, metric row below |
-| `51c23f6` | 2026-05-03T20:00:10+10:00 | iEgor72 | fix(tg): blank mini-app WebView — drop risky auth CSS hide, defer SDK, skip SW |
-| `8cbe34c` | 2026-05-03T19:55:25+10:00 | iEgor72 | fix(sw): tolerate slow mobile networks for Telegram WebView |
