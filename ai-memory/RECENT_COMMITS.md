@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-04 07:45:36 +0000
+Generated: 2026-05-04 07:51:23 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `93d2c1d` | 2026-05-04T07:51:20+00:00 | iEgor72 | fix(poekhali): separate GPS probe from run start |
+| `8c22c00` | 2026-05-04T07:45:41+00:00 | iEgor72 | chore(memory): refresh after offline GPS fix |
 | `a79f23b` | 2026-05-04T07:45:33+00:00 | iEgor72 | fix(poekhali): probe GPS before run checks |
 | `1ecd8a0` | 2026-05-04T06:14:08+00:00 | iEgor72 | chore(memory): refresh after BAM profile sign fix |
 | `0e99643` | 2026-05-04T06:14:00+00:00 | iEgor72 | fix(poekhali): invert BAM profile signs |
@@ -42,5 +44,3 @@ Generated: 2026-05-04 07:45:36 +0000
 | `1f52255` | 2026-05-03T21:12:19+10:00 | iEgor72 | fix(home): без лишнего воздуха в хиро, скролл с карусели, цвета норм |
 | `725a507` | 2026-05-03T21:07:44+10:00 | iEgor72 | fix(home): зазор между слайдами карусели и общая высота хиро/календаря |
 | `312be90` | 2026-05-03T21:03:38+10:00 | iEgor72 | fix(home): отступ и одинаковый размер точек карусели |
-| `1ad7d27` | 2026-05-03T21:01:48+10:00 | iEgor72 | feat(home): карусель часы ↔ календарь и блок последней смены ниже |
-| `6684270` | 2026-05-03T20:55:25+10:00 | iEgor72 | feat(poekhali): одна строка GPS со спутниками и раздельными цветами точки записи |

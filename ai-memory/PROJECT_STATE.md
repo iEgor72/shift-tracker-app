@@ -1,14 +1,14 @@
 # Project State
 
 <!-- AUTO_STATUS:START -->
-Generated: 2026-05-04 07:45:36 +0000
+Generated: 2026-05-04 07:51:23 +0000
 
 ## Repository Snapshot
 - Local repo path: `/opt/bloknot-mashinista`
 - Project memory path: `/opt/bloknot-mashinista/ai-memory`
 - Branch: `main`
-- HEAD: `a79f23b`
-- Last commit: `a79f23b fix(poekhali): probe GPS before run checks`
+- HEAD: `93d2c1d`
+- Last commit: `93d2c1d fix(poekhali): separate GPS probe from run start`
 
 ## Git Remote
 ```text
@@ -29,7 +29,7 @@ origin	https://github.com/iEgor72/bloknot-mashinista.git (push)
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          a79f23b [origin/main] fix(poekhali): probe GPS before run checks
+* main                                          93d2c1d [origin/main] fix(poekhali): separate GPS probe from run start
 ```
 
 ## Worktree
