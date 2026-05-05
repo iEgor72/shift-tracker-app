@@ -1,9 +1,12 @@
 # Recent Commits
 
-Generated: 2026-05-05 01:04:45 +0000
+Generated: 2026-05-05 01:07:06 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `6f77e0a` | 2026-05-05T01:07:03+00:00 | iEgor72 | fix(poekhali): display signal parity prefix |
+| `c753600` | 2026-05-05T01:04:55+00:00 | iEgor72 | chore(memory): add signal parity session note |
+| `c3018a2` | 2026-05-05T01:04:48+00:00 | iEgor72 | chore(memory): refresh after signal parity fix |
 | `95d9ea0` | 2026-05-05T01:04:42+00:00 | iEgor72 | fix(poekhali): preserve train parity for signals |
 | `9ebcc6d` | 2026-05-04T22:29:50+00:00 | iEgor72 | chore(memory): refresh after route orientation fix |
 | `68bb435` | 2026-05-04T22:29:41+00:00 | iEgor72 | fix(poekhali): orient map by matched route |
@@ -41,6 +44,3 @@ Generated: 2026-05-05 01:04:45 +0000
 | `bb58eb6` | 2026-05-03T22:18:53+10:00 | iEgor72 | fix(pwa): generate per-device iOS splashes so the white frame is replaced by dark |
 | `1a4e8a0` | 2026-05-03T22:11:14+10:00 | iEgor72 | fix(boot): stop forcing standalone PWA reload on SW controllerchange |
 | `a9119ab` | 2026-05-03T22:07:11+10:00 | iEgor72 | fix(auth): redeem stored pwa-login-request on cold load |
-| `28db81b` | 2026-05-03T21:58:31+10:00 | iEgor72 | fix(pwa): suppress iOS PWA white splash flash with dark startup image |
-| `3c54179` | 2026-05-03T21:52:34+10:00 | iEgor72 | fix(boot): remove white flash before first paint |
-| `3da420c` | 2026-05-03T21:48:40+10:00 | iEgor72 | fix(boot): never paint auth gate when cached shell is available |
