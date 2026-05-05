@@ -3595,11 +3595,11 @@
     if (!label || distance > LIVE_ALERT_AHEAD_M) return null;
 
     var isNear = distance <= LIVE_ALERT_NEAR_M;
-    var eta = formatEtaSeconds(run.nextTargetEtaSeconds, true);
-    var shortLabel = getNavigationTargetShortLabel(run.nextTargetKind, run.nextTargetSource);
-    var text = label + (distance > 0 ? ' через ' + formatRunDistance(distance) : ' тут');
-    if (eta) text += ' · ' + eta;
-    if (shortLabel) text += ' · ' + shortLabel;
+    var eta = formatLiveHudEtaLabel(run.nextTargetEtaSeconds);
+    var kind = String(run.nextTargetKind || '');
+    var displayLabel = kind === 'station' ? 'ст ' + label : (kind === 'signal' ? 'Светофор ' + label : label);
+    var text = displayLabel + (distance > 0 ? ' через ' + formatRunDistance(distance) : ' сейчас');
+    if (eta) text += ' | ' + eta;
 
     return {
       key: [
@@ -3612,7 +3612,7 @@
       ].join(':'),
       kind: run.nextTargetKind || 'target',
       level: isNear ? 'danger' : 'warning',
-      title: isNear ? 'Цель рядом' : 'Цель впереди',
+      title: '',
       text: text,
       distanceMeters: distance
     };
@@ -15198,15 +15198,21 @@
     return 'ЦЕЛЬ';
   }
 
-  /** Single headline line: «Светофор Н2 через 697 м» without extra координаты/пояса. */
+  function formatLiveHudEtaLabel(value) {
+    return String(formatEtaSeconds(value, true) || '').replace(/^~/, '').trim();
+  }
+
+  /** Single human headline: «ст Хальгасо через 697 м | 2 мин» without status labels/координаты/пояса. */
   function formatLiveHudHeadline(navTarget, fallbackTitle) {
     var fb = String(fallbackTitle || '').trim();
     if (!navTarget) return fb || '—';
     var dist = Math.max(0, Math.round(Number(navTarget.distanceMeters) || 0));
     var head = String(formatLiveNavigationTargetTitle(navTarget) || '').trim();
+    var eta = formatLiveHudEtaLabel(navTarget.etaSeconds);
     if (!head) return fb || '—';
-    if (dist > 0) return head + ' через ' + formatDistanceLabel(dist);
-    return head + ' · сейчас';
+    var line = head + (dist > 0 ? ' через ' + formatDistanceLabel(dist) : ' сейчас');
+    if (eta) line += ' | ' + eta;
+    return line;
   }
 
   function formatLiveNavigationTargetTitle(target) {
@@ -15223,7 +15229,7 @@
       return 'Далее ' + (shortLabel && shortLabel !== 'ОГР' ? shortLabel + ' ' : '') + label;
     }
     if (target.kind === 'signal') return 'Светофор ' + label;
-    if (target.kind === 'station') return 'Станция ' + label;
+    if (target.kind === 'station') return 'ст ' + label;
     return label;
   }
 
