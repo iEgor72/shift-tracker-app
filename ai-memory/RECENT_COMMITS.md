@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-05 05:23:39 +0000
+Generated: 2026-05-05 05:46:18 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `496158a` | 2026-05-05T05:46:11+00:00 | iEgor72 | refactor(poekhali): centralize target display formatting |
+| `ddb5c8a` | 2026-05-05T05:23:42+00:00 | iEgor72 | chore(memory): refresh project state |
 | `23e3e4e` | 2026-05-05T05:23:33+00:00 | iEgor72 | fix(poekhali): advance past station anchors |
 | `f47e0e7` | 2026-05-05T05:16:43+00:00 | iEgor72 | chore(memory): refresh project state |
 | `34051e0` | 2026-05-05T05:16:35+00:00 | iEgor72 | fix(poekhali): remove remaining target labels |
@@ -42,5 +44,3 @@ Generated: 2026-05-05 05:23:39 +0000
 | `51c1151` | 2026-05-04T04:45:49+00:00 | iEgor72 | fix(poekhali): use Telegram native location |
 | `5e7deaa` | 2026-05-04T04:43:13+00:00 | iEgor72 | chore(memory): refresh after live GPS watch |
 | `2f34e98` | 2026-05-04T04:43:06+00:00 | iEgor72 | fix(poekhali): use live GPS watch |
-| `3a61745` | 2026-05-04T04:39:12+00:00 | iEgor72 | chore(memory): refresh after poekhali GPS fix |
-| `a7b25e4` | 2026-05-04T04:38:36+00:00 | iEgor72 | fix(poekhali): make GPS startup more reliable |
