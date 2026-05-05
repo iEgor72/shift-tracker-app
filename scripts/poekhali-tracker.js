@@ -211,6 +211,8 @@
     liveAlertLastKey: '',
     liveAlertLastAt: 0,
     editingWarningId: '',
+    warningFormDraft: null,
+    warningBulkDraft: '',
     width: 0,
     height: 0,
     dpr: 1,
@@ -3748,6 +3750,25 @@
       if (getSectorKey(item.sector) !== sectorKey) return false;
       if (isFinite(left) && isFinite(right) && !isObjectInRange(item, left, right)) return false;
       return true;
+    });
+  }
+
+  function getWarningFormDraft() {
+    return tracker.warningFormDraft && typeof tracker.warningFormDraft === 'object' ? tracker.warningFormDraft : null;
+  }
+
+  function setWarningFormDraft(draft) {
+    tracker.warningFormDraft = draft && typeof draft === 'object' ? draft : null;
+  }
+
+  function updateWarningFormDraft(sector, start, end, speed, note, validUntil) {
+    setWarningFormDraft({
+      sector: Number(sector),
+      start: Number(start),
+      end: Number(end),
+      speed: Number(speed),
+      note: String(note || ''),
+      validUntil: String(validUntil || '')
     });
   }
 
@@ -10615,12 +10636,17 @@
     var baseCoordinate = projection && isRealNumber(projection.lineCoordinate)
       ? projection.lineCoordinate
       : getPreferredSectorCoordinate(baseSector, 'middle');
+    var draft = !editing ? getWarningFormDraft() : null;
     if (editing) {
       baseSector = editing.sector;
       baseCoordinate = editing.start;
+    } else if (draft) {
+      if (isRealNumber(draft.sector)) baseSector = draft.sector;
+      if (isRealNumber(draft.start)) baseCoordinate = draft.start;
     }
+    var draftEnd = draft && isRealNumber(draft.end) ? draft.end : NaN;
     var startKmPk = coordinateToKmPk(baseCoordinate);
-    var endKmPk = coordinateToKmPk(editing ? editing.end : baseCoordinate + 1000);
+    var endKmPk = coordinateToKmPk(editing ? editing.end : (isRealNumber(draftEnd) ? draftEnd : baseCoordinate + 1000));
 
     var sectorSelect = document.createElement('select');
     var sectors = getAvailableSectors();
@@ -10635,15 +10661,31 @@
     var startPkInput = createNumberInput(startKmPk.pk, 0, 9, 1);
     var endKmInput = createNumberInput(endKmPk.km, 0, 9999, 1);
     var endPkInput = createNumberInput(endKmPk.pk, 0, 9, 1);
-    var speedInput = createNumberInput(editing ? editing.speed : 40, 1, 200, 1);
+    var speedInput = createNumberInput(editing ? editing.speed : (draft && isRealNumber(draft.speed) ? draft.speed : 40), 1, 200, 1);
     var noteInput = document.createElement('input');
     noteInput.type = 'text';
     noteInput.maxLength = 40;
     noteInput.placeholder = 'например: работы';
-    noteInput.value = editing ? editing.note : '';
+    noteInput.value = editing ? editing.note : (draft ? String(draft.note || '') : '');
     var validUntilInput = document.createElement('input');
     validUntilInput.type = 'date';
-    validUntilInput.value = editing ? editing.validUntil : '';
+    validUntilInput.value = editing ? editing.validUntil : (draft ? String(draft.validUntil || '') : '');
+
+    function captureWarningDraft() {
+      if (editing) return;
+      updateWarningFormDraft(
+        Number(sectorSelect.value),
+        coordinateFromKmPk(startKmInput.value, startPkInput.value),
+        coordinateFromKmPk(endKmInput.value, endPkInput.value),
+        speedInput.value,
+        noteInput.value,
+        validUntilInput.value
+      );
+    }
+    [sectorSelect, startKmInput, startPkInput, endKmInput, endPkInput, speedInput, noteInput, validUntilInput].forEach(function(input) {
+      input.addEventListener('input', captureWarningDraft);
+      input.addEventListener('change', captureWarningDraft);
+    });
 
     var grid = document.createElement('div');
     grid.className = 'poekhali-ops-grid is-warning-grid';
@@ -10663,15 +10705,21 @@
     saveBtn.className = 'poekhali-primary-action';
     saveBtn.textContent = editing ? 'Сохранить предупреждение' : 'Добавить предупреждение';
     saveBtn.addEventListener('click', function() {
-      saveWarningFromForm(
+      var startCoordinate = coordinateFromKmPk(startKmInput.value, startPkInput.value);
+      var endCoordinate = coordinateFromKmPk(endKmInput.value, endPkInput.value);
+      var saved = saveWarningFromForm(
         editing ? editing.id : '',
         Number(sectorSelect.value),
-        coordinateFromKmPk(startKmInput.value, startPkInput.value),
-        coordinateFromKmPk(endKmInput.value, endPkInput.value),
+        startCoordinate,
+        endCoordinate,
         speedInput.value,
         noteInput.value,
         validUntilInput.value
       );
+      if (saved && !editing) {
+        var nextStart = Math.max(startCoordinate, endCoordinate);
+        updateWarningFormDraft(Number(sectorSelect.value), nextStart, nextStart + 1000, speedInput.value, '', validUntilInput.value);
+      }
     });
     formActions.appendChild(saveBtn);
     if (editing) {
@@ -10690,6 +10738,10 @@
     bulkInput.rows = 4;
     bulkInput.maxLength = 2000;
     bulkInput.placeholder = '84/1-84/5 40 работы\nуч 9 85км3пк-86км1пк 60 окно';
+    bulkInput.value = tracker.warningBulkDraft || '';
+    bulkInput.addEventListener('input', function() {
+      tracker.warningBulkDraft = bulkInput.value;
+    });
     var bulkField = createField('Пакет ПР', bulkInput);
     bulkField.classList.add('is-wide');
 
@@ -10704,6 +10756,7 @@
       tracker.warningBulkMessage = result.created.length
         ? 'Добавлено ПР: ' + result.created.length + (result.errors.length ? '. Ошибки: ' + result.errors.slice(0, 2).join(' / ') : '')
         : 'ПР не добавлены' + (result.errors.length ? ': ' + result.errors.slice(0, 2).join(' / ') : '.');
+      if (result.created.length && !result.errors.length) tracker.warningBulkDraft = '';
       tracker.editingWarningId = '';
       renderOpsSheet();
       requestDraw();
@@ -17046,7 +17099,6 @@
     drawApkGradeLabels(ctx, layout, center, sector, bounds, isPreview, labelLayout);
 
     if (isPreview) {
-      drawApkPreviewCursor(ctx, layout, center, sector);
       drawApkTrain(ctx, layout, center, sector, avgAngle, true);
     } else {
       drawApkTrain(ctx, layout, center, sector, avgAngle, false);
