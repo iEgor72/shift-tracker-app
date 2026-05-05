@@ -1,6 +1,6 @@
 # Worktree Status
 
-Generated: 2026-05-05 06:07:24 +0000
+Generated: 2026-05-05 06:11:13 +0000
 
 ## git status -sb
 ```text
@@ -21,16 +21,17 @@ Generated: 2026-05-05 06:07:24 +0000
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          589fca6 [origin/main] fix(poekhali): keep train length label visible
+* main                                          057f6d5 [origin/main] fix(poekhali): restore truncated object names
 ```
 
 ## HEAD
 ```text
-589fca6 fix(poekhali): keep train length label visible
- ai-memory/CHANGELOG.md           |  8 ++++++++
- ai-memory/sessions/2026-05-05.md |  1 +
- scripts/app-constants.js         |  2 +-
- scripts/poekhali-tracker.js      | 41 +++++++++++++++++++++++++++++-----------
- sw.js                            |  2 +-
- 5 files changed, 41 insertions(+), 13 deletions(-)
+057f6d5 fix(poekhali): restore truncated object names
+ ai-memory/CHANGELOG.md           | 8 ++++++++
+ ai-memory/sessions/2026-05-05.md | 1 +
+ scripts/app-constants.js         | 2 +-
+ scripts/poekhali-tracker.js      | 5 +++++
+ scripts/time-utils.js            | 5 +++++
+ sw.js                            | 2 +-
+ 6 files changed, 21 insertions(+), 2 deletions(-)
 ```
