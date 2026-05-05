@@ -3479,6 +3479,11 @@
     }
     var text = String(value || '').replace(/\s+/g, ' ').trim().replace(/^ст\.?\s+/i, '');
     if (!text) return '';
+    var lowerText = text.toLowerCase();
+    if (lowerText === 'комсом') text = 'Комсомольск';
+    else if (lowerText === 'хальгас') text = 'Хальгасо';
+    else if (lowerText === 'хурму') text = 'Хурмули';
+    else if (lowerText === 'скоро') text = 'Скорость';
     text = text.replace(/Комсомольск[\s-]*на[\s-]*Амуре/ig, 'К-на-А');
     text = text.replace(/Партизанские\s+сопки/ig, 'Парт сопки');
     text = text.replace(/\bсортировочн(?:ый|ая|ое|ые)?\b/ig, 'сорт');
