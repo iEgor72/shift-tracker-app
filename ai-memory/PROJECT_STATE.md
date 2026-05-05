@@ -1,14 +1,14 @@
 # Project State
 
 <!-- AUTO_STATUS:START -->
-Generated: 2026-05-05 11:36:48 +0000
+Generated: 2026-05-05 11:55:15 +0000
 
 ## Repository Snapshot
 - Local repo path: `/opt/bloknot-mashinista`
 - Project memory path: `/opt/bloknot-mashinista/ai-memory`
 - Branch: `main`
-- HEAD: `369fb91`
-- Last commit: `369fb91 fix(poekhali): preserve warning form drafts`
+- HEAD: `6670231`
+- Last commit: `6670231 feat(poekhali): improve regime control marks`
 
 ## Git Remote
 ```text
@@ -29,7 +29,7 @@ origin	https://github.com/iEgor72/bloknot-mashinista.git (push)
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          369fb91 [origin/main] fix(poekhali): preserve warning form drafts
+* main                                          6670231 [origin/main] feat(poekhali): improve regime control marks
 ```
 
 ## Worktree

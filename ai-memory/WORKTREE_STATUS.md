@@ -1,6 +1,6 @@
 # Worktree Status
 
-Generated: 2026-05-05 11:36:48 +0000
+Generated: 2026-05-05 11:55:15 +0000
 
 ## git status -sb
 ```text
@@ -21,16 +21,18 @@ Generated: 2026-05-05 11:36:48 +0000
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          369fb91 [origin/main] fix(poekhali): preserve warning form drafts
+* main                                          6670231 [origin/main] feat(poekhali): improve regime control marks
 ```
 
 ## HEAD
 ```text
-369fb91 fix(poekhali): preserve warning form drafts
- ai-memory/CHANGELOG.md           |  8 +++++
+6670231 feat(poekhali): improve regime control marks
+ ai-memory/CHANGELOG.md           |  8 ++++++++
  ai-memory/sessions/2026-05-05.md |  1 +
+ assets/tracker/regime-maps.json  |  2 +-
  scripts/app-constants.js         |  2 +-
- scripts/poekhali-tracker.js      | 68 +++++++++++++++++++++++++++++++++++-----
+ scripts/import-regime-maps.py    |  7 +++++++
+ scripts/poekhali-tracker.js      | 34 ++++++++++++++++++----------------
  sw.js                            |  2 +-
- 5 files changed, 71 insertions(+), 10 deletions(-)
+ 7 files changed, 37 insertions(+), 19 deletions(-)
 ```

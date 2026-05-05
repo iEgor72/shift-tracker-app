@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-05 11:36:48 +0000
+Generated: 2026-05-05 11:55:15 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `6670231` | 2026-05-05T11:55:07+00:00 | iEgor72 | feat(poekhali): improve regime control marks |
+| `25299d0` | 2026-05-05T11:36:51+00:00 | iEgor72 | chore(memory): refresh project state |
 | `369fb91` | 2026-05-05T11:36:41+00:00 | iEgor72 | fix(poekhali): preserve warning form drafts |
 | `0782da8` | 2026-05-05T11:31:55+00:00 | iEgor72 | chore(memory): refresh project state |
 | `9a0af0f` | 2026-05-05T11:31:45+00:00 | iEgor72 | fix(poekhali): align signal direction with route movement |
@@ -42,5 +44,3 @@ Generated: 2026-05-05 11:36:48 +0000
 | `6fc3822` | 2026-05-05T01:43:16+00:00 | iEgor72 | chore(memory): refresh after next signal label fix |
 | `3039e91` | 2026-05-05T01:43:09+00:00 | iEgor72 | fix(poekhali): normalize next signal label |
 | `22ce0e2` | 2026-05-05T01:07:09+00:00 | iEgor72 | chore(memory): refresh after signal label fix |
-| `6f77e0a` | 2026-05-05T01:07:03+00:00 | iEgor72 | fix(poekhali): display signal parity prefix |
-| `c753600` | 2026-05-05T01:04:55+00:00 | iEgor72 | chore(memory): add signal parity session note |
