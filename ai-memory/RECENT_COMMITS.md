@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-05 05:11:45 +0000
+Generated: 2026-05-05 05:16:40 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `34051e0` | 2026-05-05T05:16:35+00:00 | iEgor72 | fix(poekhali): remove remaining target labels |
+| `c3592c4` | 2026-05-05T05:11:49+00:00 | iEgor72 | chore(memory): refresh project state |
 | `be82701` | 2026-05-05T05:11:23+00:00 | iEgor72 | fix(poekhali): simplify live target HUD |
 | `d8c8ca8` | 2026-05-05T01:51:30+00:00 | iEgor72 | chore(memory): refresh after parity orientation fix |
 | `146c79f` | 2026-05-05T01:51:22+00:00 | iEgor72 | fix(poekhali): set parity screen orientation |
@@ -42,5 +44,3 @@ Generated: 2026-05-05 05:11:45 +0000
 | `a7b25e4` | 2026-05-04T04:38:36+00:00 | iEgor72 | fix(poekhali): make GPS startup more reliable |
 | `60b5f85` | 2026-05-03T22:09:56+00:00 | iEgor72 | chore(memory): refresh after cache version sync |
 | `b7ecd3e` | 2026-05-03T22:09:48+00:00 | iEgor72 | fix(ui): sync displayed cache version |
-| `bd430b6` | 2026-05-03T22:07:42+00:00 | iEgor72 | chore(memory): refresh after trip expense cleanup |
-| `6ef4e3a` | 2026-05-03T22:07:31+00:00 | iEgor72 | fix(salary): hide trip expense field |
