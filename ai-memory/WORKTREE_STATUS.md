@@ -1,6 +1,6 @@
 # Worktree Status
 
-Generated: 2026-05-05 06:30:00 +0000
+Generated: 2026-05-05 06:58:18 +0000
 
 ## git status -sb
 ```text
@@ -21,17 +21,17 @@ Generated: 2026-05-05 06:30:00 +0000
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          b606f21 [origin/main] fix(poekhali): resolve KOMSOM station as Komsomolsk-2
+* main                                          ba0de56 [origin/main] fix(poekhali): simplify zero-distance target HUD
 ```
 
 ## HEAD
 ```text
-b606f21 fix(poekhali): resolve KOMSOM station as Komsomolsk-2
+ba0de56 fix(poekhali): simplify zero-distance target HUD
  ai-memory/CHANGELOG.md           |  8 ++++++++
  ai-memory/sessions/2026-05-05.md |  1 +
  scripts/app-constants.js         |  2 +-
- scripts/poekhali-tracker.js      | 24 ++++++++++++++----------
- scripts/time-utils.js            | 10 ++++++----
+ scripts/poekhali-tracker.js      | 17 ++++-------------
+ scripts/time-utils.js            |  4 ++--
  sw.js                            |  2 +-
- 6 files changed, 31 insertions(+), 16 deletions(-)
+ 6 files changed, 17 insertions(+), 17 deletions(-)
 ```

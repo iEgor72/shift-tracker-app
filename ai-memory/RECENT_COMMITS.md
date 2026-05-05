@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-05 06:30:00 +0000
+Generated: 2026-05-05 06:58:18 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `ba0de56` | 2026-05-05T06:58:10+00:00 | iEgor72 | fix(poekhali): simplify zero-distance target HUD |
+| `c551a78` | 2026-05-05T06:30:04+00:00 | iEgor72 | chore(memory): refresh project state |
 | `b606f21` | 2026-05-05T06:29:49+00:00 | iEgor72 | fix(poekhali): resolve KOMSOM station as Komsomolsk-2 |
 | `5dde77a` | 2026-05-05T06:11:18+00:00 | iEgor72 | chore(memory): refresh project state |
 | `057f6d5` | 2026-05-05T06:11:04+00:00 | iEgor72 | fix(poekhali): restore truncated object names |
@@ -42,5 +44,3 @@ Generated: 2026-05-05 06:30:00 +0000
 | `20a5d8e` | 2026-05-04T08:26:00+00:00 | iEgor72 | fix(poekhali): keep Hurmuli profile orientation |
 | `1b86db4` | 2026-05-04T07:56:28+00:00 | iEgor72 | chore(memory): refresh after GPS deadlock fix |
 | `8a222f1` | 2026-05-04T07:56:17+00:00 | iEgor72 | fix(poekhali): avoid GPS startup deadlock |
-| `b8c06bb` | 2026-05-04T07:51:32+00:00 | iEgor72 | chore(memory): refresh after GPS probe split |
-| `93d2c1d` | 2026-05-04T07:51:20+00:00 | iEgor72 | fix(poekhali): separate GPS probe from run start |
