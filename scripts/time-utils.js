@@ -703,6 +703,31 @@
       return meters ? meters + ' м' : '';
     }
 
+    function formatPoekhaliTargetEta(value) {
+      return String(formatShiftPoekhaliEta(value, true) || '').replace(/^~/, '').trim();
+    }
+
+    function formatPoekhaliTargetTitle(target) {
+      if (!target) return '';
+      var label = String(target.label || target.name || '').trim();
+      var kind = String(target.kind || '');
+      if (!label) return '';
+      if (kind === 'station') return 'ст ' + label.replace(/^ст\.?\s+/i, '');
+      if (kind === 'signal') return label.indexOf('Светофор ') === 0 ? label : 'Светофор ' + label;
+      return label;
+    }
+
+    function formatPoekhaliNavigationTargetDisplay(target) {
+      if (!target) return '';
+      var title = formatPoekhaliTargetTitle(target);
+      if (!title) return '';
+      var distance = Math.max(0, Math.round(Number(target.distanceMeters) || 0));
+      var eta = formatPoekhaliTargetEta(target.etaSeconds);
+      var text = title + (distance > 0 ? ' через ' + formatShiftPoekhaliDistance(distance) : ' сейчас');
+      if (eta) text += ' | ' + eta;
+      return text;
+    }
+
     function formatShiftPoekhaliTrainLength(shift) {
       var meters = getShiftPoekhaliNumber(shift, 'poekhali_train_length_m');
       if (!meters) return '';
@@ -856,40 +881,14 @@
       return parts.join(' · ');
     }
 
-    function getShiftPoekhaliTargetShortLabel(kind, source) {
-      if (kind === 'restriction_end') return 'КОНЕЦ';
-      if (kind === 'warning') return 'ПР';
-      if (kind === 'restriction') {
-        if (source === 'document') return 'ДОК';
-        if (source === 'regime') return 'РК';
-        if (source === 'user') return 'GPS';
-        return 'ОГР';
-      }
-      if (kind === 'signal') return 'СВ';
-      if (kind === 'station') return 'СТ';
-      if (kind === 'route_start') return 'СТАРТ';
-      if (kind === 'route_finish') return 'ФИН';
-      return 'ЦЕЛЬ';
-    }
-
-    function formatShiftPoekhaliNavigationTarget(shift, compact) {
+    function formatShiftPoekhaliNavigationTarget(shift) {
       if (!shift) return '';
-      var label = String(shift.poekhali_next_target_label || '').trim();
-      if (!label) return '';
-      var distance = getShiftPoekhaliNumber(shift, 'poekhali_next_target_distance_m');
-      var eta = formatShiftPoekhaliEta(shift.poekhali_next_target_eta_s, compact);
-      if (compact) return label + (distance > 0 ? ' через ' + formatShiftPoekhaliDistance(distance) : ' тут') + (eta ? ' / ' + eta : '');
-      var point = formatShiftPoekhaliCoordinate(
-        shift.poekhali_next_target_sector,
-        shift.poekhali_next_target_coordinate
-      );
-      var parts = [label];
-      if (distance > 0) parts.push('через ' + formatShiftPoekhaliDistance(distance));
-      else parts.push('тут');
-      if (eta) parts.push(eta);
-      if (point) parts.push(point);
-      parts.push(getShiftPoekhaliTargetShortLabel(shift.poekhali_next_target_kind, shift.poekhali_next_target_source));
-      return parts.join(' · ');
+      return formatPoekhaliNavigationTargetDisplay({
+        kind: shift.poekhali_next_target_kind,
+        label: shift.poekhali_next_target_label,
+        distanceMeters: getShiftPoekhaliNumber(shift, 'poekhali_next_target_distance_m'),
+        etaSeconds: getShiftPoekhaliNumber(shift, 'poekhali_next_target_eta_s')
+      });
     }
 
     function formatShiftPoekhaliLastAlert(shift, compact) {

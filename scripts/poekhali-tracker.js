@@ -3460,40 +3460,32 @@
     return parts.join(' · ');
   }
 
-  function getNavigationTargetShortLabel(kind, source) {
-    if (kind === 'restriction_end') return 'КОНЕЦ';
-    if (kind === 'warning') return 'ПР';
-    if (kind === 'restriction') {
-      if (source === 'document') return 'ДОК';
-      if (source === 'regime') return 'РК';
-      if (source === 'user') return 'GPS';
-      return 'ОГР';
-    }
-    if (kind === 'signal') return 'СВ';
-    if (kind === 'station') return 'СТ';
-    if (kind === 'route_start') return 'СТАРТ';
-    if (kind === 'route_finish') return 'ФИН';
-    return 'ЦЕЛЬ';
-  }
-
-  function formatRunNavigationTarget(run, compact) {
+  function formatRunNavigationTarget(run) {
     if (!run || !run.nextTargetLabel) return '—';
     var label = String(run.nextTargetLabel || '').trim();
     if (String(run.nextTargetKind || '') === 'signal') label = formatSignalNameForDirection(label, run.direction ? String(run.direction).toUpperCase().indexOf('НЕЧ') !== 0 : tracker.even);
-    var distance = Math.max(0, Math.round(Number(run.nextTargetDistanceMeters) || 0));
-    var eta = formatEtaSeconds(run.nextTargetEtaSeconds, compact);
-    if (compact) {
-      return label + (distance ? ' / ' + formatRunDistance(distance) : ' / 0 м') + (eta ? ' / ' + eta : '');
+    return formatSharedPoekhaliNavigationTargetDisplay({
+      kind: run.nextTargetKind,
+      label: label,
+      distanceMeters: run.nextTargetDistanceMeters,
+      etaSeconds: run.nextTargetEtaSeconds
+    }) || '—';
+  }
+
+  function formatSharedPoekhaliNavigationTargetDisplay(target) {
+    if (typeof window !== 'undefined' && typeof window.formatPoekhaliNavigationTargetDisplay === 'function') {
+      return window.formatPoekhaliNavigationTargetDisplay(target);
     }
-    var coordinate = Number(run.nextTargetCoordinate);
-    var point = isFinite(coordinate) && coordinate > 0 ? formatLineCoordinate(coordinate) : '';
-    var parts = [label];
-    if (distance > 0) parts.push('через ' + formatRunDistance(distance));
-    else parts.push('сейчас');
-    if (eta) parts.push(eta);
-    if (point) parts.push(point);
-    parts.push(getNavigationTargetShortLabel(run.nextTargetKind, run.nextTargetSource));
-    return parts.join(' · ');
+    var label = String(target && (target.label || target.name) || '').trim();
+    if (!label) return '';
+    var kind = String(target && target.kind || '');
+    if (kind === 'station') label = 'ст ' + label.replace(/^ст\.?\s+/i, '');
+    else if (kind === 'signal' && label.indexOf('Светофор ') !== 0) label = 'Светофор ' + label;
+    var distance = Math.max(0, Math.round(Number(target && target.distanceMeters) || 0));
+    var eta = String(formatEtaSeconds(target && target.etaSeconds, true) || '').replace(/^~/, '').trim();
+    var text = label + (distance > 0 ? ' через ' + formatRunDistance(distance) : ' сейчас');
+    if (eta) text += ' | ' + eta;
+    return text;
   }
 
   function resetPoekhaliLiveAlert() {
@@ -3595,11 +3587,12 @@
     if (!label || distance > LIVE_ALERT_AHEAD_M) return null;
 
     var isNear = distance <= LIVE_ALERT_NEAR_M;
-    var eta = formatLiveHudEtaLabel(run.nextTargetEtaSeconds);
-    var kind = String(run.nextTargetKind || '');
-    var displayLabel = kind === 'station' ? 'ст ' + label : (kind === 'signal' ? 'Светофор ' + label : label);
-    var text = displayLabel + (distance > 0 ? ' через ' + formatRunDistance(distance) : ' сейчас');
-    if (eta) text += ' | ' + eta;
+    var text = formatSharedPoekhaliNavigationTargetDisplay({
+      kind: run.nextTargetKind,
+      label: label,
+      distanceMeters: distance,
+      etaSeconds: run.nextTargetEtaSeconds
+    });
 
     return {
       key: [
@@ -15189,49 +15182,31 @@
         case 'route_finish':
           return 'МАРШРУТ';
         default:
-          return 'ЦЕЛЬ';
+          return 'ОБЪЕКТ';
       }
     }
     if (nextRestriction) return 'СКОРОСТЬ';
     if (nextWarning) return 'ПРЕДУПР.';
     if (nextSignal) return 'СВЕТОФОР';
     if (isPreview) return 'GPS';
-    return 'ЦЕЛЬ';
-  }
-
-  function formatLiveHudEtaLabel(value) {
-    return String(formatEtaSeconds(value, true) || '').replace(/^~/, '').trim();
+    return 'ОБЪЕКТ';
   }
 
   /** Single human headline: «ст Хальгасо через 697 м | 2 мин» without status labels/координаты/пояса. */
   function formatLiveHudHeadline(navTarget, fallbackTitle) {
     var fb = String(fallbackTitle || '').trim();
     if (!navTarget) return fb || '—';
-    var dist = Math.max(0, Math.round(Number(navTarget.distanceMeters) || 0));
-    var head = String(formatLiveNavigationTargetTitle(navTarget) || '').trim();
-    var eta = formatLiveHudEtaLabel(navTarget.etaSeconds);
-    if (!head) return fb || '—';
-    var line = head + (dist > 0 ? ' через ' + formatDistanceLabel(dist) : ' сейчас');
-    if (eta) line += ' | ' + eta;
-    return line;
+    return formatSharedPoekhaliNavigationTargetDisplay(navTarget) || fb || '—';
   }
 
   function formatLiveNavigationTargetTitle(target) {
     if (!target) return '';
-    var label = String(target.label || '').trim();
-    var shortLabel = getNavigationTargetShortLabel(target.kind, target.source);
-    if (target.kind === 'restriction_end' || target.kind === 'route_start' || target.kind === 'route_finish') {
-      return label;
-    }
-    if (target.kind === 'warning') {
-      return label.indexOf('ПР') === 0 ? label : 'ПР ' + label;
-    }
-    if (target.kind === 'restriction') {
-      return 'Далее ' + (shortLabel && shortLabel !== 'ОГР' ? shortLabel + ' ' : '') + label;
-    }
-    if (target.kind === 'signal') return 'Светофор ' + label;
-    if (target.kind === 'station') return 'ст ' + label;
-    return label;
+    return formatSharedPoekhaliNavigationTargetDisplay({
+      kind: target.kind,
+      label: target.label,
+      distanceMeters: 0,
+      etaSeconds: 0
+    }).replace(/\s+сейчас$/, '');
   }
 
   function drawApkLiveSummary(ctx, layout, center, sector, visibleObjects, activeSpeed, nextSignal, nextStation, nextWarning, nextRestriction, routeProgress, isPreview, projection) {
