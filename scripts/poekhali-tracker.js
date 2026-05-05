@@ -3469,18 +3469,20 @@
       kind: run.nextTargetKind,
       label: label,
       distanceMeters: run.nextTargetDistanceMeters,
-      etaSeconds: run.nextTargetEtaSeconds
+      etaSeconds: run.nextTargetEtaSeconds,
+      coordinate: run.nextTargetCoordinate
     }) || '—';
   }
 
-  function formatHumanTrackObjectName(value, kind) {
+  function formatHumanTrackObjectName(value, kind, coordinate) {
     if (typeof window !== 'undefined' && typeof window.formatPoekhaliHumanObjectName === 'function') {
-      return window.formatPoekhaliHumanObjectName(value, kind);
+      return window.formatPoekhaliHumanObjectName(value, kind, coordinate);
     }
     var text = String(value || '').replace(/\s+/g, ' ').trim().replace(/^ст\.?\s+/i, '');
     if (!text) return '';
     var lowerText = text.toLowerCase();
-    if (lowerText === 'комсом') text = 'Комсомольск';
+    var numericCoordinate = Math.max(0, Math.round(Number(coordinate) || 0));
+    if (lowerText === 'комсом') text = numericCoordinate >= 3812000 && numericCoordinate <= 3816000 ? 'Комсомольск-2' : 'Комсомольск';
     else if (lowerText === 'хальгас') text = 'Хальгасо';
     else if (lowerText === 'хурму') text = 'Хурмули';
     else if (lowerText === 'скоро') text = 'Скорость';
@@ -3510,7 +3512,7 @@
     var label = String(target && (target.label || target.name) || '').trim();
     if (!label) return '';
     var kind = String(target && target.kind || '');
-    label = formatHumanTrackObjectName(label, kind);
+    label = formatHumanTrackObjectName(label, kind, target && (target.coordinate || target.coordinateMeters));
     if (kind === 'station') label = 'ст ' + label;
     else if (kind === 'signal' && label.indexOf('Светофор ') !== 0) label = 'Светофор ' + label;
     var distance = Math.max(0, Math.round(Number(target && target.distanceMeters) || 0));
@@ -3623,7 +3625,8 @@
       kind: run.nextTargetKind,
       label: label,
       distanceMeters: distance,
-      etaSeconds: run.nextTargetEtaSeconds
+      etaSeconds: run.nextTargetEtaSeconds,
+      coordinate: run.nextTargetCoordinate
     });
 
     return {
@@ -15237,7 +15240,8 @@
       kind: target.kind,
       label: target.label,
       distanceMeters: 0,
-      etaSeconds: 0
+      etaSeconds: 0,
+      coordinate: target.coordinate
     }).replace(/\s+сейчас$/, '');
   }
 
@@ -15252,7 +15256,7 @@
     var hasProfile = hasProfileForSector(sector);
     var rawDraft = getRawDraftForSector(sector);
     var userSection = getUserSectionForSector(sector);
-    var title = rawDraft ? rawDraft.title : userSection ? userSection.title : (station && station.name ? formatHumanTrackObjectName(station.name, 'station') : 'Участок ' + sector);
+    var title = rawDraft ? rawDraft.title : userSection ? userSection.title : (station && station.name ? formatHumanTrackObjectName(station.name, 'station', station.coordinate) : 'Участок ' + sector);
     var regimeProfile = profilePoint && profilePoint.regime || (!hasProfile && hasRegimeProfileForSector(sector));
     var slopeLabel = rawDraft ? 'GPS' : userSection ? 'GPS' : (profilePoint && profilePoint.regime ? 'РК' : (hasProfile ? 'УКЛОН' : (regimeProfile ? 'РК' : 'ПРОФ')));
     var slopeText = (rawDraft || userSection) && profilePoint && profilePoint.altitudeMissing ? 'ЛИН.' : (hasProfile && profilePoint ? formatProfileGradeLabel(profilePoint) : (hasProfile ? '—' : (regimeProfile ? 'ЕСТЬ' : 'НЕТ')));
@@ -15662,7 +15666,7 @@
       var shouldLabel = visibleWidth > 70 && (isRangeNearCenter(start, end, center, APK_LABEL_CONTEXT_RADIUS_M) || isRegimeStation);
       var minGap = isPreview ? 88 : 112;
       if (shouldLabel && labelX - minGap > labelRight) {
-        var stationLabel = formatHumanTrackObjectName(station.name, 'station').toUpperCase();
+        var stationLabel = formatHumanTrackObjectName(station.name, 'station', station.coordinate).toUpperCase();
         var stationLabelWidth = Math.min(140, Math.max(54, stationLabel.length * 6.4));
         drawText(ctx, stationLabel, labelX, layout.profileTop + 7, {
           size: 10,
@@ -16865,7 +16869,7 @@
       var width = Math.max(34, x2 - x1);
       fillRoundRect(ctx, x1, trackY - 58, width, 22, 8, 'rgba(56, 189, 248, 0.14)');
       strokeRoundRect(ctx, x1 + 0.5, trackY - 57.5, width - 1, 21, 8, 'rgba(56, 189, 248, 0.34)');
-      drawText(ctx, formatHumanTrackObjectName(station.name, 'station'), x1 + width / 2, trackY - 43, {
+      drawText(ctx, formatHumanTrackObjectName(station.name, 'station', station.coordinate), x1 + width / 2, trackY - 43, {
         size: 10,
         weight: 850,
         color: THEME.accentStrong,

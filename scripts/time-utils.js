@@ -707,12 +707,13 @@
       return String(formatShiftPoekhaliEta(value, true) || '').replace(/^~/, '').trim();
     }
 
-    function formatPoekhaliHumanObjectName(value, kind) {
+    function formatPoekhaliHumanObjectName(value, kind, coordinate) {
       var text = String(value || '').replace(/\s+/g, ' ').trim();
       if (!text) return '';
       text = text.replace(/^ст\.?\s+/i, '');
       var lowerText = text.toLowerCase();
-      if (lowerText === 'комсом') text = 'Комсомольск';
+      var numericCoordinate = Math.max(0, Math.round(Number(coordinate) || 0));
+      if (lowerText === 'комсом') text = numericCoordinate >= 3812000 && numericCoordinate <= 3816000 ? 'Комсомольск-2' : 'Комсомольск';
       else if (lowerText === 'хальгас') text = 'Хальгасо';
       else if (lowerText === 'хурму') text = 'Хурмули';
       else if (lowerText === 'скоро') text = 'Скорость';
@@ -740,7 +741,7 @@
       var label = String(target.label || target.name || '').trim();
       var kind = String(target.kind || '');
       if (!label) return '';
-      var humanLabel = formatPoekhaliHumanObjectName(label, kind);
+      var humanLabel = formatPoekhaliHumanObjectName(label, kind, target.coordinate || target.coordinateMeters);
       if (kind === 'station') return 'ст ' + humanLabel;
       if (kind === 'signal') return humanLabel.indexOf('Светофор ') === 0 ? humanLabel : 'Светофор ' + humanLabel;
       return humanLabel;
@@ -916,7 +917,8 @@
         kind: shift.poekhali_next_target_kind,
         label: shift.poekhali_next_target_label,
         distanceMeters: getShiftPoekhaliNumber(shift, 'poekhali_next_target_distance_m'),
-        etaSeconds: getShiftPoekhaliNumber(shift, 'poekhali_next_target_eta_s')
+        etaSeconds: getShiftPoekhaliNumber(shift, 'poekhali_next_target_eta_s'),
+        coordinate: getShiftPoekhaliNumber(shift, 'poekhali_next_target_coordinate')
       });
     }
 
