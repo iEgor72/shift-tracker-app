@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-05 01:43:12 +0000
+Generated: 2026-05-05 01:45:21 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `dc4ff1a` | 2026-05-05T01:45:13+00:00 | iEgor72 | fix(poekhali): remove train guide line |
+| `6fc3822` | 2026-05-05T01:43:16+00:00 | iEgor72 | chore(memory): refresh after next signal label fix |
 | `3039e91` | 2026-05-05T01:43:09+00:00 | iEgor72 | fix(poekhali): normalize next signal label |
 | `22ce0e2` | 2026-05-05T01:07:09+00:00 | iEgor72 | chore(memory): refresh after signal label fix |
 | `6f77e0a` | 2026-05-05T01:07:03+00:00 | iEgor72 | fix(poekhali): display signal parity prefix |
@@ -42,5 +44,3 @@ Generated: 2026-05-05 01:43:12 +0000
 | `4e80426` | 2026-05-03T22:05:26+00:00 | iEgor72 | fix(salary): hide unclear zone and BAM fields |
 | `79e891c` | 2026-05-03T22:35:16+10:00 | iEgor72 | Revert "fix(pwa): suppress iOS PWA white splash flash with dark startup image" |
 | `6839f85` | 2026-05-03T22:27:09+10:00 | iEgor72 | chore(cache): bump shell cache to v254 after splash revert |
-| `4274554` | 2026-05-03T22:26:33+10:00 | iEgor72 | Revert "fix(pwa): generate per-device iOS splashes so the white frame is replaced by dark" |
-| `bb58eb6` | 2026-05-03T22:18:53+10:00 | iEgor72 | fix(pwa): generate per-device iOS splashes so the white frame is replaced by dark |
