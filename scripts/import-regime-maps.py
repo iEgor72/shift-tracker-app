@@ -42,6 +42,8 @@ MODE_POWER_RE = re.compile(r"^\d{3,5},?\d{0,5}$")
 SIGNAL_LABEL_EXCLUDE = {
     "НТ",
     "ННТТ",
+    "КТ",
+    "ККТТ",
     "НЕТ",
     "ЧЕТ",
     "ЧЕТН",
@@ -49,6 +51,7 @@ SIGNAL_LABEL_EXCLUDE = {
     "ЧАСЫ",
 }
 CONTROL_NEUTRAL_LABELS = {"НТ", "ННТТ"}
+CONTROL_BRAKE_END_LABELS = {"КТ", "ККТТ"}
 CONTROL_POWER_LABELS = {"2200", "3500", "4900", "5600", "7100", "2200,3500"}
 
 
@@ -800,6 +803,8 @@ def classify_control_label(label: str, top: float) -> str | None:
     normalized = normalize_control_label(label)
     if normalized in CONTROL_NEUTRAL_LABELS and 150 <= top <= 465:
         return "neutral"
+    if normalized in CONTROL_BRAKE_END_LABELS and 150 <= top <= 465:
+        return "brake_end"
     latin = normalized.replace("Х", "X")
     if not 52 <= top <= 190:
         return None
@@ -843,6 +848,8 @@ def build_control_marks_from_page(
             continue
         if kind == "neutral":
             label = "НТ"
+        elif kind == "brake_end":
+            label = "КТ"
         elif kind == "power":
             label = label.rstrip(",")
         width = float(word.get("x1", 0)) - float(word.get("x0", 0))

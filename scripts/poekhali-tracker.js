@@ -15808,11 +15808,11 @@
         text: '#bae6fd'
       };
     }
-    if (kind === 'brake') {
+    if (kind === 'brake' || kind === 'brake_end') {
       return {
-        fill: 'rgba(24, 24, 32, 0.78)',
-        stroke: 'rgba(196, 181, 253, 0.34)',
-        text: '#ddd6fe'
+        fill: kind === 'brake_end' ? 'rgba(30, 41, 59, 0.82)' : 'rgba(24, 24, 32, 0.78)',
+        stroke: kind === 'brake_end' ? 'rgba(148, 163, 184, 0.44)' : 'rgba(196, 181, 253, 0.34)',
+        text: kind === 'brake_end' ? '#e2e8f0' : '#ddd6fe'
       };
     }
     if (kind === 'power') {
@@ -15832,7 +15832,7 @@
   function drawRegimeControlMarks(ctx, layout, center, sector, marks, isPreview, labelLayout) {
     if (!Array.isArray(marks) || !marks.length) return;
     var drawnLabels = 0;
-    var maxLabels = isPreview ? 5 : 6;
+    var maxLabels = isPreview ? 8 : 12;
     ctx.save();
     for (var i = 0; i < marks.length; i++) {
       var mark = marks[i];
@@ -15841,37 +15841,39 @@
       if (x < layout.viewportX - 10 || x > layout.viewportRight + 10) continue;
       var profileY = getProfileYAt(mark.coordinate, center, sector, layout);
       var neutral = mark.kind === 'neutral';
+      var brakeEnd = mark.kind === 'brake_end';
+      var primaryBrakeMark = neutral || brakeEnd;
       var tone = getRegimeControlMarkTone(mark);
       var markDistance = Math.abs(mark.coordinate - center);
-      var markFocus = markDistance <= (neutral ? APK_LABEL_CONTEXT_RADIUS_M : APK_LABEL_FOCUS_RADIUS_M);
-      var stemEnd = neutral ? profileY - (isPreview ? 24 : 30) : profileY + (isPreview ? 18 : 23);
-      ctx.globalAlpha = markFocus ? 1 : 0.46;
+      var markFocus = markDistance <= (primaryBrakeMark ? APK_LABEL_CONTEXT_RADIUS_M : APK_LABEL_FOCUS_RADIUS_M);
+      var stemEnd = primaryBrakeMark ? profileY - (isPreview ? 24 : 30) : profileY + (isPreview ? 18 : 23);
+      ctx.globalAlpha = markFocus ? 1 : (primaryBrakeMark ? 0.58 : 0.42);
       ctx.strokeStyle = tone.stroke;
-      ctx.lineWidth = neutral ? 1.35 : 1.05;
-      ctx.setLineDash(neutral ? [4, 4] : [3, 5]);
+      ctx.lineWidth = primaryBrakeMark ? 1.35 : 1.05;
+      ctx.setLineDash(primaryBrakeMark ? [] : [3, 5]);
       ctx.beginPath();
-      ctx.moveTo(x, profileY + (neutral ? -3 : 3));
+      ctx.moveTo(x, profileY + (primaryBrakeMark ? -3 : 3));
       ctx.lineTo(x, stemEnd);
       ctx.stroke();
       ctx.setLineDash([]);
       ctx.fillStyle = tone.text;
       ctx.beginPath();
-      ctx.arc(x, profileY, neutral ? 3.5 : 2.7, 0, Math.PI * 2);
+      ctx.arc(x, profileY, primaryBrakeMark ? 3.5 : 2.7, 0, Math.PI * 2);
       ctx.fill();
       ctx.globalAlpha = 1;
 
       if (!markFocus || drawnLabels >= maxLabels) continue;
-      var label = neutral ? 'НТ' : String(mark.name || '');
+      var label = neutral ? 'НТ' : brakeEnd ? 'КТ' : String(mark.name || '');
       if (!label) continue;
-      var width = Math.min(neutral ? 44 : 68, Math.max(neutral ? 28 : 32, label.length * 7 + 12));
-      var labelY = neutral ? stemEnd - 7 : stemEnd + 13;
+      var width = Math.min(primaryBrakeMark ? 44 : 68, Math.max(primaryBrakeMark ? 28 : 32, label.length * 7 + 12));
+      var labelY = primaryBrakeMark ? stemEnd - 7 : stemEnd + 13;
       if (labelY < layout.profileTop + 15) labelY = layout.profileTop + 15;
       if (labelY > layout.profileBottom - 2) labelY = layout.profileBottom - 2;
       if (!reserveLabel(labelLayout, x, labelY - 4, width, 18, isPreview ? 8 : 5)) continue;
       fillRoundRect(ctx, x - width / 2, labelY - 14, width, 18, 6, tone.fill);
       strokeRoundRect(ctx, x - width / 2 + 0.5, labelY - 13.5, width - 1, 17, 6, tone.stroke);
       drawText(ctx, label, x, labelY, {
-        size: neutral ? 8 : 7.5,
+        size: primaryBrakeMark ? 8 : 7.5,
         weight: 850,
         color: tone.text,
         align: 'center',
