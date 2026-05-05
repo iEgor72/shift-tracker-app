@@ -79,6 +79,25 @@ def load_pdf_text_pages(path: Path) -> list[tuple[int, str]]:
         ]
 
 
+def load_pdf_table_pages(path: Path) -> list[tuple[int, list[list[list[str | None]]]]]:
+    try:
+        import pdfplumber
+    except Exception:
+        return []
+
+    table_settings = {
+        "vertical_strategy": "lines",
+        "horizontal_strategy": "lines",
+        "snap_tolerance": 3,
+        "join_tolerance": 3,
+    }
+    with pdfplumber.open(path) as pdf:
+        pages: list[tuple[int, list[list[list[str | None]]]]] = []
+        for index, page in enumerate(pdf.pages):
+            pages.append((index + 1, page.extract_tables(table_settings=table_settings) or []))
+        return pages
+
+
 def normalize_line(text: str) -> str:
     value = text.replace("\u00a0", " ").replace("—", "-").replace("–", "-")
     value = re.sub(r"(\d)(км|КМ|пк|ПК)", r"\1 \2", value)
@@ -91,6 +110,137 @@ def normalize_line(text: str) -> str:
 def coordinate_from_km_pk(km: int, pk: int | None) -> int:
     safe_pk = max(1, min(10, int(pk or 1)))
     return int(km) * 1000 + (safe_pk - 1) * 100
+
+
+def parse_km_axis_cell(value: str | None) -> int | None:
+    text = normalize_line(value or "")
+    if not text:
+        return None
+    match = re.search(r"(?<!\d)(\d{1,4})(?!\d)", text)
+    if not match:
+        return None
+    km = int(match.group(1))
+    return km if 1 <= km <= 9999 else None
+
+
+def extract_speed_values_from_table_row(row: list[str | None], type_col: int) -> list[int]:
+    values: list[int] = []
+    for col in range(type_col + 1, min(len(row), type_col + 17)):
+        text = normalize_line(row[col] or "")
+        if not text:
+            continue
+        lower = text.lower()
+        if "км/ч" in lower or "км /ч" in lower or "пк" in lower or "км" in lower:
+            break
+        for match in re.finditer(r"(?<!\d)(\d{2,3})(?!\d)", text):
+            value = int(match.group(1))
+            if 20 <= value <= 160:
+                values.append(value)
+    return values
+
+
+def min_coordinate_from_rule_text(source: dict, text: str, bounds: dict[int, tuple[int, int]]) -> int | None:
+    rules = parse_rules_from_line(source, 0, text, bounds)
+    coordinates = [int(rule["coordinate"]) for rule in rules if rule.get("coordinate")]
+    return min(coordinates) if coordinates else None
+
+
+def extract_base_speed_rows_from_tables(
+    source: dict,
+    page: int,
+    tables: list[list[list[str | None]]],
+    bounds: dict[int, tuple[int, int]],
+) -> list[dict]:
+    rows: list[dict] = []
+    for table in tables:
+        if not table or len(table) < 6:
+            continue
+        for index, row in enumerate(table):
+            if not row:
+                continue
+            type_col = -1
+            train_type = ""
+            for col, cell in enumerate(row):
+                normalized = normalize_line(cell or "").lower().replace(".", "")
+                if normalized in {"г", "гр", "груз"}:
+                    type_col = col
+                    train_type = "cargo"
+                    break
+                if normalized in {"п", "пасс"}:
+                    type_col = col
+                    train_type = "passenger"
+                    break
+            if type_col < 0:
+                continue
+            speeds = extract_speed_values_from_table_row(row, type_col)
+            if not speeds:
+                continue
+            axis_km = parse_km_axis_cell(row[0] if len(row) else None)
+            row_text = " ".join(normalize_line(cell or "") for cell in row if cell and normalize_line(cell))
+            inferred_coordinate = axis_km * 1000 if axis_km is not None else min_coordinate_from_rule_text(source, row_text, bounds)
+            if inferred_coordinate is None:
+                continue
+            rows.append(
+                {
+                    "sourceCode": source["code"],
+                    "sourceName": source["name"],
+                    "sourcePath": source["path"],
+                    "sourceUpdatedAt": source.get("updated_at", ""),
+                    "page": page,
+                    "row": index,
+                    "coordinate": inferred_coordinate,
+                    "speed": max(speeds),
+                    "appliesTo": train_type,
+                    "confidence": "speed-table-base",
+                    "raw": row_text[:260],
+                }
+            )
+    return rows
+
+
+def build_base_speed_rules(base_rows: list[dict], bounds: dict[int, tuple[int, int]]) -> list[dict]:
+    grouped: dict[str, list[dict]] = {}
+    for row in base_rows:
+        grouped.setdefault(row["sourceCode"], []).append(row)
+    result: list[dict] = []
+    for source_code, rows in grouped.items():
+        rows = sorted(rows, key=lambda item: (item["coordinate"], item["page"], item["row"], item["appliesTo"]))
+        anchors = sorted(set(int(item["coordinate"]) for item in rows))
+        for row in rows:
+            start = int(row["coordinate"])
+            end_candidates = [value for value in anchors if value > start + 300]
+            if not end_candidates:
+                continue
+            end = end_candidates[0]
+            if end - start < 500 or end - start > 80_000:
+                continue
+            hints = SOURCE_CONFIG.get(row["sourceName"], {}).get("sectorHints", [])
+            target_sectors = guess_target_sectors(source_code, start, end, hints, bounds)
+            if not target_sectors:
+                continue
+            result.append(
+                {
+                    "sourceCode": row["sourceCode"],
+                    "sourceName": row["sourceName"],
+                    "sourcePath": row["sourcePath"],
+                    "sourceUpdatedAt": row["sourceUpdatedAt"],
+                    "page": row["page"],
+                    "startKm": start // 1000,
+                    "startPk": 1,
+                    "endKm": end // 1000,
+                    "endPk": 1,
+                    "coordinate": start,
+                    "end": end,
+                    "length": end - start,
+                    "speed": int(row["speed"]),
+                    "name": f"Уст {int(row['speed'])}",
+                    "appliesTo": row["appliesTo"],
+                    "targetSectors": target_sectors,
+                    "confidence": row["confidence"],
+                    "raw": row["raw"],
+                }
+            )
+    return result
 
 
 def parse_applies_to(raw: str) -> str:
@@ -327,9 +477,13 @@ def main() -> None:
         }
         sources.append(source)
         local_path = ROOT / item["path"].lstrip("/")
+        base_rows: list[dict] = []
         for page, text in load_pdf_text_pages(local_path):
             for line in text.splitlines():
                 rules.extend(parse_rules_from_line(source, page, line, bounds))
+        for page, tables in load_pdf_table_pages(local_path):
+            base_rows.extend(extract_base_speed_rows_from_tables(source, page, tables, bounds))
+        rules.extend(build_base_speed_rules(base_rows, bounds))
 
     rules = dedupe_rules(rules)
     by_sector: dict[str, int] = {}

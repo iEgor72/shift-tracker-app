@@ -14094,6 +14094,7 @@
 
     var best = null;
     var bestSpeed = Infinity;
+    var bestPriority = -Infinity;
 
     for (var i = 0; i < speedRules.length; i++) {
       var rule = speedRules[i];
@@ -14112,14 +14113,18 @@
       if (overlap < 1) continue;
       var spd = getSpeedRuleValue(rule);
       if (!isFinite(spd) || spd <= 0) continue;
-      if (!best || spd < bestSpeed - 0.05) {
+      var priority = getSpeedRulePriority(rule);
+      if (!best || priority > bestPriority) {
         best = rule;
         bestSpeed = spd;
+        bestPriority = priority;
         continue;
       }
-      if (best && Math.abs(spd - bestSpeed) <= 0.05 && getSpeedRulePriority(rule) > getSpeedRulePriority(best)) {
+      if (priority < bestPriority) continue;
+      if (spd < bestSpeed - 0.05) {
         best = rule;
         bestSpeed = spd;
+        bestPriority = priority;
       }
     }
     return best || findActiveSpeedRule(center, speedRules);
@@ -16059,8 +16064,12 @@
         var existing = result[j];
         var existingSpeed = getSpeedRuleValue(existing);
         if (!isFinite(speed) || !isFinite(existingSpeed)) continue;
-        if (Math.abs(speed - existingSpeed) > 3) continue;
         if (!doSpeedRangesOverlap(rule, existing, 45)) continue;
+        if (getSpeedRulePriority(existing) > getSpeedRulePriority(rule)) {
+          duplicate = true;
+          break;
+        }
+        if (Math.abs(speed - existingSpeed) > 3) continue;
         duplicate = true;
         break;
       }
