@@ -1006,8 +1006,12 @@
 
   function getEvenFromObjectFileName(fileKey) {
     var key = String(fileKey || '').toLowerCase();
-    if (!/^[12]n?$/.test(key)) return null;
-    return key.slice(-1) === 'n';
+    // APK object files are not suffix-uniform: use the actual signal direction in bundled files.
+    if (key === '1') return false;
+    if (key === '1n') return true;
+    if (key === '2') return true;
+    if (key === '2n') return false;
+    return null;
   }
 
   function getEvenFromObjectFileKey(fileKey) {
@@ -1025,7 +1029,9 @@
   }
 
   function getCoordinateDirectionForEven(even) {
-    return even ? -1 : 1;
+    // На этой карте: Чётное = рост координаты (Постышево → Комсомольск),
+    // нечётное = уменьшение координаты (Комсомольск → Постышево).
+    return even ? 1 : -1;
   }
 
   function getCurrentCoordinateDirection() {
@@ -1035,7 +1041,7 @@
   function getEvenFromCoordinateDelta(delta) {
     var value = Number(delta);
     if (!isFinite(value) || Math.abs(value) < 1) return !!tracker.even;
-    return value < 0;
+    return value > 0;
   }
 
   function getEvenFromTrainNumber(value) {
@@ -13449,7 +13455,9 @@
         : getEvenFromObjectFileName(keys[i]);
       if (directionEven === even) return keys[i];
     }
-    return String(way) + (even ? 'n' : '');
+    if (way === 1) return even ? '1n' : '1';
+    if (way === 2) return even ? '2' : '2n';
+    return String(way);
   }
 
   function mergeRegimeTrackObjects(baseObjects, regimeObjects) {
