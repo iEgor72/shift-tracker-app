@@ -322,15 +322,19 @@
     poekhaliMskClockDisplay: ''
   };
 
+  var GPS_ERROR_TOAST_MIN_INTERVAL_MS = 45000;
+
   var gpsConnectionToastState = {
     suppressUntil: 0,
-    hadErrorUi: false
+    hadErrorUi: false,
+    lastErrorKey: '',
+    lastErrorToastAt: 0
   };
 
   function mapGpsStatusToBriefError(fullText) {
     var v = String(fullText || '').trim();
     if (v === 'НЕТ GPS') return 'Нет сигнала GPS';
-    if (v.indexOf('ВНЕ') === 0) return 'Точка вне карты';
+    if (v.indexOf('ВНЕ') === 0) return 'GPS далеко от линии карты';
     if (v === 'МАРШРУТ') return 'Нужен маршрут или GPS';
     if (v === 'КАРТА') return 'Карта недоступна';
     if (v.indexOf('ПОИСК') === 0) return 'Ищем карту по координате…';
@@ -346,16 +350,18 @@
 
     var hasError = tone === 'is-error';
     if (hasError) {
-      if (!gpsConnectionToastState.hadErrorUi) {
-        gpsConnectionToastState.hadErrorUi = true;
-        enqueue(mapGpsStatusToBriefError(fullText), 'danger', 2800);
+      var message = mapGpsStatusToBriefError(fullText);
+      var errorKey = String(message || fullText || 'gps-error');
+      var canRepeat = gpsConnectionToastState.lastErrorKey !== errorKey || now - gpsConnectionToastState.lastErrorToastAt >= GPS_ERROR_TOAST_MIN_INTERVAL_MS;
+      gpsConnectionToastState.hadErrorUi = true;
+      if (canRepeat) {
+        gpsConnectionToastState.lastErrorKey = errorKey;
+        gpsConnectionToastState.lastErrorToastAt = now;
+        enqueue(message, 'danger', 2400);
       }
       return;
     }
-    if (gpsConnectionToastState.hadErrorUi) {
-      gpsConnectionToastState.hadErrorUi = false;
-      enqueue('GPS снова в норме', 'success', 2000);
-    }
+    gpsConnectionToastState.hadErrorUi = false;
   }
 
   function byId(id) {
