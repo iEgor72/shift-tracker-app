@@ -10,7 +10,7 @@
   var APK_ANGLE_MULTIPLIER = 0.22;
   var APK_LABEL_FOCUS_RADIUS_M = 720;
   var APK_LABEL_CONTEXT_RADIUS_M = 1500;
-  var POEKHALI_DIAGNOSTIC_VERSION = 'v214';
+  var POEKHALI_DIAGNOSTIC_VERSION = 'v215';
   var REMOTE_MAP_SOURCE_ENABLED = false;
   var BACKUP_SCHEMA_VERSION = 1;
   var TRAIN_LOCO_LENGTH_M = 51;
@@ -16922,15 +16922,6 @@
     drawApkRouteTargetCue(ctx, layout, center, sector, routeProgress, isPreview, labelLayout);
     drawApkGradeLabels(ctx, layout, center, sector, bounds, isPreview, labelLayout);
 
-    var currentProfileY = getProfileYAt(center, center, sector, layout);
-    ctx.strokeStyle = isPreview ? 'rgba(136, 146, 164, 0.40)' : 'rgba(74, 222, 128, 0.55)';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([6, 6]);
-    ctx.beginPath();
-    ctx.moveTo(layout.headX, currentProfileY + 18);
-    ctx.lineTo(layout.headX, layout.trackY + 32);
-    ctx.stroke();
-    ctx.setLineDash([]);
     if (isPreview) {
       drawApkPreviewCursor(ctx, layout, center, sector);
       drawApkTrain(ctx, layout, center, sector, avgAngle, true);
