@@ -3540,7 +3540,7 @@
       key: alert.key,
       kind: alert.kind || '',
       level: alert.level || 'warning',
-      title: alert.title || 'Предупреждение',
+      title: typeof alert.title === 'string' ? alert.title : 'Предупреждение',
       text: alert.text || '',
       distanceMeters: Math.max(0, Math.round(Number(alert.distanceMeters) || 0)),
       ts: now,
@@ -7720,7 +7720,7 @@
     if (!run) {
       var empty = document.createElement('div');
       empty.className = 'poekhali-shift-route is-muted';
-      empty.textContent = 'После первой записи здесь будут пробег, скорость, ограничения и цель впереди.';
+      empty.textContent = 'После первой записи здесь будут пробег, скорость, ограничения и объект впереди.';
       section.appendChild(empty);
       parent.appendChild(section);
       return;
@@ -7733,7 +7733,7 @@
     grid.appendChild(createShiftInfoCell('Техскорость', formatRunSpeedKmh(run.technicalSpeedKmh), run.technicalSpeedKmh ? '' : 'muted'));
     grid.appendChild(createShiftInfoCell('Макс.', run.maxSpeedKmh ? run.maxSpeedKmh + ' км/ч' : '—', run.maxSpeedKmh ? '' : 'muted'));
     grid.appendChild(createShiftInfoCell('Трек', run.points && run.points.length ? run.points.length + ' точ.' : '—', run.points && run.points.length ? 'success' : 'muted'));
-    grid.appendChild(createShiftInfoCell('Цель', formatRunNavigationTarget(run, true), run.nextTargetLabel ? 'warning' : 'muted'));
+    grid.appendChild(createShiftInfoCell('Впереди', formatRunNavigationTarget(run, true), run.nextTargetLabel ? 'warning' : 'muted'));
     grid.appendChild(createShiftInfoCell('Оповещения', run.alertCount ? String(run.alertCount) : '0', run.alertCount ? 'danger' : 'muted'));
     section.appendChild(grid);
 
@@ -10437,7 +10437,7 @@
     grid.appendChild(createShiftInfoCell('Сигнал', summaryRun ? formatRunNextObject(summaryRun, 'nextSignal', true) : '—', summaryRun && summaryRun.nextSignalName ? '' : 'muted'));
     grid.appendChild(createShiftInfoCell('Станция', summaryRun ? formatRunNextObject(summaryRun, 'nextStation', true) : '—', summaryRun && summaryRun.nextStationName ? '' : 'muted'));
     grid.appendChild(createShiftInfoCell('Маршрут', summaryRun ? formatRunRouteProgress(summaryRun, true) : '—', summaryRun && summaryRun.routeDistanceMeters ? '' : 'muted'));
-    grid.appendChild(createShiftInfoCell('Цель', summaryRun ? formatRunNavigationTarget(summaryRun, true) : '—', summaryRun && summaryRun.nextTargetLabel ? '' : 'muted'));
+    grid.appendChild(createShiftInfoCell('Впереди', summaryRun ? formatRunNavigationTarget(summaryRun, true) : '—', summaryRun && summaryRun.nextTargetLabel ? '' : 'muted'));
     grid.appendChild(createShiftInfoCell('Прев.', summaryRun && summaryRun.overspeedMaxKmh ? '+' + summaryRun.overspeedMaxKmh + ' км/ч' : '—', summaryRun && summaryRun.overspeedMaxKmh ? 'danger' : 'muted'));
     grid.appendChild(createShiftInfoCell('Опов.', summaryRun && summaryRun.alertCount ? String(summaryRun.alertCount) : '—', summaryRun && summaryRun.alertCount ? 'danger' : 'muted'));
     grid.appendChild(createShiftInfoCell('ПР', summaryRun ? String(summaryRun.warningsCount || 0) : '—', summaryRun ? '' : 'muted'));
@@ -10510,7 +10510,7 @@
           (item.nextSignalName ? ' · св ' + formatRunNextObject(item, 'nextSignal', true) : '') +
           (item.nextStationName ? ' · ст ' + formatRunNextObject(item, 'nextStation', true) : '') +
           (item.routeDistanceMeters ? ' · маршрут ' + formatRunRouteProgress(item, true) : '') +
-          (item.nextTargetLabel ? ' · цель ' + formatRunNavigationTarget(item, true) : '') +
+          (item.nextTargetLabel ? ' · впереди ' + formatRunNavigationTarget(item, true) : '') +
           (item.overspeedMaxKmh ? ' · прев +' + item.overspeedMaxKmh : '') +
           (item.alertCount ? ' · опов ' + item.alertCount : '') +
           (item.lastPoint ? ' · ' + formatRunPoint(item.lastPoint) : '');

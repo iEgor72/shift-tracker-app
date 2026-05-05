@@ -1336,7 +1336,7 @@
         poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Следующий светофор', nextSignalText);
         poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Следующая станция', nextStationText);
         poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Маршрут', routeProgressText);
-        poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Цель впереди', targetText);
+        poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Впереди', targetText);
         poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Откуда', startPointText);
         poekhaliRouteRows += buildShiftDetailOptionalRowHtml('Куда', endPointText);
         poekhaliDetailsHtml += buildShiftDetailSubsectionHtml('Навигация', poekhaliRouteRows);
