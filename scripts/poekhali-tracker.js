@@ -15247,7 +15247,7 @@
     var hasProfile = hasProfileForSector(sector);
     var rawDraft = getRawDraftForSector(sector);
     var userSection = getUserSectionForSector(sector);
-    var title = rawDraft ? rawDraft.title : userSection ? userSection.title : (station && station.name ? station.name : 'Участок ' + sector);
+    var title = rawDraft ? rawDraft.title : userSection ? userSection.title : (station && station.name ? formatHumanTrackObjectName(station.name, 'station') : 'Участок ' + sector);
     var regimeProfile = profilePoint && profilePoint.regime || (!hasProfile && hasRegimeProfileForSector(sector));
     var slopeLabel = rawDraft ? 'GPS' : userSection ? 'GPS' : (profilePoint && profilePoint.regime ? 'РК' : (hasProfile ? 'УКЛОН' : (regimeProfile ? 'РК' : 'ПРОФ')));
     var slopeText = (rawDraft || userSection) && profilePoint && profilePoint.altitudeMissing ? 'ЛИН.' : (hasProfile && profilePoint ? formatProfileGradeLabel(profilePoint) : (hasProfile ? '—' : (regimeProfile ? 'ЕСТЬ' : 'НЕТ')));
@@ -16841,7 +16841,7 @@
       var width = Math.max(34, x2 - x1);
       fillRoundRect(ctx, x1, trackY - 58, width, 22, 8, 'rgba(56, 189, 248, 0.14)');
       strokeRoundRect(ctx, x1 + 0.5, trackY - 57.5, width - 1, 21, 8, 'rgba(56, 189, 248, 0.34)');
-      drawText(ctx, station.name, x1 + width / 2, trackY - 43, {
+      drawText(ctx, formatHumanTrackObjectName(station.name, 'station'), x1 + width / 2, trackY - 43, {
         size: 10,
         weight: 850,
         color: THEME.accentStrong,
