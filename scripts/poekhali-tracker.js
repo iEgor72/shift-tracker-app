@@ -1188,6 +1188,7 @@
       axles: axles ? String(axles) : '',
       route: shift ? formatRouteSummary(shift) : '',
       conditionalLength: conditionalLength,
+      locoLengthMeters: fallbackSettings.locoLength,
       lengthMeters: Math.max(1, Math.round(composition.lengthMeters || fallbackSettings.locoLength)),
       lengthLabel: composition.lengthLabel || '',
       lengthSource: composition.lengthSource || '',
@@ -15356,14 +15357,29 @@
     ctx.restore();
   }
 
+  function formatTrainKmScaleLengthLabel(details) {
+    var source = details || getPoekhaliTrainDetails();
+    var trainMeters = Math.max(0, Math.round(Number(source && source.lengthMeters) || 0));
+    var locoMeters = Math.max(0, Math.round(Number(source && source.locoLengthMeters) || TRAIN_LOCO_LENGTH_M));
+    var compositionType = String(source && source.compositionType || '');
+    if (compositionType === 'train' || compositionType === 'estimated') {
+      return (source && source.lengthSource === 'по осям' ? '~' : '') + trainMeters + 'м + ' + locoMeters + 'м';
+    }
+    if (trainMeters > 0) return trainMeters + 'м';
+    return '';
+  }
+
   /**
    * Same head/tail geometry as profile train (drawApkTrain); drawn above the km axis like riding on the rail.
    */
   function drawTrainKmScaleProjection(ctx, layout, center, isPreview) {
     var details = getPoekhaliTrainDetails();
     var trainMeters = Math.max(1, Math.round(Number(details && details.lengthMeters) || getTrainLengthMeters()));
+    var locoMeters = Math.max(0, Math.round(Number(details && details.locoLengthMeters) || TRAIN_LOCO_LENGTH_M));
+    var compositionType = String(details && details.compositionType || '');
+    var projectionMeters = (compositionType === 'train' || compositionType === 'estimated') ? trainMeters + locoMeters : trainMeters;
     var dir = getCurrentCoordinateDirection();
-    var tailCoord = center - dir * trainMeters;
+    var tailCoord = center - dir * projectionMeters;
     var headX = coordinateToApkX(center, center, layout);
     var tailX = coordinateToApkX(tailCoord, center, layout);
     var barLeft = Math.min(headX, tailX);
@@ -15373,17 +15389,44 @@
 
     var railY = layout.trackY;
     var tickTop = railY - 15;
-    var bandH = Math.max(5, Math.min(8, layout.xUnit * 0.82));
+    var bandH = Math.max(10, Math.min(13, layout.xUnit * 1.45));
     var bandBottom = tickTop - 3;
     var bandTop = bandBottom - bandH;
 
     ctx.save();
     ctx.beginPath();
     var clipTop = bandTop - 4;
-    ctx.rect(layout.viewportX + 6, clipTop, layout.viewportWidth - 12, Math.max(0, railY - clipTop));
+    var clipLeft = layout.viewportX + 6;
+    var clipRight = layout.viewportRight - 6;
+    ctx.rect(clipLeft, clipTop, Math.max(0, clipRight - clipLeft), Math.max(0, railY - clipTop));
     ctx.clip();
 
-    fillRoundRect(ctx, barLeft, bandTop, span, bandH, Math.min(3, bandH / 2), isPreview ? 'rgba(91, 210, 255, 0.45)' : 'rgba(74, 222, 128, 0.42)');
+    fillRoundRect(ctx, barLeft, bandTop, span, bandH, Math.min(6, bandH / 2), isPreview ? 'rgba(91, 210, 255, 0.45)' : 'rgba(74, 222, 128, 0.42)');
+
+    var label = formatTrainKmScaleLengthLabel(details);
+    var visibleLeft = Math.max(barLeft, clipLeft + 2);
+    var visibleRight = Math.min(barRight, clipRight - 2);
+    var visibleWidth = visibleRight - visibleLeft;
+    if (label && visibleWidth >= 58) {
+      var fontSize = Math.max(8, Math.min(10, bandH - 3));
+      ctx.save();
+      ctx.font = '850 ' + fontSize + 'px "Plus Jakarta Sans", system-ui, sans-serif';
+      var labelWidth = ctx.measureText(label).width;
+      ctx.restore();
+      if (labelWidth + 12 <= visibleWidth) {
+        var labelX = visibleLeft + visibleWidth / 2;
+        var labelY = bandTop + bandH / 2;
+        fillRoundRect(ctx, labelX - labelWidth / 2 - 5, bandTop + 1.5, labelWidth + 10, bandH - 3, Math.min(5, (bandH - 3) / 2), isPreview ? 'rgba(2, 6, 23, 0.38)' : 'rgba(2, 6, 23, 0.46)');
+        drawText(ctx, label, labelX, labelY, {
+          size: fontSize,
+          weight: 850,
+          color: isPreview ? 'rgba(240, 249, 255, 0.86)' : 'rgba(240, 253, 244, 0.96)',
+          align: 'center',
+          baseline: 'middle',
+          maxWidth: visibleWidth - 10
+        });
+      }
+    }
     ctx.restore();
   }
 
