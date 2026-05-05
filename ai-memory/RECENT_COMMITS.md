@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-05 01:07:06 +0000
+Generated: 2026-05-05 01:43:12 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `3039e91` | 2026-05-05T01:43:09+00:00 | iEgor72 | fix(poekhali): normalize next signal label |
+| `22ce0e2` | 2026-05-05T01:07:09+00:00 | iEgor72 | chore(memory): refresh after signal label fix |
 | `6f77e0a` | 2026-05-05T01:07:03+00:00 | iEgor72 | fix(poekhali): display signal parity prefix |
 | `c753600` | 2026-05-05T01:04:55+00:00 | iEgor72 | chore(memory): add signal parity session note |
 | `c3018a2` | 2026-05-05T01:04:48+00:00 | iEgor72 | chore(memory): refresh after signal parity fix |
@@ -42,5 +44,3 @@ Generated: 2026-05-05 01:07:06 +0000
 | `6839f85` | 2026-05-03T22:27:09+10:00 | iEgor72 | chore(cache): bump shell cache to v254 after splash revert |
 | `4274554` | 2026-05-03T22:26:33+10:00 | iEgor72 | Revert "fix(pwa): generate per-device iOS splashes so the white frame is replaced by dark" |
 | `bb58eb6` | 2026-05-03T22:18:53+10:00 | iEgor72 | fix(pwa): generate per-device iOS splashes so the white frame is replaced by dark |
-| `1a4e8a0` | 2026-05-03T22:11:14+10:00 | iEgor72 | fix(boot): stop forcing standalone PWA reload on SW controllerchange |
-| `a9119ab` | 2026-05-03T22:07:11+10:00 | iEgor72 | fix(auth): redeem stored pwa-login-request on cold load |
