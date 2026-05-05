@@ -3485,7 +3485,7 @@
     if (lowerText === 'комсом') text = numericCoordinate >= 3812000 && numericCoordinate <= 3816000 ? 'Комсомольск-2' : 'Комсомольск';
     else if (lowerText === 'хальгас') text = 'Хальгасо';
     else if (lowerText === 'хурму') text = 'Хурмули';
-    else if (lowerText === 'скоро') text = 'Скорость';
+    else if (lowerText === 'скоро') text = 'Огр.';
     text = text.replace(/Комсомольск[\s-]*на[\s-]*Амуре/ig, 'К-на-А');
     text = text.replace(/Партизанские\s+сопки/ig, 'Парт сопки');
     text = text.replace(/\bсортировочн(?:ый|ая|ое|ые)?\b/ig, 'сорт');
@@ -14074,7 +14074,7 @@
     if (rule.source === 'document') return 'ДОК';
     if (rule.source === 'regime') return 'РК';
     if (rule.source === 'user') return 'GPS';
-    return 'СКОР';
+    return 'ОГР';
   }
 
   function formatSpeedRuleDisplay(rule) {
@@ -14506,6 +14506,7 @@
   function getRestrictionTargetLabel(label, speedKmh) {
     var text = String(label || '').trim();
     var speed = Math.max(0, Math.round(Number(speedKmh) || 0));
+    if (/^скор(?:ость|о)?\.?$/i.test(text)) text = '';
     if (!text && speed > 0) text = speed + ' км/ч';
     if (speed > 0 && text && text.indexOf('км/ч') < 0) text += ' км/ч';
     return text;
@@ -15204,14 +15205,14 @@
     if (navTarget) {
       switch (navTarget.kind) {
         case 'restriction':
-          return 'СКОРОСТЬ';
+          return 'ОГР';
         case 'warning':
           return 'ПРЕДУПР.';
         default:
           return 'ДО';
       }
     }
-    if (nextRestriction) return 'СКОРОСТЬ';
+    if (nextRestriction) return 'ОГР';
     if (nextWarning) return 'ПРЕДУПР.';
     if (nextSignal) return 'СВЕТОФОР';
     if (isPreview) return 'GPS';

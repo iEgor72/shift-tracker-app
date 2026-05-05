@@ -716,7 +716,7 @@
       if (lowerText === 'комсом') text = numericCoordinate >= 3812000 && numericCoordinate <= 3816000 ? 'Комсомольск-2' : 'Комсомольск';
       else if (lowerText === 'хальгас') text = 'Хальгасо';
       else if (lowerText === 'хурму') text = 'Хурмули';
-      else if (lowerText === 'скоро') text = 'Скорость';
+      else if (lowerText === 'скоро') text = 'Огр.';
       text = text.replace(/Комсомольск[\s-]*на[\s-]*Амуре/ig, 'К-на-А');
       text = text.replace(/Партизанские\s+сопки/ig, 'Парт сопки');
       text = text.replace(/\bсортировочн(?:ый|ая|ое|ые)?\b/ig, 'сорт');
