@@ -15383,16 +15383,20 @@
     ctx.restore();
   }
 
-  function formatTrainKmScaleLengthLabel(details) {
+  function getTrainKmScaleLengthLabels(details) {
     var source = details || getPoekhaliTrainDetails();
     var trainMeters = Math.max(0, Math.round(Number(source && source.lengthMeters) || 0));
     var locoMeters = Math.max(0, Math.round(Number(source && source.locoLengthMeters) || TRAIN_LOCO_LENGTH_M));
     var compositionType = String(source && source.compositionType || '');
+    var approx = source && source.lengthSource === 'по осям' ? '~' : '';
     if (compositionType === 'train' || compositionType === 'estimated') {
-      return (source && source.lengthSource === 'по осям' ? '~' : '') + trainMeters + 'м + ' + locoMeters + 'м';
+      return [
+        approx + trainMeters + 'м + ' + locoMeters + 'м',
+        approx + trainMeters + '+' + locoMeters + 'м',
+        approx + (trainMeters + locoMeters) + 'м'
+      ];
     }
-    if (trainMeters > 0) return trainMeters + 'м';
-    return '';
+    return trainMeters > 0 ? [trainMeters + 'м'] : [];
   }
 
   /**
@@ -15429,27 +15433,42 @@
 
     fillRoundRect(ctx, barLeft, bandTop, span, bandH, Math.min(6, bandH / 2), isPreview ? 'rgba(91, 210, 255, 0.45)' : 'rgba(74, 222, 128, 0.42)');
 
-    var label = formatTrainKmScaleLengthLabel(details);
+    var labels = getTrainKmScaleLengthLabels(details);
     var visibleLeft = Math.max(barLeft, clipLeft + 2);
     var visibleRight = Math.min(barRight, clipRight - 2);
     var visibleWidth = visibleRight - visibleLeft;
-    if (label && visibleWidth >= 58) {
-      var fontSize = Math.max(8, Math.min(10, bandH - 3));
+    if (labels.length && visibleWidth >= 34) {
+      var fontSize = Math.max(7, Math.min(10, bandH - 3));
+      var label = '';
+      var labelWidth = 0;
       ctx.save();
       ctx.font = '850 ' + fontSize + 'px "Plus Jakarta Sans", system-ui, sans-serif';
-      var labelWidth = ctx.measureText(label).width;
+      for (var li = 0; li < labels.length; li++) {
+        var candidate = labels[li];
+        var candidateWidth = ctx.measureText(candidate).width;
+        if (candidateWidth + 10 <= visibleWidth) {
+          label = candidate;
+          labelWidth = candidateWidth;
+          break;
+        }
+      }
+      if (!label && visibleWidth >= 46 && labels.length) {
+        label = labels[labels.length - 1];
+        labelWidth = Math.min(ctx.measureText(label).width, visibleWidth - 8);
+      }
       ctx.restore();
-      if (labelWidth + 12 <= visibleWidth) {
+      if (label) {
         var labelX = visibleLeft + visibleWidth / 2;
         var labelY = bandTop + bandH / 2;
-        fillRoundRect(ctx, labelX - labelWidth / 2 - 5, bandTop + 1.5, labelWidth + 10, bandH - 3, Math.min(5, (bandH - 3) / 2), isPreview ? 'rgba(2, 6, 23, 0.38)' : 'rgba(2, 6, 23, 0.46)');
+        var pillWidth = Math.min(visibleWidth - 2, labelWidth + 10);
+        fillRoundRect(ctx, labelX - pillWidth / 2, bandTop + 1.5, pillWidth, bandH - 3, Math.min(5, (bandH - 3) / 2), isPreview ? 'rgba(2, 6, 23, 0.38)' : 'rgba(2, 6, 23, 0.46)');
         drawText(ctx, label, labelX, labelY, {
           size: fontSize,
           weight: 850,
           color: isPreview ? 'rgba(240, 249, 255, 0.86)' : 'rgba(240, 253, 244, 0.96)',
           align: 'center',
           baseline: 'middle',
-          maxWidth: visibleWidth - 10
+          maxWidth: Math.max(8, pillWidth - 6)
         });
       }
     }
