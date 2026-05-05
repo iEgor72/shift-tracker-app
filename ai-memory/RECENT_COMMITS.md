@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-04 22:29:44 +0000
+Generated: 2026-05-05 01:04:45 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `95d9ea0` | 2026-05-05T01:04:42+00:00 | iEgor72 | fix(poekhali): preserve train parity for signals |
+| `9ebcc6d` | 2026-05-04T22:29:50+00:00 | iEgor72 | chore(memory): refresh after route orientation fix |
 | `68bb435` | 2026-05-04T22:29:41+00:00 | iEgor72 | fix(poekhali): orient map by matched route |
 | `5036d06` | 2026-05-04T09:25:41+00:00 | iEgor72 | chore(memory): refresh after travel profile fix |
 | `536f101` | 2026-05-04T09:25:32+00:00 | iEgor72 | fix(poekhali): show profile by travel direction |
@@ -42,5 +44,3 @@ Generated: 2026-05-04 22:29:44 +0000
 | `28db81b` | 2026-05-03T21:58:31+10:00 | iEgor72 | fix(pwa): suppress iOS PWA white splash flash with dark startup image |
 | `3c54179` | 2026-05-03T21:52:34+10:00 | iEgor72 | fix(boot): remove white flash before first paint |
 | `3da420c` | 2026-05-03T21:48:40+10:00 | iEgor72 | fix(boot): never paint auth gate when cached shell is available |
-| `a41c602` | 2026-05-03T21:37:23+10:00 | iEgor72 | fix(sw): serve cached shell instantly on slow network |
-| `3371b1e` | 2026-05-03T21:32:13+10:00 | iEgor72 | fix(ui): show shell cache version on its own line under user stats |
