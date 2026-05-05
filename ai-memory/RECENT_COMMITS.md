@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-05 05:46:18 +0000
+Generated: 2026-05-05 05:50:00 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `cf5938c` | 2026-05-05T05:49:43+00:00 | iEgor72 | feat(poekhali): label train length on km scale |
+| `64b75ce` | 2026-05-05T05:46:21+00:00 | iEgor72 | chore(memory): refresh project state |
 | `496158a` | 2026-05-05T05:46:11+00:00 | iEgor72 | refactor(poekhali): centralize target display formatting |
 | `ddb5c8a` | 2026-05-05T05:23:42+00:00 | iEgor72 | chore(memory): refresh project state |
 | `23e3e4e` | 2026-05-05T05:23:33+00:00 | iEgor72 | fix(poekhali): advance past station anchors |
@@ -42,5 +44,3 @@ Generated: 2026-05-05 05:46:18 +0000
 | `062c31a` | 2026-05-04T05:10:30+00:00 | iEgor72 | fix(poekhali): invert BAM odd profile |
 | `56235b3` | 2026-05-04T04:45:54+00:00 | iEgor72 | chore(memory): refresh after Telegram location fix |
 | `51c1151` | 2026-05-04T04:45:49+00:00 | iEgor72 | fix(poekhali): use Telegram native location |
-| `5e7deaa` | 2026-05-04T04:43:13+00:00 | iEgor72 | chore(memory): refresh after live GPS watch |
-| `2f34e98` | 2026-05-04T04:43:06+00:00 | iEgor72 | fix(poekhali): use live GPS watch |
