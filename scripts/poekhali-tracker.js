@@ -14257,7 +14257,8 @@
       var anchor = getObjectApproachAnchor(item, center);
       if (anchor === null || !isFinite(anchor)) continue;
       var distance = getDirectionalDistance(anchor, center, tracker.even);
-      if (item.type === '2' && center >= item.coordinate && center <= item.end) distance = 0;
+      // Stations are navigation objects, not zones to keep pinned after entry.
+      // If the head has passed the approach anchor, drop this station and move to the next object.
       if (!isFinite(distance) || distance < 0) continue;
       if (!best || distance < best.distance) {
         best = {
