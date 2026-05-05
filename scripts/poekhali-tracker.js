@@ -15938,9 +15938,31 @@
   function shouldDrawSpeedBandLabel(rule, activeSpeed, center, priority, drawnLabels, maxLabels) {
     if (!rule || drawnLabels >= maxLabels || isSameSpeedRule(rule, activeSpeed)) return false;
     var distance = getRangeDistanceFromCenter(rule.coordinate, rule.end, center);
-    if (rule.source === 'warning' || rule.conflict) return distance <= APK_LABEL_CONTEXT_RADIUS_M;
-    if (rule.source === 'document' || rule.source === 'regime') return distance <= APK_LABEL_FOCUS_RADIUS_M;
-    return priority >= 44 && distance <= APK_LABEL_FOCUS_RADIUS_M;
+    if (rule.source === 'warning' || rule.conflict) return distance <= APK_LABEL_FOCUS_RADIUS_M;
+    if (rule.source === 'document' || rule.source === 'regime') return distance <= APK_LABEL_FOCUS_RADIUS_M * 0.72;
+    return priority >= 44 && distance <= APK_LABEL_FOCUS_RADIUS_M * 0.64;
+  }
+
+  function getTrainClearDistanceForSpeedRule(rule, center) {
+    if (!rule || !isFinite(center)) return 0;
+    var trainLen = Math.max(1, Math.round(Number(getTrainLengthMeters()) || 1));
+    var dir = getCurrentCoordinateDirection();
+    var tail = center - dir * trainLen;
+    var start = Number(rule.coordinate);
+    var end = Number(rule.end);
+    if (!isFinite(start)) start = 0;
+    if (!isFinite(end)) end = start;
+    var clearCoordinate = getDirectionEndCoordinate(Math.min(start, end), Math.max(start, end), tracker.even);
+    return Math.max(0, Math.round(getDirectionalDistance(clearCoordinate, tail, tracker.even)));
+  }
+
+  function formatSpeedBandLabel(rule, isActive, center) {
+    var speed = getSpeedRuleValue(rule);
+    var base = isFinite(speed) && speed > 0 ? Math.round(speed) + ' км/ч' : formatSpeedRuleDisplay(rule);
+    if (!isActive) return base;
+    var clearDistance = getTrainClearDistanceForSpeedRule(rule, center);
+    if (clearDistance >= 25) return base + ' · тянуть ' + formatDistanceLabel(clearDistance);
+    return base;
   }
 
   function doSpeedRangesOverlap(a, b, tolerance) {
@@ -16014,9 +16036,11 @@
     laneValues.sort(function(a, b) { return b - a; });
     if (laneValues.length > maxLanes) laneValues = laneValues.slice(0, maxLanes);
     prepared.sort(function(a, b) {
+      var aActive = isSameSpeedRule(a.rule, activeSpeed) ? 1 : 0;
+      var bActive = isSameSpeedRule(b.rule, activeSpeed) ? 1 : 0;
       var aSpeed = getSpeedLaneValue(a.rule);
       var bSpeed = getSpeedLaneValue(b.rule);
-      return bSpeed - aSpeed || a.rule.coordinate - b.rule.coordinate || b.priority - a.priority;
+      return aActive - bActive || bSpeed - aSpeed || a.rule.coordinate - b.rule.coordinate || b.priority - a.priority;
     });
     for (var i = 0; i < prepared.length; i++) {
       var rule = prepared[i].rule;
@@ -16030,18 +16054,17 @@
       if (end < start) continue;
       var xSpan = getObjectXSpan({ coordinate: start, end: end, length: end - start }, center, layout);
       var visibleWidth = xSpan.x2 - xSpan.x1;
-      var distance = getRangeDistanceFromCenter(rule.coordinate, rule.end, center);
-      var isDimmed = !isActive && !isWarning && !isDocConflict && distance > APK_LABEL_CONTEXT_RADIUS_M;
-      if (isDimmed && visibleWidth < (isPreview ? 28 : 38)) continue;
+      var isDimmed = !isActive;
+      if (isDimmed && visibleWidth < (isPreview ? 26 : 34)) continue;
       var speedValue = getSpeedLaneValue(rule);
       var lane = laneValues.indexOf(speedValue);
       if (lane < 0) continue;
       var y = topY + lane * 14;
-      var width = isActive ? 5 : (isDimmed ? 2.2 : 3.6);
+      var width = isActive ? 6.4 : (isDocConflict || isWarning ? 3 : 2.2);
       var stroke = getSpeedRowColor(rule, isDimmed);
-      ctx.globalAlpha = isDimmed ? 0.52 : 1;
-      ctx.strokeStyle = 'rgba(3, 7, 18, 0.72)';
-      ctx.lineWidth = width + 2.5;
+      ctx.globalAlpha = isActive ? 1 : (isDocConflict || isWarning ? 0.62 : 0.34);
+      ctx.strokeStyle = 'rgba(3, 7, 18, 0.76)';
+      ctx.lineWidth = width + (isActive ? 3.4 : 2.2);
       ctx.lineCap = 'round';
       ctx.beginPath();
       ctx.moveTo(xSpan.x1, y);
@@ -16049,31 +16072,43 @@
       ctx.stroke();
       ctx.strokeStyle = stroke;
       ctx.lineWidth = width;
+      ctx.shadowColor = isActive ? stroke : 'transparent';
+      ctx.shadowBlur = isActive && !isPreview ? 12 : 0;
       ctx.beginPath();
       ctx.moveTo(xSpan.x1, y);
       ctx.lineTo(xSpan.x2, y);
       ctx.stroke();
+      ctx.shadowBlur = 0;
       ctx.globalAlpha = 1;
 
-      var mid = (start + end) / 2;
-      var labelX = clamp(coordinateToApkX(mid, center, layout), xSpan.x1 + 14, xSpan.x2 - 14);
-      var labelGap = isPreview ? 50 : 58;
+      var mid = isActive ? center : (start + end) / 2;
+      var labelX = clamp(coordinateToApkX(mid, center, layout), xSpan.x1 + 18, xSpan.x2 - 18);
+      var labelGap = isPreview ? 54 : 66;
       var wideEnough = visibleWidth > (isPreview ? 34 : 42);
-      var shouldLabel = isActive || shouldDrawSpeedBandLabel(rule, activeSpeed, center, priority, drawnLabels, maxLabels) || (distance <= APK_LABEL_FOCUS_RADIUS_M && wideEnough);
+      var shouldLabel = isActive || shouldDrawSpeedBandLabel(rule, activeSpeed, center, priority, drawnLabels, maxLabels);
       var labelRight = isFinite(labelRightByLane[lane]) ? labelRightByLane[lane] : -Infinity;
-      if (wideEnough && shouldLabel && labelX > labelRight + labelGap && drawnLabels < maxLabels) {
-        var speed = getSpeedRuleValue(rule);
-        var label = isFinite(speed) ? Math.round(speed) + ' км/ч' : formatSpeedRuleDisplay(rule);
-        var labelColor = getSpeedRowTextColor(rule, isActive);
-        drawText(ctx, label, labelX, y - 5, {
-          size: isActive ? 10 : 9,
-          weight: 850,
+      if (wideEnough && shouldLabel && (isActive || labelX > labelRight + labelGap) && (isActive || drawnLabels < maxLabels)) {
+        var label = formatSpeedBandLabel(rule, isActive, center);
+        var labelMaxWidth = Math.min(isActive ? 146 : 74, visibleWidth + 18);
+        var labelColor = isActive ? '#f8fafc' : getSpeedRowTextColor(rule, false);
+        if (isActive) {
+          ctx.save();
+          ctx.font = '900 11px system-ui, -apple-system, Segoe UI, sans-serif';
+          var measured = Math.min(labelMaxWidth, Math.ceil(ctx.measureText(label).width) + 18);
+          fillRoundRect(ctx, labelX - measured / 2, y - 19, measured, 17, 8, 'rgba(2, 6, 23, 0.84)');
+          ctx.lineWidth = 1;
+          strokeRoundRect(ctx, labelX - measured / 2, y - 19, measured, 17, 8, 'rgba(248, 250, 252, 0.18)');
+          ctx.restore();
+        }
+        drawText(ctx, label, labelX, y - 6, {
+          size: isActive ? 11 : 9,
+          weight: isActive ? 900 : 750,
           color: labelColor,
           align: 'center',
-          maxWidth: Math.min(72, visibleWidth + 12)
+          maxWidth: labelMaxWidth
         });
-        labelRightByLane[lane] = labelX + Math.min(72, label.length * 5.5) / 2;
-        drawnLabels += 1;
+        labelRightByLane[lane] = labelX + labelMaxWidth / 2;
+        if (!isActive) drawnLabels += 1;
       }
     }
     ctx.restore();
