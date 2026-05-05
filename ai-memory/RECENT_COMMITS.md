@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-05 11:14:12 +0000
+Generated: 2026-05-05 11:25:46 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `6b9cce9` | 2026-05-05T11:25:40+00:00 | iEgor72 | feat(poekhali): emphasize active speed band |
+| `c02adbb` | 2026-05-05T11:14:19+00:00 | iEgor72 | chore(memory): refresh project state |
 | `58ba4de` | 2026-05-05T11:14:03+00:00 | iEgor72 | fix(poekhali): throttle GPS status toasts |
 | `1d070d3` | 2026-05-05T07:05:08+00:00 | iEgor72 | chore(memory): refresh project state |
 | `7de8ac2` | 2026-05-05T07:04:25+00:00 | iEgor72 | fix(poekhali): avoid machine speed abbreviations |
@@ -42,5 +44,3 @@ Generated: 2026-05-05 11:14:12 +0000
 | `95d9ea0` | 2026-05-05T01:04:42+00:00 | iEgor72 | fix(poekhali): preserve train parity for signals |
 | `9ebcc6d` | 2026-05-04T22:29:50+00:00 | iEgor72 | chore(memory): refresh after route orientation fix |
 | `68bb435` | 2026-05-04T22:29:41+00:00 | iEgor72 | fix(poekhali): orient map by matched route |
-| `5036d06` | 2026-05-04T09:25:41+00:00 | iEgor72 | chore(memory): refresh after travel profile fix |
-| `536f101` | 2026-05-04T09:25:32+00:00 | iEgor72 | fix(poekhali): show profile by travel direction |
