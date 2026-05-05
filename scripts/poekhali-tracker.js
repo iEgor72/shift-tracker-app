@@ -10,7 +10,7 @@
   var APK_ANGLE_MULTIPLIER = 0.22;
   var APK_LABEL_FOCUS_RADIUS_M = 720;
   var APK_LABEL_CONTEXT_RADIUS_M = 1500;
-  var POEKHALI_DIAGNOSTIC_VERSION = 'v211';
+  var POEKHALI_DIAGNOSTIC_VERSION = 'v212';
   var REMOTE_MAP_SOURCE_ENABLED = false;
   var BACKUP_SCHEMA_VERSION = 1;
   var TRAIN_LOCO_LENGTH_M = 51;
@@ -1023,15 +1023,6 @@
   }
 
   function getCurrentCoordinateDirection() {
-    var routeSuggestion = null;
-    try {
-      routeSuggestion = tracker.assetsLoaded ? getShiftRouteSuggestion() : null;
-    } catch (error) {
-      routeSuggestion = null;
-    }
-    if (routeSuggestion && routeSuggestion.status === 'ready' && routeSuggestion.even !== null && routeSuggestion.even !== undefined) {
-      return getCoordinateDirectionForEven(routeSuggestion.even);
-    }
     return getCoordinateDirectionForEven(tracker.even);
   }
 
@@ -1570,7 +1561,15 @@
     var item = suggestion || getShiftRouteSuggestion();
     if (!item || item.status !== 'ready') return false;
     if (item.wayNumber) tracker.wayNumber = normalizeWayNumber(item.wayNumber);
-    applyDetectedDirection(item.even, 'route', { force: tracker.directionSource !== 'gps', updateRun: true });
+    var trainEven = getEvenFromTrainNumber(getPoekhaliTrainDetails().trainNumber);
+    // Route geometry can be ambiguous on BAM maps where station names repeat across
+    // sectors. Never let it switch signal parity when the train number already
+    // tells us ЧЕТ/НЕЧЕТ; object/signal files must follow the actual train.
+    if (trainEven === null) {
+      applyDetectedDirection(item.even, 'route', { force: tracker.directionSource !== 'gps', updateRun: true });
+    } else if (tracker.even !== trainEven || tracker.directionSource === 'route') {
+      applyDetectedDirection(trainEven, 'train', { force: true, updateRun: true });
+    }
     setPreviewProjection({
       lineCoordinate: item.coordinate,
       sector: item.sector
@@ -1586,7 +1585,10 @@
     if (!item || item.status !== 'ready') return false;
     var hasLiveProjection = tracker.projection && tracker.projection.onTrack;
     if (hasLiveProjection) {
-      if (!tracker.directionSource || tracker.directionSource === 'route' || tracker.directionSource === 'train') {
+      var trainEven = getEvenFromTrainNumber(getPoekhaliTrainDetails().trainNumber);
+      if (trainEven !== null) {
+        applyDetectedDirection(trainEven, 'train', { force: true, updateRun: true });
+      } else if (!tracker.directionSource || tracker.directionSource === 'route' || tracker.directionSource === 'train') {
         applyDetectedDirection(item.even, 'route', { force: true, updateRun: true });
       }
       if (item.wayNumber) tracker.wayNumber = normalizeWayNumber(item.wayNumber);
