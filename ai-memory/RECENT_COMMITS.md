@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-05 11:55:15 +0000
+Generated: 2026-05-05 12:16:40 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `b286f5f` | 2026-05-05T12:15:57+00:00 | iEgor72 | feat(poekhali): derive speeds from speed documents |
+| `7097eb3` | 2026-05-05T11:55:20+00:00 | iEgor72 | chore(memory): refresh project state |
 | `6670231` | 2026-05-05T11:55:07+00:00 | iEgor72 | feat(poekhali): improve regime control marks |
 | `25299d0` | 2026-05-05T11:36:51+00:00 | iEgor72 | chore(memory): refresh project state |
 | `369fb91` | 2026-05-05T11:36:41+00:00 | iEgor72 | fix(poekhali): preserve warning form drafts |
@@ -42,5 +44,3 @@ Generated: 2026-05-05 11:55:15 +0000
 | `8502539` | 2026-05-05T01:45:21+00:00 | iEgor72 | chore(memory): refresh after guide line removal |
 | `dc4ff1a` | 2026-05-05T01:45:13+00:00 | iEgor72 | fix(poekhali): remove train guide line |
 | `6fc3822` | 2026-05-05T01:43:16+00:00 | iEgor72 | chore(memory): refresh after next signal label fix |
-| `3039e91` | 2026-05-05T01:43:09+00:00 | iEgor72 | fix(poekhali): normalize next signal label |
-| `22ce0e2` | 2026-05-05T01:07:09+00:00 | iEgor72 | chore(memory): refresh after signal label fix |
