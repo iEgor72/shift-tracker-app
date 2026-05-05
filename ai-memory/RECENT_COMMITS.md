@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-05 06:04:41 +0000
+Generated: 2026-05-05 06:07:24 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `589fca6` | 2026-05-05T06:07:16+00:00 | iEgor72 | fix(poekhali): keep train length label visible |
+| `6816b25` | 2026-05-05T06:04:45+00:00 | iEgor72 | chore(memory): refresh project state |
 | `5e98c6f` | 2026-05-05T06:04:33+00:00 | iEgor72 | fix(poekhali): format fallback station titles |
 | `750cb3e` | 2026-05-05T06:01:03+00:00 | iEgor72 | chore(memory): refresh project state |
 | `f4619d1` | 2026-05-05T06:00:50+00:00 | iEgor72 | fix(poekhali): humanize object abbreviations |
@@ -42,5 +44,3 @@ Generated: 2026-05-05 06:04:41 +0000
 | `a79f23b` | 2026-05-04T07:45:33+00:00 | iEgor72 | fix(poekhali): probe GPS before run checks |
 | `1ecd8a0` | 2026-05-04T06:14:08+00:00 | iEgor72 | chore(memory): refresh after BAM profile sign fix |
 | `0e99643` | 2026-05-04T06:14:00+00:00 | iEgor72 | fix(poekhali): invert BAM profile signs |
-| `655591c` | 2026-05-04T05:49:27+00:00 | iEgor72 | chore(memory): refresh after rail km display fix |
-| `7581def` | 2026-05-04T05:49:20+00:00 | iEgor72 | fix(poekhali): display rail km and pickets |
