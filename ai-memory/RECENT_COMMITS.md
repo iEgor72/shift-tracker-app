@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-05 06:11:13 +0000
+Generated: 2026-05-05 06:30:00 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `b606f21` | 2026-05-05T06:29:49+00:00 | iEgor72 | fix(poekhali): resolve KOMSOM station as Komsomolsk-2 |
+| `5dde77a` | 2026-05-05T06:11:18+00:00 | iEgor72 | chore(memory): refresh project state |
 | `057f6d5` | 2026-05-05T06:11:04+00:00 | iEgor72 | fix(poekhali): restore truncated object names |
 | `ff66adf` | 2026-05-05T06:07:28+00:00 | iEgor72 | chore(memory): refresh project state |
 | `589fca6` | 2026-05-05T06:07:16+00:00 | iEgor72 | fix(poekhali): keep train length label visible |
@@ -42,5 +44,3 @@ Generated: 2026-05-05 06:11:13 +0000
 | `8a222f1` | 2026-05-04T07:56:17+00:00 | iEgor72 | fix(poekhali): avoid GPS startup deadlock |
 | `b8c06bb` | 2026-05-04T07:51:32+00:00 | iEgor72 | chore(memory): refresh after GPS probe split |
 | `93d2c1d` | 2026-05-04T07:51:20+00:00 | iEgor72 | fix(poekhali): separate GPS probe from run start |
-| `8c22c00` | 2026-05-04T07:45:41+00:00 | iEgor72 | chore(memory): refresh after offline GPS fix |
-| `a79f23b` | 2026-05-04T07:45:33+00:00 | iEgor72 | fix(poekhali): probe GPS before run checks |
