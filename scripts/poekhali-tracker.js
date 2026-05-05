@@ -10,7 +10,7 @@
   var APK_ANGLE_MULTIPLIER = 0.22;
   var APK_LABEL_FOCUS_RADIUS_M = 720;
   var APK_LABEL_CONTEXT_RADIUS_M = 1500;
-  var POEKHALI_DIAGNOSTIC_VERSION = 'v213';
+  var POEKHALI_DIAGNOSTIC_VERSION = 'v214';
   var REMOTE_MAP_SOURCE_ENABLED = false;
   var BACKUP_SCHEMA_VERSION = 1;
   var TRAIN_LOCO_LENGTH_M = 51;
@@ -3422,6 +3422,7 @@
   function formatRunNextObject(run, prefix, compact) {
     if (!run || !prefix) return '—';
     var name = String(run[prefix + 'Name'] || '').trim();
+    if (prefix === 'nextSignal') name = formatSignalNameForDirection(name, run.direction ? String(run.direction).toUpperCase().indexOf('НЕЧ') !== 0 : tracker.even);
     if (!name) return '—';
     var source = String(run[prefix + 'Source'] || '').trim();
     var distance = Math.max(0, Math.round(Number(run[prefix + 'DistanceMeters']) || 0));
@@ -3478,6 +3479,7 @@
   function formatRunNavigationTarget(run, compact) {
     if (!run || !run.nextTargetLabel) return '—';
     var label = String(run.nextTargetLabel || '').trim();
+    if (String(run.nextTargetKind || '') === 'signal') label = formatSignalNameForDirection(label, run.direction ? String(run.direction).toUpperCase().indexOf('НЕЧ') !== 0 : tracker.even);
     var distance = Math.max(0, Math.round(Number(run.nextTargetDistanceMeters) || 0));
     var eta = formatEtaSeconds(run.nextTargetEtaSeconds, compact);
     if (compact) {
@@ -3588,6 +3590,7 @@
     }
 
     var label = String(run.nextTargetLabel || '').trim();
+    if (String(run.nextTargetKind || '') === 'signal') label = formatSignalNameForDirection(label, run.direction ? String(run.direction).toUpperCase().indexOf('НЕЧ') !== 0 : tracker.even);
     var distance = Math.max(0, Math.round(Number(run.nextTargetDistanceMeters) || 0));
     if (!label || distance > LIVE_ALERT_AHEAD_M) return null;
 
@@ -14310,7 +14313,7 @@
     var sourceProjection = projection || getCurrentProjectionForForm();
     var signal = nextSignal || resolveNextSignalForProjection(sourceProjection);
     var station = nextStation || resolveNextStationForProjection(sourceProjection);
-    run.nextSignalName = signal ? signal.name : '';
+    run.nextSignalName = signal ? formatSignalNameForDirection(signal.name, tracker.even) : '';
     run.nextSignalSource = signal ? signal.source : '';
     run.nextSignalSector = signal ? signal.sector : 0;
     run.nextSignalCoordinate = signal ? signal.coordinate : 0;
@@ -14513,7 +14516,7 @@
     if (run.nextSignalName) {
       candidates.push({
         kind: 'signal',
-        label: run.nextSignalName,
+        label: formatSignalNameForDirection(run.nextSignalName, run.direction ? String(run.direction).toUpperCase().indexOf('НЕЧ') !== 0 : tracker.even),
         source: run.nextSignalSource,
         sector: run.nextSignalSector,
         coordinate: run.nextSignalCoordinate,
@@ -15101,7 +15104,7 @@
     if (nextSignal) {
       candidates.push({
         kind: 'signal',
-        label: nextSignal.name,
+        label: formatSignalNameForDirection(nextSignal.name, tracker.even),
         source: nextSignal.source,
         sector: nextSignal.sector || projectionSector,
         coordinate: nextSignal.coordinate,

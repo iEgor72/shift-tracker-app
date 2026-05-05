@@ -654,24 +654,15 @@
       var isSyncing = !!offlineUiState.isSyncing;
       var status = offlineUiState.lastSyncStatus || 'idle';
 
-      if (isSyncing) {
-        return {
-          key: 'syncing',
-          title: 'Синхронизация',
-          text: 'Отправляем локальные изменения на сервер.',
-          statusText: 'Синхронизация...',
-          tone: 'info',
-          autoHideMs: 3500
-        };
-      }
+      if (isSyncing) return null;
       if (isOffline) {
         return {
-          key: hasPending ? 'offline-pending' : 'offline',
+          key: 'offline',
           title: 'Нет сети',
-          text: hasPending ? 'Показываем последние сохранённые данные. Изменения отправятся при появлении сети.' : 'Показываем последние сохранённые данные.',
-          statusText: hasPending ? 'Сохранено локально' : 'Оффлайн',
+          text: 'Работаем по сохранённым данным.',
+          statusText: '',
           tone: 'danger',
-          autoHideMs: 6500
+          autoHideMs: 2800
         };
       }
       if (status === 'error') {
@@ -684,16 +675,7 @@
           autoHideMs: 6500
         };
       }
-      if (hasPending) {
-        return {
-          key: 'pending',
-          title: 'Есть несинхронизированные изменения',
-          text: 'Данные сохранены локально и будут отправлены автоматически.',
-          statusText: 'Сохранено локально',
-          tone: 'info',
-          autoHideMs: 4500
-        };
-      }
+      if (hasPending) return null;
       return null;
     }
 
@@ -742,16 +724,10 @@
 
       hideOfflineBanner(false);
 
-      if (payload.key !== lastOfflineToastKey) {
+      if (payload.key !== lastOfflineToastKey && (payload.key === 'offline' || String(payload.key || '').indexOf('error') === 0)) {
         lastOfflineToastKey = payload.key;
-        var brief = payload.title;
-        if (payload.key === 'syncing') brief = 'Синхронизация…';
-        else if (payload.key === 'offline') brief = 'Нет сети';
-        else if (payload.key === 'offline-pending') brief = 'Оффлайн · есть очередь';
-        else if (String(payload.key || '').indexOf('error') === 0) brief = 'Не удалось синхронизировать';
-        else if (payload.key === 'pending') brief = 'Ждёт отправки на сервер';
-        var toastTone = payload.tone === 'danger' ? 'danger' : 'info';
-        enqueueAppToast(brief, toastTone, Math.min(payload.autoHideMs || 2400, 3200));
+        var brief = payload.key === 'offline' ? 'Нет сети' : 'Не удалось сохранить';
+        enqueueAppToast(brief, 'danger', Math.min(payload.autoHideMs || 2400, 2800));
       }
     }
 
