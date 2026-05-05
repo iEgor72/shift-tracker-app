@@ -1,14 +1,14 @@
 # Project State
 
 <!-- AUTO_STATUS:START -->
-Generated: 2026-05-05 01:45:20 +0000
+Generated: 2026-05-05 01:51:29 +0000
 
 ## Repository Snapshot
 - Local repo path: `/opt/bloknot-mashinista`
 - Project memory path: `/opt/bloknot-mashinista/ai-memory`
 - Branch: `main`
-- HEAD: `dc4ff1a`
-- Last commit: `dc4ff1a fix(poekhali): remove train guide line`
+- HEAD: `146c79f`
+- Last commit: `146c79f fix(poekhali): set parity screen orientation`
 
 ## Git Remote
 ```text
@@ -29,7 +29,7 @@ origin	https://github.com/iEgor72/bloknot-mashinista.git (push)
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          dc4ff1a [origin/main] fix(poekhali): remove train guide line
+* main                                          146c79f [origin/main] fix(poekhali): set parity screen orientation
 ```
 
 ## Worktree
