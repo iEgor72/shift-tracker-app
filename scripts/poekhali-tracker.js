@@ -3517,8 +3517,8 @@
     else if (kind === 'signal' && label.indexOf('Светофор ') !== 0) label = 'Светофор ' + label;
     var distance = Math.max(0, Math.round(Number(target && target.distanceMeters) || 0));
     var eta = String(formatEtaSeconds(target && target.etaSeconds, true) || '').replace(/^~/, '').trim();
-    var text = label + (distance > 0 ? ' через ' + formatRunDistance(distance) : ' сейчас');
-    if (eta) text += ' | ' + eta;
+    var text = distance > 0 ? label + ' через ' + formatRunDistance(distance) : label;
+    if (eta && distance > 0) text += ' | ' + eta;
     return text;
   }
 
@@ -15203,21 +15203,12 @@
   function getNavigationHudReachChipCaption(navTarget, nextRestriction, nextWarning, nextSignal, isPreview) {
     if (navTarget) {
       switch (navTarget.kind) {
-        case 'signal':
-          return 'СВЕТОФОР';
-        case 'station':
-          return 'СТАНЦИЯ';
         case 'restriction':
           return 'СКОРОСТЬ';
         case 'warning':
           return 'ПРЕДУПР.';
-        case 'restriction_end':
-          return 'ЗОНА';
-        case 'route_start':
-        case 'route_finish':
-          return 'МАРШРУТ';
         default:
-          return 'ОБЪЕКТ';
+          return 'ДО';
       }
     }
     if (nextRestriction) return 'СКОРОСТЬ';
@@ -15242,7 +15233,7 @@
       distanceMeters: 0,
       etaSeconds: 0,
       coordinate: target.coordinate
-    }).replace(/\s+сейчас$/, '');
+    });
   }
 
   function drawApkLiveSummary(ctx, layout, center, sector, visibleObjects, activeSpeed, nextSignal, nextStation, nextWarning, nextRestriction, routeProgress, isPreview, projection) {

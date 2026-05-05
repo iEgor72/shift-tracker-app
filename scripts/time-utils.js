@@ -753,8 +753,8 @@
       if (!title) return '';
       var distance = Math.max(0, Math.round(Number(target.distanceMeters) || 0));
       var eta = formatPoekhaliTargetEta(target.etaSeconds);
-      var text = title + (distance > 0 ? ' через ' + formatShiftPoekhaliDistance(distance) : ' сейчас');
-      if (eta) text += ' | ' + eta;
+      var text = distance > 0 ? title + ' через ' + formatShiftPoekhaliDistance(distance) : title;
+      if (eta && distance > 0) text += ' | ' + eta;
       return text;
     }
 
