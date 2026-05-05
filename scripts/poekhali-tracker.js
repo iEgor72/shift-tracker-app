@@ -10,7 +10,7 @@
   var APK_ANGLE_MULTIPLIER = 0.22;
   var APK_LABEL_FOCUS_RADIUS_M = 720;
   var APK_LABEL_CONTEXT_RADIUS_M = 1500;
-  var POEKHALI_DIAGNOSTIC_VERSION = 'v212';
+  var POEKHALI_DIAGNOSTIC_VERSION = 'v213';
   var REMOTE_MAP_SOURCE_ENABLED = false;
   var BACKUP_SCHEMA_VERSION = 1;
   var TRAIN_LOCO_LENGTH_M = 51;
@@ -1043,6 +1043,19 @@
 
   function getDirectionValueLabel(even) {
     return even ? 'ЧЕТ' : 'НЕЧЕТ';
+  }
+
+  function formatSignalNameForDirection(name, even) {
+    var text = String(name || '').trim();
+    if (!text) return '';
+    var prefix = even ? 'Ч' : 'Н';
+    return text.replace(/^[НHЧ]/i, prefix);
+  }
+
+  function getDisplayTrackObjectName(item) {
+    var name = String(item && item.name || '').trim();
+    if (item && String(item.type) === '1') return formatSignalNameForDirection(name, tracker.even);
+    return name;
   }
 
   function resetGpsDirectionVote() {
@@ -14257,9 +14270,9 @@
   function normalizeNavigationObject(match, projection) {
     if (!match || !match.item || !projection || !isRealNumber(projection.sector)) return null;
     var item = match.item;
-    var name = String(item.name || '').trim();
-    if (!name) return null;
     var kind = item.type === '1' ? 'signal' : 'station';
+    var name = getDisplayTrackObjectName(item);
+    if (!name) return null;
     var anchor = Math.max(0, Math.round(Number(match.anchor) || 0));
     var distance = Math.max(0, Math.round(Number(match.distance) || 0));
     return {
@@ -15622,7 +15635,7 @@
       ctx.globalAlpha = 1;
 
       if (signalDistance <= APK_LABEL_FOCUS_RADIUS_M && x - lastLabelX > (isPreview ? 76 : 92) && reserveLabel(labelLayout, x, y - 70, 48, 14, isPreview ? 8 : 5)) {
-        drawText(ctx, signal.name, x, y - 70, {
+        drawText(ctx, getDisplayTrackObjectName(signal), x, y - 70, {
           size: 8,
           weight: 850,
           color: 'rgba(238, 242, 248, 0.72)',
@@ -16800,7 +16813,7 @@
       ctx.arc(x, trackY - 27, 4, 0, Math.PI * 2);
       ctx.fill();
       if (i % 2 === 0) {
-        drawText(ctx, signal.name, x, trackY - 36, {
+        drawText(ctx, getDisplayTrackObjectName(signal), x, trackY - 36, {
           size: 9,
           weight: 800,
           color: THEME.text,
@@ -16939,7 +16952,7 @@
       });
     } else if (!activeSpeed && !nextWarning && nextSignal && !isPreview) {
       var distance = Math.abs(nextSignal.coordinate - center);
-      var signalText = nextSignal.name + ' · ' + Math.round(distance) + ' м';
+      var signalText = formatSignalNameForDirection(nextSignal.name, tracker.even) + ' · ' + Math.round(distance) + ' м';
       var signalWidth = Math.min(132, Math.max(74, signalText.length * 6 + 18));
       var signalX = layout.viewportRight - signalWidth - 8;
       var signalY = layout.trackY - 48;
