@@ -3473,6 +3473,31 @@
     }) || '—';
   }
 
+  function formatHumanTrackObjectName(value, kind) {
+    if (typeof window !== 'undefined' && typeof window.formatPoekhaliHumanObjectName === 'function') {
+      return window.formatPoekhaliHumanObjectName(value, kind);
+    }
+    var text = String(value || '').replace(/\s+/g, ' ').trim().replace(/^ст\.?\s+/i, '');
+    if (!text) return '';
+    text = text.replace(/Комсомольск[\s-]*на[\s-]*Амуре/ig, 'К-на-А');
+    text = text.replace(/Партизанские\s+сопки/ig, 'Парт сопки');
+    text = text.replace(/\bсортировочн(?:ый|ая|ое|ые)?\b/ig, 'сорт');
+    text = text.replace(/\bгрузов(?:ой|ая|ое|ые)?\b/ig, 'груз');
+    text = text.replace(/\bпассажирск(?:ий|ая|ое|ие)?\b/ig, 'пасс');
+    text = text.replace(/\bразъезд\b/ig, 'рзд');
+    text = text.replace(/остановочн(?:ый|ая|ое)?\s+пункт/ig, 'о.п.');
+    text = text.replace(/\s+\(/g, '(').replace(/,\s*/g, ', ').replace(/\s+/g, ' ').trim();
+    if (text.length <= 18) return text;
+    var words = text.split(' ');
+    if (words.length === 1) return text;
+    return words.map(function(word, index) {
+      if (word.indexOf('-') >= 0 || word.indexOf('.') >= 0 || /[()]/.test(word)) return word;
+      if (index === words.length - 1 && word.length <= 8) return word;
+      if (word.length <= 9) return word;
+      return word.slice(0, 4) + '.';
+    }).join(' ');
+  }
+
   function formatSharedPoekhaliNavigationTargetDisplay(target) {
     if (typeof window !== 'undefined' && typeof window.formatPoekhaliNavigationTargetDisplay === 'function') {
       return window.formatPoekhaliNavigationTargetDisplay(target);
@@ -3480,7 +3505,8 @@
     var label = String(target && (target.label || target.name) || '').trim();
     if (!label) return '';
     var kind = String(target && target.kind || '');
-    if (kind === 'station') label = 'ст ' + label.replace(/^ст\.?\s+/i, '');
+    label = formatHumanTrackObjectName(label, kind);
+    if (kind === 'station') label = 'ст ' + label;
     else if (kind === 'signal' && label.indexOf('Светофор ') !== 0) label = 'Светофор ' + label;
     var distance = Math.max(0, Math.round(Number(target && target.distanceMeters) || 0));
     var eta = String(formatEtaSeconds(target && target.etaSeconds, true) || '').replace(/^~/, '').trim();
@@ -15612,15 +15638,16 @@
       var shouldLabel = visibleWidth > 70 && (isRangeNearCenter(start, end, center, APK_LABEL_CONTEXT_RADIUS_M) || isRegimeStation);
       var minGap = isPreview ? 88 : 112;
       if (shouldLabel && labelX - minGap > labelRight) {
-        var stationLabel = String(station.name || '').toUpperCase();
+        var stationLabel = formatHumanTrackObjectName(station.name, 'station').toUpperCase();
+        var stationLabelWidth = Math.min(140, Math.max(54, stationLabel.length * 6.4));
         drawText(ctx, stationLabel, labelX, layout.profileTop + 7, {
           size: 10,
           weight: 850,
           color: isRegimeStation ? 'rgba(251, 146, 60, 0.36)' : 'rgba(238, 242, 248, 0.32)',
           align: 'center',
-          maxWidth: Math.min(visibleWidth + 12, 118)
+          maxWidth: Math.min(visibleWidth + 12, stationLabelWidth)
         });
-        labelRight = labelX + Math.min(118, stationLabel.length * 6.4) / 2 + 14;
+        labelRight = labelX + stationLabelWidth / 2 + 14;
       }
     }
     ctx.restore();
