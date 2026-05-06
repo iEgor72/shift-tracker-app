@@ -14619,11 +14619,48 @@
     return 'ЭК';
   }
 
+  function getStationNavigationName(item) {
+    return normalizeRouteName(formatHumanTrackObjectName(item && item.name, 'station', item && item.coordinate));
+  }
+
+  function getStationNavigationSpan(item) {
+    if (!item) return Infinity;
+    var length = Math.max(0, Math.round(Number(item.length) || 0));
+    if (length > 0) return length;
+    var start = Math.max(0, Math.round(Number(item.coordinate) || 0));
+    var end = Math.max(start, Math.round(Number(item.end) || start));
+    return Math.max(0, end - start);
+  }
+
+  function collapseStationNavigationObjects(objects) {
+    var byName = {};
+    var result = [];
+    for (var i = 0; i < (objects || []).length; i++) {
+      var item = objects[i];
+      if (!item || item.type !== '2') continue;
+      var key = getStationNavigationName(item) || String(Math.round(Number(item.coordinate) || 0));
+      var current = byName[key];
+      if (!current) {
+        byName[key] = item;
+        continue;
+      }
+      // APK/RK often contains both a long station zone and a short station point.
+      // Navigation must use the short point, otherwise the HUD says "0 м" while
+      // the train is still kilometres before the station.
+      var itemSpan = getStationNavigationSpan(item);
+      var currentSpan = getStationNavigationSpan(current);
+      if (itemSpan < currentSpan || (itemSpan === currentSpan && Number(item.coordinate) < Number(current.coordinate))) {
+        byName[key] = item;
+      }
+    }
+    Object.keys(byName).forEach(function(key) { result.push(byName[key]); });
+    return result;
+  }
+
   function getObjectApproachAnchor(item, center) {
     if (!item || !isFinite(item.coordinate)) return null;
     var start = Math.max(0, Math.round(Number(item.coordinate) || 0));
     var end = Math.max(start, Math.round(Number(item.end) || start));
-    if (item.type === '2' && center >= start && center <= end) return center;
     return getDirectionStartCoordinate(start, end, tracker.even);
   }
 
@@ -14634,7 +14671,9 @@
       if (!item || item.type !== type || !isFinite(item.coordinate)) return false;
       var objectWay = getWayNumberFromObjectFileKey(item.fileKey);
       return !objectWay || !currentWay || objectWay === currentWay;
-    }).sort(function(a, b) {
+    });
+    if (type === '2') objects = collapseStationNavigationObjects(objects);
+    objects.sort(function(a, b) {
       return a.coordinate - b.coordinate;
     });
     var best = null;
@@ -16400,8 +16439,11 @@
         var existing = result[j];
         var existingSpeed = getSpeedRuleValue(existing);
         if (!isFinite(speed) || !isFinite(existingSpeed)) continue;
-        if (!doSpeedRangesOverlap(rule, existing, 45)) continue;
-        if (getSpeedRulePriority(existing) > getSpeedRulePriority(rule)) {
+        var existingPriority = getSpeedRulePriority(existing);
+        var rulePriority = getSpeedRulePriority(rule);
+        var strongExisting = existingPriority >= getSpeedRulePriority({ source: 'manual' });
+        if (!doSpeedRangesOverlap(rule, existing, strongExisting ? 350 : 45)) continue;
+        if (existingPriority > rulePriority) {
           duplicate = true;
           break;
         }
