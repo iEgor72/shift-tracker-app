@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-06 16:08:55 +0000
+Generated: 2026-05-06 18:30:29 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `beab473` | 2026-05-06T18:30:22+00:00 | iEgor72 | fix(poekhali): expand station names in tracker ui |
+| `a566923` | 2026-05-06T16:08:59+00:00 | iEgor72 | chore(memory): refresh after restriction hud fix |
 | `0f54261` | 2026-05-06T16:08:46+00:00 | iEgor72 | fix(poekhali): align restriction hud distance |
 | `9f97061` | 2026-05-06T16:02:42+00:00 | iEgor72 | chore(memory): note main cache version sync rule |
 | `612ad67` | 2026-05-06T16:01:55+00:00 | iEgor72 | chore(memory): refresh after cache version sync |
@@ -42,5 +44,3 @@ Generated: 2026-05-06 16:08:55 +0000
 | `98d8f38` | 2026-05-06T00:16:59+00:00 | iEgor72 | fix(calendar): avoid duplicate day sheet summary |
 | `f2ec7c2` | 2026-05-06T00:14:51+00:00 | iEgor72 | chore(memory): refresh project state |
 | `4a9c264` | 2026-05-06T00:14:39+00:00 | iEgor72 | fix(shifts): remove detail hero route duplicate |
-| `bba1fa4` | 2026-05-06T00:12:20+00:00 | iEgor72 | chore(memory): refresh project state |
-| `87db842` | 2026-05-06T00:12:10+00:00 | iEgor72 | fix(shifts): remove duplicated detail hero metadata |
