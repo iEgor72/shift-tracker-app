@@ -1,14 +1,14 @@
 # Project State
 
 <!-- AUTO_STATUS:START -->
-Generated: 2026-05-06 18:30:28 +0000
+Generated: 2026-05-06 19:48:50 +0000
 
 ## Repository Snapshot
 - Local repo path: `/opt/bloknot-mashinista`
 - Project memory path: `/opt/bloknot-mashinista/ai-memory`
 - Branch: `main`
-- HEAD: `beab473`
-- Last commit: `beab473 fix(poekhali): expand station names in tracker ui`
+- HEAD: `3351e11`
+- Last commit: `3351e11 fix(poekhali): stabilize station and warning tracking`
 
 ## Git Remote
 ```text
@@ -29,7 +29,7 @@ origin	https://github.com/iEgor72/bloknot-mashinista.git (push)
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          beab473 [origin/main] fix(poekhali): expand station names in tracker ui
+* main                                          3351e11 [origin/main] fix(poekhali): stabilize station and warning tracking
 ```
 
 ## Worktree
