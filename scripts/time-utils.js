@@ -1247,6 +1247,7 @@
       var directionHtml = buildShiftDirectionHtml(directionText);
       var dateTimeHtml = buildShiftDateTimeHtml(dateTimeText);
       var durationHtml = buildShiftDurationHtml(durationText);
+      var technicalHtml = buildShiftTechnicalHtml(shift);
       var fuelNoteHtml = buildShiftFuelConsumptionHtml(shift);
       var incomeLabelHtml = buildShiftIncomeLabelHtml();
       var incomeVm = getShiftIncomeViewModel(shift, shiftIncomeMap);
@@ -1268,6 +1269,7 @@
               durationHtml +
             '</div>' +
             directionHtml +
+            technicalHtml +
             fuelNoteHtml +
             '<div class="shift-income-row">' +
               incomeLabelHtml +
