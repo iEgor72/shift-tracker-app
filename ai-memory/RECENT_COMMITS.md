@@ -1,9 +1,12 @@
 # Recent Commits
 
-Generated: 2026-05-06 16:01:47 +0000
+Generated: 2026-05-06 16:08:55 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `0f54261` | 2026-05-06T16:08:46+00:00 | iEgor72 | fix(poekhali): align restriction hud distance |
+| `9f97061` | 2026-05-06T16:02:42+00:00 | iEgor72 | chore(memory): note main cache version sync rule |
+| `612ad67` | 2026-05-06T16:01:55+00:00 | iEgor72 | chore(memory): refresh after cache version sync |
 | `b572a1e` | 2026-05-06T16:01:39+00:00 | iEgor72 | fix(pwa): sync displayed cache version |
 | `b1d44ca` | 2026-05-06T16:00:04+00:00 | iEgor72 | chore(memory): refresh after Khurmuli label fix |
 | `f069269` | 2026-05-06T15:59:49+00:00 | iEgor72 | fix(poekhali): expand Khurmuli station abbreviation |
@@ -41,6 +44,3 @@ Generated: 2026-05-06 16:01:47 +0000
 | `4a9c264` | 2026-05-06T00:14:39+00:00 | iEgor72 | fix(shifts): remove detail hero route duplicate |
 | `bba1fa4` | 2026-05-06T00:12:20+00:00 | iEgor72 | chore(memory): refresh project state |
 | `87db842` | 2026-05-06T00:12:10+00:00 | iEgor72 | fix(shifts): remove duplicated detail hero metadata |
-| `de4f590` | 2026-05-05T12:16:40+00:00 | iEgor72 | chore(memory): refresh project state |
-| `b286f5f` | 2026-05-05T12:15:57+00:00 | iEgor72 | feat(poekhali): derive speeds from speed documents |
-| `7097eb3` | 2026-05-05T11:55:20+00:00 | iEgor72 | chore(memory): refresh project state |
