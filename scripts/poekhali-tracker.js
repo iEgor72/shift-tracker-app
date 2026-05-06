@@ -12800,7 +12800,9 @@
     var wayBtn = byId('btnPoekhaliWay');
     var mapBtn = byId('btnPoekhaliMap');
     if (wayBtn) {
-      wayBtn.classList.remove('is-hidden');
+      var normalizedWay = normalizeWayNumber(tracker.wayNumber);
+      wayBtn.classList.remove('is-hidden', 'is-way-1', 'is-way-2');
+      wayBtn.classList.add(normalizedWay === 2 ? 'is-way-2' : 'is-way-1');
       wayBtn.title = 'Переключить путь: скорости будут считаться для выбранного пути';
       wayBtn.setAttribute('aria-label', wayBtn.title);
     }
@@ -17252,7 +17254,9 @@
     var wayBtn = byId('btnPoekhaliWay');
     var mapBtn = byId('btnPoekhaliMap');
     if (wayBtn) {
-      wayBtn.classList.remove('is-hidden');
+      var normalizedWay = normalizeWayNumber(tracker.wayNumber);
+      wayBtn.classList.remove('is-hidden', 'is-way-1', 'is-way-2');
+      wayBtn.classList.add(normalizedWay === 2 ? 'is-way-2' : 'is-way-1');
       wayBtn.title = 'Переключить путь: скорости будут считаться для выбранного пути';
       wayBtn.setAttribute('aria-label', wayBtn.title);
     }

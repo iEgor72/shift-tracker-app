@@ -1,6 +1,6 @@
     // ── Constants ──
     // Держите в синхроне с CACHE_VERSION в sw.js — показывается на главной рядом со статистикой пользователей.
-    var SHELL_CACHE_VERSION = 'v297';
+    var SHELL_CACHE_VERSION = 'v298';
 
     var MONTH_NAMES = [
       'Январь','Февраль','Март','Апрель','Май','Июнь',

@@ -702,11 +702,44 @@
 
     .poekhali-top-tray .poekhali-way-btn {
       display: inline-flex;
-      width: 54px;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      width: auto;
+      min-width: 58px;
+      max-width: 68px;
+      height: 44px;
+      padding: 5px 11px;
       flex: 0 0 auto;
-      color: var(--accent-strong);
-      border-color: rgba(56, 189, 248, 0.26);
-      background: rgba(56, 189, 248, 0.12);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      font-variant-numeric: tabular-nums;
+      border: 1px solid var(--border-hi);
+      background: linear-gradient(180deg, rgba(34, 36, 46, 0.98) 0%, rgba(22, 23, 30, 0.96) 100%);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .poekhali-top-tray .poekhali-way-btn::before {
+      content: none !important;
+    }
+
+    .poekhali-top-tray .poekhali-way-btn.is-way-1 {
+      color: #67e8f9;
+      border-color: rgba(34, 211, 238, 0.34);
+      box-shadow:
+        0 8px 28px rgba(0, 0, 0, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 0 0 1px rgba(34, 211, 238, 0.12);
+    }
+
+    .poekhali-top-tray .poekhali-way-btn.is-way-2 {
+      color: #c4b5fd;
+      border-color: rgba(167, 139, 250, 0.38);
+      box-shadow:
+        0 8px 28px rgba(0, 0, 0, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 0 0 1px rgba(167, 139, 250, 0.14);
     }
 
     .poekhali-map-btn {
@@ -2067,7 +2100,10 @@
       }
 
       .poekhali-top-tray .poekhali-way-btn {
-        width: 48px;
+        min-width: 52px;
+        max-width: 60px;
+        height: 42px;
+        padding: 5px 9px;
       }
 
       .poekhali-map-btn {
@@ -2174,7 +2210,11 @@
       }
 
       .poekhali-top-tray .poekhali-way-btn {
-        width: 44px;
+        min-width: 48px;
+        max-width: 54px;
+        height: 40px;
+        padding: 4px 8px;
+        font-size: 11px;
       }
 
       .poekhali-map-btn {
