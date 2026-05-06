@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-06 00:14:46 +0000
+Generated: 2026-05-06 00:17:06 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `98d8f38` | 2026-05-06T00:16:59+00:00 | iEgor72 | fix(calendar): avoid duplicate day sheet summary |
+| `f2ec7c2` | 2026-05-06T00:14:51+00:00 | iEgor72 | chore(memory): refresh project state |
 | `4a9c264` | 2026-05-06T00:14:39+00:00 | iEgor72 | fix(shifts): remove detail hero route duplicate |
 | `bba1fa4` | 2026-05-06T00:12:20+00:00 | iEgor72 | chore(memory): refresh project state |
 | `87db842` | 2026-05-06T00:12:10+00:00 | iEgor72 | fix(shifts): remove duplicated detail hero metadata |
@@ -42,5 +44,3 @@ Generated: 2026-05-06 00:14:46 +0000
 | `f47e0e7` | 2026-05-05T05:16:43+00:00 | iEgor72 | chore(memory): refresh project state |
 | `34051e0` | 2026-05-05T05:16:35+00:00 | iEgor72 | fix(poekhali): remove remaining target labels |
 | `c3592c4` | 2026-05-05T05:11:49+00:00 | iEgor72 | chore(memory): refresh project state |
-| `be82701` | 2026-05-05T05:11:23+00:00 | iEgor72 | fix(poekhali): simplify live target HUD |
-| `d8c8ca8` | 2026-05-05T01:51:30+00:00 | iEgor72 | chore(memory): refresh after parity orientation fix |

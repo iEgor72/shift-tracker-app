@@ -1,6 +1,6 @@
 # Worktree Status
 
-Generated: 2026-05-06 00:14:46 +0000
+Generated: 2026-05-06 00:17:06 +0000
 
 ## git status -sb
 ```text
@@ -21,16 +21,16 @@ Generated: 2026-05-06 00:14:46 +0000
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          4a9c264 [origin/main] fix(shifts): remove detail hero route duplicate
+* main                                          98d8f38 [origin/main] fix(calendar): avoid duplicate day sheet summary
 ```
 
 ## HEAD
 ```text
-4a9c264 fix(shifts): remove detail hero route duplicate
+98d8f38 fix(calendar): avoid duplicate day sheet summary
  ai-memory/CHANGELOG.md           | 8 ++++++++
  ai-memory/sessions/2026-05-06.md | 1 +
  scripts/app-constants.js         | 2 +-
- scripts/time-utils.js            | 2 --
+ scripts/render.js                | 4 ++--
  sw.js                            | 2 +-
- 5 files changed, 11 insertions(+), 4 deletions(-)
+ 5 files changed, 13 insertions(+), 4 deletions(-)
 ```
