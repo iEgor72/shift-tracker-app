@@ -1,11 +1,12 @@
 # Worktree Status
 
-Generated: 2026-05-05 12:16:40 +0000
+Generated: 2026-05-06 00:12:17 +0000
 
 ## git status -sb
 ```text
 ## main...origin/main
  M ai-memory/PROJECT_STATE.md
+?? ai-memory/sessions/2026-05-06.md
 ```
 
 ## git branch -vv
@@ -21,18 +22,15 @@ Generated: 2026-05-05 12:16:40 +0000
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          b286f5f [origin/main] feat(poekhali): derive speeds from speed documents
+* main                                          87db842 [origin/main] fix(shifts): remove duplicated detail hero metadata
 ```
 
 ## HEAD
 ```text
-b286f5f feat(poekhali): derive speeds from speed documents
- ai-memory/CHANGELOG.md           |    8 +
- ai-memory/sessions/2026-05-05.md |    1 +
- assets/tracker/speed-docs.json   | 3114 ++++++++++++++++++++++++++++----------
- scripts/app-constants.js         |    2 +-
- scripts/import-speed-docs.py     |  154 ++
- scripts/poekhali-tracker.js      |   15 +-
- sw.js                            |    2 +-
- 7 files changed, 2470 insertions(+), 826 deletions(-)
+87db842 fix(shifts): remove duplicated detail hero metadata
+ ai-memory/CHANGELOG.md   | 8 ++++++++
+ scripts/app-constants.js | 2 +-
+ scripts/time-utils.js    | 2 --
+ sw.js                    | 2 +-
+ 4 files changed, 10 insertions(+), 4 deletions(-)
 ```

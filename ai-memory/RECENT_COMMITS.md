@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-05 12:16:40 +0000
+Generated: 2026-05-06 00:12:17 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `87db842` | 2026-05-06T00:12:10+00:00 | iEgor72 | fix(shifts): remove duplicated detail hero metadata |
+| `de4f590` | 2026-05-05T12:16:40+00:00 | iEgor72 | chore(memory): refresh project state |
 | `b286f5f` | 2026-05-05T12:15:57+00:00 | iEgor72 | feat(poekhali): derive speeds from speed documents |
 | `7097eb3` | 2026-05-05T11:55:20+00:00 | iEgor72 | chore(memory): refresh project state |
 | `6670231` | 2026-05-05T11:55:07+00:00 | iEgor72 | feat(poekhali): improve regime control marks |
@@ -42,5 +44,3 @@ Generated: 2026-05-05 12:16:40 +0000
 | `d8c8ca8` | 2026-05-05T01:51:30+00:00 | iEgor72 | chore(memory): refresh after parity orientation fix |
 | `146c79f` | 2026-05-05T01:51:22+00:00 | iEgor72 | fix(poekhali): set parity screen orientation |
 | `8502539` | 2026-05-05T01:45:21+00:00 | iEgor72 | chore(memory): refresh after guide line removal |
-| `dc4ff1a` | 2026-05-05T01:45:13+00:00 | iEgor72 | fix(poekhali): remove train guide line |
-| `6fc3822` | 2026-05-05T01:43:16+00:00 | iEgor72 | chore(memory): refresh after next signal label fix |
