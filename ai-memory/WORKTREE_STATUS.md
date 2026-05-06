@@ -1,6 +1,6 @@
 # Worktree Status
 
-Generated: 2026-05-06 00:42:26 +0000
+Generated: 2026-05-06 00:45:05 +0000
 
 ## git status -sb
 ```text
@@ -21,17 +21,18 @@ Generated: 2026-05-06 00:42:26 +0000
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          a49f1cf [origin/main] fix(poekhali): show track switch near gps
+* main                                          efd3d51 [origin/main] fix(poekhali): polish track switch button
 ```
 
 ## HEAD
 ```text
-a49f1cf fix(poekhali): show track switch near gps
- ai-memory/CHANGELOG.md             |  8 ++++++++
+efd3d51 fix(poekhali): polish track switch button
+ ai-memory/CHANGELOG.md             |  8 ++++++
  ai-memory/sessions/2026-05-06.md   |  1 +
  index.html                         |  2 +-
  scripts/app-constants.js           |  2 +-
- styles/10-navigation-and-cards.css | 17 +++++++++++++++++
+ scripts/poekhali-tracker.js        |  8 ++++--
+ styles/10-navigation-and-cards.css | 52 +++++++++++++++++++++++++++++++++-----
  sw.js                              |  2 +-
- 6 files changed, 29 insertions(+), 3 deletions(-)
+ 7 files changed, 64 insertions(+), 11 deletions(-)
 ```

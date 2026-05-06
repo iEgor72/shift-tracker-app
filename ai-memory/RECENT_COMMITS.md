@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-06 00:42:26 +0000
+Generated: 2026-05-06 00:45:05 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `efd3d51` | 2026-05-06T00:45:02+00:00 | iEgor72 | fix(poekhali): polish track switch button |
+| `ffc61c5` | 2026-05-06T00:42:30+00:00 | iEgor72 | chore(memory): refresh project state |
 | `a49f1cf` | 2026-05-06T00:42:23+00:00 | iEgor72 | fix(poekhali): show track switch near gps |
 | `999a495` | 2026-05-06T00:39:09+00:00 | iEgor72 | chore(memory): refresh project state |
 | `93e6efa` | 2026-05-06T00:39:04+00:00 | iEgor72 | feat(poekhali): support manual track speed selection |
@@ -42,5 +44,3 @@ Generated: 2026-05-06 00:42:26 +0000
 | `5dde77a` | 2026-05-05T06:11:18+00:00 | iEgor72 | chore(memory): refresh project state |
 | `057f6d5` | 2026-05-05T06:11:04+00:00 | iEgor72 | fix(poekhali): restore truncated object names |
 | `ff66adf` | 2026-05-05T06:07:28+00:00 | iEgor72 | chore(memory): refresh project state |
-| `589fca6` | 2026-05-05T06:07:16+00:00 | iEgor72 | fix(poekhali): keep train length label visible |
-| `6816b25` | 2026-05-05T06:04:45+00:00 | iEgor72 | chore(memory): refresh project state |
