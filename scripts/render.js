@@ -690,8 +690,8 @@
       }
       if (!contentEl || !noteEl) return;
       if (!shifts.length) {
-        noteEl.textContent = 'На этот день пока нет смен. Можно сначала посмотреть дату, а потом создать запись отсюда.';
-        contentEl.innerHTML = '<div class="home-calendar-day-empty">На этот день записей нет. Если хочешь, можно сразу добавить новую смену.</div>';
+        noteEl.textContent = 'Свободный день.';
+        contentEl.innerHTML = '<div class="home-calendar-day-empty">Смен нет — можно добавить новую, если в этот день была работа.</div>';
         return;
       }
       var bounds = typeof getMonthBounds === 'function' ? getMonthBounds(currentYear, currentMonth) : null;
