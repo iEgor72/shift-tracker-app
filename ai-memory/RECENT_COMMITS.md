@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-06 22:42:13 +0000
+Generated: 2026-05-06 22:46:09 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `c99b6dc` | 2026-05-06T22:46:03+00:00 | iEgor72 | fix(poekhali): show current station separately from next target |
+| `f46a6a6` | 2026-05-06T22:42:19+00:00 | iEgor72 | chore(memory): refresh after signal focus fix |
 | `1989653` | 2026-05-06T22:42:04+00:00 | iEgor72 | fix(poekhali): focus signals ahead of train head |
 | `fb99c42` | 2026-05-06T22:37:46+00:00 | iEgor72 | chore(memory): refresh after station signal fix |
 | `974c916` | 2026-05-06T22:37:34+00:00 | iEgor72 | fix(poekhali): keep station name while inside station |
@@ -42,5 +44,3 @@ Generated: 2026-05-06 22:42:13 +0000
 | `089ac16` | 2026-05-06T00:47:39+00:00 | iEgor72 | fix(poekhali): prevent track switch overlapping gps |
 | `5438231` | 2026-05-06T00:45:08+00:00 | iEgor72 | chore(memory): refresh project state |
 | `efd3d51` | 2026-05-06T00:45:02+00:00 | iEgor72 | fix(poekhali): polish track switch button |
-| `ffc61c5` | 2026-05-06T00:42:30+00:00 | iEgor72 | chore(memory): refresh project state |
-| `a49f1cf` | 2026-05-06T00:42:23+00:00 | iEgor72 | fix(poekhali): show track switch near gps |
