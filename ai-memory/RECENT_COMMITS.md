@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-06 00:39:07 +0000
+Generated: 2026-05-06 00:42:26 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `a49f1cf` | 2026-05-06T00:42:23+00:00 | iEgor72 | fix(poekhali): show track switch near gps |
+| `999a495` | 2026-05-06T00:39:09+00:00 | iEgor72 | chore(memory): refresh project state |
 | `93e6efa` | 2026-05-06T00:39:04+00:00 | iEgor72 | feat(poekhali): support manual track speed selection |
 | `fc2b80a` | 2026-05-06T00:26:22+00:00 | iEgor72 | chore(memory): refresh project state |
 | `e32307c` | 2026-05-06T00:26:15+00:00 | iEgor72 | fix(poekhali): disambiguate komsomolsk stations |
@@ -42,5 +44,3 @@ Generated: 2026-05-06 00:39:07 +0000
 | `ff66adf` | 2026-05-05T06:07:28+00:00 | iEgor72 | chore(memory): refresh project state |
 | `589fca6` | 2026-05-05T06:07:16+00:00 | iEgor72 | fix(poekhali): keep train length label visible |
 | `6816b25` | 2026-05-05T06:04:45+00:00 | iEgor72 | chore(memory): refresh project state |
-| `5e98c6f` | 2026-05-05T06:04:33+00:00 | iEgor72 | fix(poekhali): format fallback station titles |
-| `750cb3e` | 2026-05-05T06:01:03+00:00 | iEgor72 | chore(memory): refresh project state |
