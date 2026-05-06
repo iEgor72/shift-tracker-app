@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-06 22:46:09 +0000
+Generated: 2026-05-06 23:53:22 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `1ba44a2` | 2026-05-06T23:53:11+00:00 | iEgor72 | fix(poekhali): cache signal direction during drawing |
+| `5257931` | 2026-05-06T22:46:12+00:00 | iEgor72 | chore(memory): refresh after station hud fix |
 | `c99b6dc` | 2026-05-06T22:46:03+00:00 | iEgor72 | fix(poekhali): show current station separately from next target |
 | `f46a6a6` | 2026-05-06T22:42:19+00:00 | iEgor72 | chore(memory): refresh after signal focus fix |
 | `1989653` | 2026-05-06T22:42:04+00:00 | iEgor72 | fix(poekhali): focus signals ahead of train head |
@@ -42,5 +44,3 @@ Generated: 2026-05-06 22:46:09 +0000
 | `807fd2e` | 2026-05-06T00:51:05+00:00 | iEgor72 | fix(poekhali): silence idle target haptics |
 | `e55ffc3` | 2026-05-06T00:47:45+00:00 | iEgor72 | chore(memory): refresh project state |
 | `089ac16` | 2026-05-06T00:47:39+00:00 | iEgor72 | fix(poekhali): prevent track switch overlapping gps |
-| `5438231` | 2026-05-06T00:45:08+00:00 | iEgor72 | chore(memory): refresh project state |
-| `efd3d51` | 2026-05-06T00:45:02+00:00 | iEgor72 | fix(poekhali): polish track switch button |
