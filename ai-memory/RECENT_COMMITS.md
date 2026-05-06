@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-06 22:23:50 +0000
+Generated: 2026-05-06 22:28:31 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `1b10f81` | 2026-05-06T22:28:23+00:00 | iEgor72 | fix(poekhali): show speed labels without source prefix |
+| `a469c9c` | 2026-05-06T22:23:54+00:00 | iEgor72 | chore(memory): refresh after hiding legacy speed UI |
 | `7ef0e22` | 2026-05-06T22:23:41+00:00 | iEgor72 | fix(poekhali): hide legacy speed sources in UI |
 | `2492408` | 2026-05-06T19:51:21+00:00 | iEgor72 | chore(memory): refresh after station navigation fix |
 | `28537cf` | 2026-05-06T19:51:07+00:00 | iEgor72 | fix(poekhali): use station points for navigation |
@@ -42,5 +44,3 @@ Generated: 2026-05-06 22:23:50 +0000
 | `e32307c` | 2026-05-06T00:26:15+00:00 | iEgor72 | fix(poekhali): disambiguate komsomolsk stations |
 | `9a226a5` | 2026-05-06T00:21:15+00:00 | iEgor72 | chore(memory): refresh project state |
 | `d5e4a4d` | 2026-05-06T00:21:08+00:00 | iEgor72 | fix(calendar): simplify empty day copy |
-| `5e6c188` | 2026-05-06T00:19:08+00:00 | iEgor72 | chore(memory): log ui revert |
-| `93fc5a2` | 2026-05-06T00:18:48+00:00 | iEgor72 | Revert "fix(shifts): remove duplicated detail hero metadata" |
