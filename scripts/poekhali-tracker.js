@@ -14845,8 +14845,7 @@
     };
     var sourceProjection = projection || getCurrentProjectionForForm();
     var signal = nextSignal || resolveNextSignalForProjection(sourceProjection);
-    var currentStation = resolveCurrentStationForProjection(sourceProjection);
-    var station = currentStation || nextStation || resolveNextStationForProjection(sourceProjection);
+    var station = nextStation || resolveNextStationForProjection(sourceProjection);
     run.nextSignalName = signal ? formatSignalNameForDirection(signal.name, getEffectiveSignalDirectionEven()) : '';
     run.nextSignalSource = signal ? signal.source : '';
     run.nextSignalSector = signal ? signal.sector : 0;
@@ -15804,6 +15803,10 @@
     var slopeLabel = rawDraft ? 'GPS' : userSection ? 'GPS' : (profilePoint && profilePoint.regime ? 'РК' : (hasProfile ? 'УКЛОН' : (regimeProfile ? 'РК' : 'ПРОФ')));
     var slopeText = (rawDraft || userSection) && profilePoint && profilePoint.altitudeMissing ? 'ЛИН.' : (hasProfile && profilePoint ? formatProfileGradeLabel(profilePoint) : (hasProfile ? '—' : (regimeProfile ? 'ЕСТЬ' : 'НЕТ')));
     var slopeTone = rawDraft ? 'warning' : userSection ? 'success' : (profilePoint && profilePoint.regime ? 'warning' : (hasProfile ? (profilePoint && getEffectiveProfileGrade(profilePoint, sector) >= 0 ? 'success' : 'info') : (regimeProfile ? 'warning' : 'danger')));
+    var currentStation = resolveCurrentStationForProjection(projection);
+    var currentStationLabel = currentStation && currentStation.name
+      ? 'ст. ' + formatHumanTrackObjectName(currentStation.name, 'station', currentStation.coordinate)
+      : '';
     var navTarget = resolveLiveNavigationTarget(projection, activeSpeed, nextWarning, nextRestriction, nextSignal, nextStation, routeProgress);
     if (navTarget) {
       title = formatLiveNavigationTargetTitle(navTarget) || title;
@@ -15855,9 +15858,10 @@
     var textFullW = Math.max(72, width - insetText * 2);
     var headlineSize = liveAlert && w < 360 ? 13 : (w < 360 ? 15 : 17);
 
-    var headlineBaseline = y + padTop + 22;
+    var stationBaseline = currentStationLabel ? y + padTop + 11 : 0;
+    var headlineBaseline = y + padTop + (currentStationLabel ? 31 : 22);
     var headlineCenterX = x + width / 2;
-    var chipTop = y + padTop + 42;
+    var chipTop = y + padTop + (currentStationLabel ? 51 : 42);
     var chipH = w < 360 ? 34 : 36;
     var chipGap = w < 380 ? 5 : 6;
     var chipsInner = width - insetText * 2;
@@ -15878,6 +15882,15 @@
     drawPanel(ctx, x, y, width, panelHeight, 16, panelFill, panelStroke);
     if (liveAlert) {
       fillRoundRect(ctx, x + 9, y + 10, 4, panelHeight - 20, 4, liveAlert.level === 'danger' ? THEME.danger : '#facc15');
+    }
+    if (currentStationLabel) {
+      drawText(ctx, currentStationLabel, headlineCenterX, stationBaseline, {
+        size: 10,
+        weight: 750,
+        color: 'rgba(238, 242, 248, 0.48)',
+        align: 'center',
+        maxWidth: textFullW
+      });
     }
     drawText(ctx, headline, headlineCenterX, headlineBaseline, {
       size: headlineSize,
@@ -17571,8 +17584,7 @@
     var visibleControlMarks = getRegimeControlMarksInWindow(bounds.left, bounds.right, sector);
     var speedRules = getSpeedRulesInWindow(bounds.left, bounds.right, sector, visibleObjects);
     var nextSignal = resolveNextSignalForProjection(projection);
-    var currentStation = resolveCurrentStationForProjection(projection);
-    var nextStation = currentStation || resolveNextStationForProjection(projection);
+    var nextStation = resolveNextStationForProjection(projection);
     var nextNeutralMark = findNextRegimeControlMarkForDirection(center, sector, 'neutral');
     var nextWarning = findNextWarningForDirection(center, sector);
     var activeSpeed = findTrainBindingSpeedRule(center, speedRules);
