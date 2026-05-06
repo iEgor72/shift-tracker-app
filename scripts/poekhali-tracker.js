@@ -1129,20 +1129,33 @@
     return even ? 'ЧЕТ' : 'НЕЧЕТ';
   }
 
+  function getEffectiveSignalDirectionEven() {
+    var suggestion = getShiftRouteSuggestion();
+    if (suggestion && suggestion.status === 'ready') return !!suggestion.even;
+    var details = getPoekhaliTrainDetails();
+    var shift = details && details.shift ? details.shift : null;
+    var to = normalizeRouteName(shift && shift.route_to || '');
+    var from = normalizeRouteName(shift && shift.route_from || '');
+    if (to.indexOf('постыш') >= 0 && from.indexOf('постыш') < 0) return false;
+    if (to.indexOf('комсом') >= 0 && from.indexOf('комсом') < 0) return true;
+    return !!tracker.even;
+  }
+
   function formatSignalNameForDirection(name, even) {
     var text = String(name || '').trim();
     if (!text) return '';
-    var prefix = even ? 'Ч' : 'Н';
+    var effectiveEven = even === undefined || even === null ? getEffectiveSignalDirectionEven() : !!even;
+    var prefix = effectiveEven ? 'Ч' : 'Н';
     text = text.replace(/^[НHЧ]/i, prefix);
     // In the source XML for П2 odd direction this signal is named НМ2, but in
     // driver-facing notation it is НМ2А. Keep the UI tied to path selection.
-    if (!even && normalizeWayNumber(tracker.wayNumber) === 2 && /^НМ2$/i.test(text)) return 'НМ2А';
+    if (!effectiveEven && normalizeWayNumber(tracker.wayNumber) === 2 && /^НМ2$/i.test(text)) return 'НМ2А';
     return text;
   }
 
   function getDisplayTrackObjectName(item) {
     var name = String(item && item.name || '').trim();
-    if (item && String(item.type) === '1') return formatSignalNameForDirection(name, tracker.even);
+    if (item && String(item.type) === '1') return formatSignalNameForDirection(name, getEffectiveSignalDirectionEven());
     return name;
   }
 
@@ -13820,7 +13833,8 @@
   function getCurrentSignalObjectFileKey() {
     var way = normalizeWayNumber(tracker.wayNumber);
     var stores = tracker.trackObjectsByFile || {};
-    var preferred = way === 1 ? (tracker.even ? '1n' : '1') : (tracker.even ? '2' : '2n');
+    var signalEven = getEffectiveSignalDirectionEven();
+    var preferred = way === 1 ? (signalEven ? '1n' : '1') : (signalEven ? '2' : '2n');
     if (stores[preferred]) return preferred;
     var base = String(way);
     if (stores[base]) return base;
@@ -13875,7 +13889,7 @@
         result.push(items[i]);
       }
     });
-    result = result.concat(getUserObjectsForSector(sector));
+    result = result.concat(getManualBamTrackObjectsForSector(sector)).concat(getUserObjectsForSector(sector));
     return mergeRegimeTrackObjects(result, getRegimeTrackObjectsForSector(sector));
   }
 
@@ -14714,6 +14728,43 @@
     return getDirectionStartCoordinate(start, end, tracker.even);
   }
 
+  function findCurrentStationForProjection(projection) {
+    if (!projection || !isRealNumber(projection.lineCoordinate) || !isRealNumber(projection.sector)) return null;
+    var center = Math.max(0, Math.round(Number(projection.lineCoordinate) || 0));
+    var direction = getCoordinateDirectionForEven(tracker.even);
+    var tail = center - direction * Math.max(0, Math.round(getTrainLengthMeters() || 0));
+    var trainLeft = Math.min(center, tail);
+    var trainRight = Math.max(center, tail);
+    var currentWay = normalizeWayNumber(tracker.wayNumber);
+    var objects = getAllTrackObjectsForSector(projection.sector).filter(function(item) {
+      if (!item || item.type !== '2' || !isFinite(item.coordinate)) return false;
+      var objectWay = getWayNumberFromObjectFileKey(item.fileKey);
+      if (objectWay && currentWay && objectWay !== currentWay) return false;
+      var start = Math.max(0, Math.round(Number(item.coordinate) || 0));
+      var end = Math.max(start, Math.round(Number(item.end) || start + Math.max(0, Number(item.length) || 0)));
+      return end >= trainLeft && start <= trainRight;
+    });
+    if (!objects.length) return null;
+    objects.sort(function(a, b) {
+      var aSpan = getStationNavigationSpan(a);
+      var bSpan = getStationNavigationSpan(b);
+      if (bSpan !== aSpan) return bSpan - aSpan;
+      return Math.abs(Number(a.coordinate) - center) - Math.abs(Number(b.coordinate) - center);
+    });
+    var station = objects[0];
+    var name = formatHumanTrackObjectName(station.name, 'station', station.coordinate);
+    if (!name) return null;
+    return {
+      kind: 'station_current',
+      name: name,
+      source: getTrackObjectSourceLabel(station),
+      sector: Math.max(0, Math.round(Number(projection.sector) || 0)),
+      coordinate: Math.max(0, Math.round(Number(station.coordinate) || 0)),
+      distance: 0,
+      updatedAt: new Date().toISOString()
+    };
+  }
+
   function findNextTrackObjectForDirection(center, sector, type) {
     if (!isRealNumber(sector) || !isFinite(center)) return null;
     var currentWay = normalizeWayNumber(tracker.wayNumber);
@@ -14774,6 +14825,10 @@
     );
   }
 
+  function resolveCurrentStationForProjection(projection) {
+    return findCurrentStationForProjection(projection);
+  }
+
   function resolveNextStationForProjection(projection) {
     if (!projection || !isRealNumber(projection.lineCoordinate) || !isRealNumber(projection.sector)) return null;
     return normalizeNavigationObject(
@@ -14789,8 +14844,9 @@
     };
     var sourceProjection = projection || getCurrentProjectionForForm();
     var signal = nextSignal || resolveNextSignalForProjection(sourceProjection);
-    var station = nextStation || resolveNextStationForProjection(sourceProjection);
-    run.nextSignalName = signal ? formatSignalNameForDirection(signal.name, tracker.even) : '';
+    var currentStation = resolveCurrentStationForProjection(sourceProjection);
+    var station = currentStation || nextStation || resolveNextStationForProjection(sourceProjection);
+    run.nextSignalName = signal ? formatSignalNameForDirection(signal.name, getEffectiveSignalDirectionEven()) : '';
     run.nextSignalSource = signal ? signal.source : '';
     run.nextSignalSector = signal ? signal.sector : 0;
     run.nextSignalCoordinate = signal ? signal.coordinate : 0;
@@ -15003,7 +15059,7 @@
     if (run.nextSignalName) {
       candidates.push({
         kind: 'signal',
-        label: formatSignalNameForDirection(run.nextSignalName, run.direction ? String(run.direction).toUpperCase().indexOf('НЕЧ') !== 0 : tracker.even),
+        label: formatSignalNameForDirection(run.nextSignalName, getEffectiveSignalDirectionEven()),
         source: run.nextSignalSource,
         sector: run.nextSignalSector,
         coordinate: run.nextSignalCoordinate,
@@ -15601,7 +15657,7 @@
     if (nextSignal) {
       candidates.push({
         kind: 'signal',
-        label: formatSignalNameForDirection(nextSignal.name, tracker.even),
+        label: formatSignalNameForDirection(nextSignal.name, getEffectiveSignalDirectionEven()),
         source: nextSignal.source,
         sector: nextSignal.sector || projectionSector,
         coordinate: nextSignal.coordinate,
@@ -17510,7 +17566,8 @@
     var visibleControlMarks = getRegimeControlMarksInWindow(bounds.left, bounds.right, sector);
     var speedRules = getSpeedRulesInWindow(bounds.left, bounds.right, sector, visibleObjects);
     var nextSignal = resolveNextSignalForProjection(projection);
-    var nextStation = resolveNextStationForProjection(projection);
+    var currentStation = resolveCurrentStationForProjection(projection);
+    var nextStation = currentStation || resolveNextStationForProjection(projection);
     var nextNeutralMark = findNextRegimeControlMarkForDirection(center, sector, 'neutral');
     var nextWarning = findNextWarningForDirection(center, sector);
     var activeSpeed = findTrainBindingSpeedRule(center, speedRules);
@@ -17563,7 +17620,7 @@
       });
     } else if (!factualActiveSpeed && !nextWarning && nextSignal && !isPreview) {
       var distance = Math.abs(nextSignal.coordinate - center);
-      var signalText = formatSignalNameForDirection(nextSignal.name, tracker.even) + ' · ' + Math.round(distance) + ' м';
+      var signalText = formatSignalNameForDirection(nextSignal.name, getEffectiveSignalDirectionEven()) + ' · ' + Math.round(distance) + ' м';
       var signalWidth = Math.min(132, Math.max(74, signalText.length * 6 + 18));
       var signalX = layout.viewportRight - signalWidth - 8;
       var signalY = layout.trackY - 48;
