@@ -1,14 +1,14 @@
 # Project State
 
 <!-- AUTO_STATUS:START -->
-Generated: 2026-05-06 14:42:42 +0000
+Generated: 2026-05-06 14:52:24 +0000
 
 ## Repository Snapshot
 - Local repo path: `/opt/bloknot-mashinista`
 - Project memory path: `/opt/bloknot-mashinista/ai-memory`
 - Branch: `main`
-- HEAD: `ef67136`
-- Last commit: `ef67136 fix(poekhali): correct live direction from gps movement`
+- HEAD: `a15a3d3`
+- Last commit: `a15a3d3 fix(poekhali): keep full station names and route profile`
 
 ## Git Remote
 ```text
@@ -29,7 +29,7 @@ origin	https://github.com/iEgor72/bloknot-mashinista.git (push)
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          ef67136 [origin/main] fix(poekhali): correct live direction from gps movement
+* main                                          a15a3d3 [origin/main] fix(poekhali): keep full station names and route profile
 ```
 
 ## Worktree
