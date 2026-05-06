@@ -707,12 +707,32 @@
       return String(formatShiftPoekhaliEta(value, true) || '').replace(/^~/, '').trim();
     }
 
+    var POEKHALI_STATION_NAME_OVERRIDES = {
+      'постыш': 'Постышево',
+      'силинк': 'Силинка',
+      'хальга': 'Хальгасо',
+      'хальгас': 'Хальгасо',
+      'лиан': 'Лиан',
+      'холони': 'Холони',
+      'хурму': 'Хурмули',
+      'хурмул': 'Хурмули',
+      'маврин': 'Мавринский',
+      'пиль': 'Пиль',
+      'горин': 'Горин',
+      'харпич': 'Харпичан',
+      'катама': 'Катама',
+      'эворон': 'Эворон',
+      'мони': 'Мони',
+      'болен': 'Болен',
+      'дуки': 'Дуки'
+    };
+
     function resolvePoekhaliKomsomolskStationName(coordinate) {
       var numericCoordinate = Math.max(0, Math.round(Number(coordinate) || 0));
       if (numericCoordinate >= 3810000 && numericCoordinate <= 3816500) return 'Комсомольск-2';
-      if (numericCoordinate >= 350000 && numericCoordinate <= 365000) return 'Комсомольск Груз';
-      if ((numericCoordinate >= 320000 && numericCoordinate < 350000) || numericCoordinate <= 5000) return 'Комсомольск Сорт';
-      return 'Комсомольск Сорт';
+      if (numericCoordinate >= 350000 && numericCoordinate <= 365000) return 'Комсомольск Грузовой';
+      if ((numericCoordinate >= 320000 && numericCoordinate < 350000) || numericCoordinate <= 5000) return 'Комсомольск-Сортировочный';
+      return 'Комсомольск-Сортировочный';
     }
 
     function formatPoekhaliHumanObjectName(value, kind, coordinate) {
@@ -721,8 +741,7 @@
       text = text.replace(/^ст\.?\s+/i, '');
       var lowerText = text.toLowerCase();
       if (lowerText === 'комсом' || lowerText === 'комсомольск') text = resolvePoekhaliKomsomolskStationName(coordinate);
-      else if (lowerText === 'хальгас') text = 'Хальгасо';
-      else if (lowerText === 'хурму' || lowerText === 'хурмул') text = 'Хурмули';
+      else if (POEKHALI_STATION_NAME_OVERRIDES[lowerText]) text = POEKHALI_STATION_NAME_OVERRIDES[lowerText];
       else if (lowerText === 'скоро') text = 'Огр.';
       text = text.replace(/\s+\(/g, '(').replace(/,\s*/g, ', ').replace(/\s+/g, ' ').trim();
       return text;
