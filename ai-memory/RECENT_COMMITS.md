@@ -1,9 +1,13 @@
 # Recent Commits
 
-Generated: 2026-05-06 00:17:06 +0000
+Generated: 2026-05-06 00:19:04 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `93fc5a2` | 2026-05-06T00:18:48+00:00 | iEgor72 | Revert "fix(shifts): remove duplicated detail hero metadata" |
+| `4d9e71f` | 2026-05-06T00:18:48+00:00 | iEgor72 | Revert "fix(shifts): remove detail hero route duplicate" |
+| `f59293a` | 2026-05-06T00:18:48+00:00 | iEgor72 | Revert "fix(calendar): avoid duplicate day sheet summary" |
+| `d5a363f` | 2026-05-06T00:17:06+00:00 | iEgor72 | chore(memory): refresh project state |
 | `98d8f38` | 2026-05-06T00:16:59+00:00 | iEgor72 | fix(calendar): avoid duplicate day sheet summary |
 | `f2ec7c2` | 2026-05-06T00:14:51+00:00 | iEgor72 | chore(memory): refresh project state |
 | `4a9c264` | 2026-05-06T00:14:39+00:00 | iEgor72 | fix(shifts): remove detail hero route duplicate |
@@ -40,7 +44,3 @@ Generated: 2026-05-06 00:17:06 +0000
 | `64b75ce` | 2026-05-05T05:46:21+00:00 | iEgor72 | chore(memory): refresh project state |
 | `496158a` | 2026-05-05T05:46:11+00:00 | iEgor72 | refactor(poekhali): centralize target display formatting |
 | `ddb5c8a` | 2026-05-05T05:23:42+00:00 | iEgor72 | chore(memory): refresh project state |
-| `23e3e4e` | 2026-05-05T05:23:33+00:00 | iEgor72 | fix(poekhali): advance past station anchors |
-| `f47e0e7` | 2026-05-05T05:16:43+00:00 | iEgor72 | chore(memory): refresh project state |
-| `34051e0` | 2026-05-05T05:16:35+00:00 | iEgor72 | fix(poekhali): remove remaining target labels |
-| `c3592c4` | 2026-05-05T05:11:49+00:00 | iEgor72 | chore(memory): refresh project state |
