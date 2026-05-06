@@ -163,8 +163,9 @@
     { sector: 18, start: 3727400, end: 3732000, speed: 60, wayNumber: 1, name: 'БАМ 60 · ПП 3732 — Пиль П1' },
     { sector: 18, start: 3727400, end: 3732000, speed: 60, wayNumber: 2, name: 'БАМ 60 · ПП 3732 — Пиль П2' },
     { sector: 18, start: 3732800, end: 3732900, speed: 40, wayNumber: 2, name: 'БАМ 40 · 3732км9пк П2' },
-    { sector: 18, start: 3727400, end: 3731115, speed: 60, name: 'БАМ 60 · Пиль' },
-    { sector: 18, start: 3715453, end: 3727400, speed: 70, name: 'БАМ 70 · Пиль — Горин' },
+    { sector: 18, start: 3732800, end: 3732900, speed: 40, wayNumber: 1, name: 'БАМ 40 · 3732км9пк П1' },
+    { sector: 18, start: 3723685, end: 3731115, speed: 60, name: 'БАМ 60 · Пиль П1/П2' },
+    { sector: 18, start: 3715453, end: 3723685, speed: 70, name: 'БАМ 70 · Пиль — Горин' },
     { sector: 18, start: 3722500, end: 3723800, speed: 60, name: 'БАМ 60 · 3723км5пк—3724км8пк' },
     { sector: 18, start: 3715453, end: 3717863, speed: 70, wayNumber: 1, name: 'БАМ 70 · Горин П1' },
     { sector: 18, start: 3701207, end: 3715453, speed: 60, name: 'БАМ 60 · Горин — Харпичан' },
@@ -1120,7 +1121,11 @@
     var text = String(name || '').trim();
     if (!text) return '';
     var prefix = even ? 'Ч' : 'Н';
-    return text.replace(/^[НHЧ]/i, prefix);
+    text = text.replace(/^[НHЧ]/i, prefix);
+    // In the source XML for П2 odd direction this signal is named НМ2, but in
+    // driver-facing notation it is НМ2А. Keep the UI tied to path selection.
+    if (!even && normalizeWayNumber(tracker.wayNumber) === 2 && /^НМ2$/i.test(text)) return 'НМ2А';
+    return text;
   }
 
   function getDisplayTrackObjectName(item) {
@@ -3875,6 +3880,49 @@
       length: match[0].length,
       label: source.slice(0, match[0].length).trim()
     };
+  }
+
+  function parseSinglePointWarningLine(rawLine, defaultSector, defaultValidUntil) {
+    var original = String(rawLine || '');
+    var line = original.replace(/[–—]/g, '-').replace(/\s+/g, ' ').trim();
+    if (!line) return null;
+    line = line.replace(/^\s*(?:пр|огр|предупреждение)\s*[:№#-]?\s*/i, '');
+    var sector = Number(defaultSector);
+    var sectorMatch = line.match(/\b(?:уч|участок|сектор)\s*\.?\s*(\d+(?:[.,]\d+)?)/i);
+    if (sectorMatch) {
+      sector = Number(String(sectorMatch[1]).replace(',', '.'));
+      line = line.replace(sectorMatch[0], '').trim();
+    }
+    if (!isRealNumber(sector)) return { error: 'не найден участок', raw: original };
+    var point = parseWarningCoordinateAtStart(line);
+    if (!point) return { error: 'не прочитан км/пк', raw: original };
+    var tail = line.slice(point.length).trim();
+    var speedMatch = tail.match(/(?:^|\s)(?:(?:v|скор(?:ость)?|огр(?:аничение)?|до)\s*)?(\d{1,3})(?:\s*(?:км\s*\/?\s*ч|кмч))?\b/i);
+    if (!speedMatch) return { error: 'не найдена скорость', raw: original };
+    var speed = Number(speedMatch[1]);
+    if (!isFinite(speed) || speed < 1 || speed > 200) return { error: 'скорость вне диапазона', raw: original };
+    var direction = getCurrentCoordinateDirection();
+    var start = point.coordinate;
+    var end = start + direction * 1000;
+    var note = (tail.slice(0, speedMatch.index) + ' ' + tail.slice(speedMatch.index + speedMatch[0].length))
+      .replace(/^[\s:;,.#-]+/, '')
+      .trim();
+    return {
+      sector: sector,
+      start: start,
+      end: end,
+      speed: speed,
+      note: note || point.label,
+      validUntil: defaultValidUntil || ''
+    };
+  }
+
+  function createWarningFromQuickText(text, defaultSector, validUntil) {
+    var parsed = parseBulkWarningLine(text, defaultSector, validUntil);
+    if (!parsed || parsed.error) parsed = parseSinglePointWarningLine(text, defaultSector, validUntil);
+    if (!parsed || parsed.error) return { warning: null, error: parsed && parsed.error ? parsed.error : 'не прочитано предупреждение' };
+    var warning = createWarning(parsed.sector, parsed.start, parsed.end, parsed.speed, parsed.note, parsed.validUntil);
+    return warning ? { warning: warning, error: '' } : { warning: null, error: 'предупреждение не сохранено' };
   }
 
   function parseBulkWarningLine(rawLine, defaultSector, defaultValidUntil) {
@@ -8636,7 +8684,7 @@
     items.push(createProdAuditItem(
       'warnings',
       'Предупреждения ПР',
-      'введено ' + warnings.length + ' · сервер ' + getWarningSyncLabel() + ' · ручной, пакетный и файловый ввод пишутся в смену/карту',
+      'введено ' + warnings.length + ' · сервер ' + getWarningSyncLabel() + ' · быстрый, ручной, пакетный и файловый ввод пишутся в смену/карту',
       warningState === 'error' ? 'blocked' : 'ready',
       { badge: 'ПР ' + warnings.length }
     ));
@@ -9653,13 +9701,13 @@
     if (signalCount) parts.push('сигналы ' + signalCount);
     if (stationCount) parts.push('станции ' + stationCount);
     else if (item && item.stationHits && item.stationHits.length) parts.push('станции');
-    if (controlCount) parts.push('режим ' + controlCount + (neutralCount ? ', НТ ' + neutralCount : ''));
+    if (controlCount) parts.push('режим ' + controlCount + (neutralCount ? ', ОМ ' + neutralCount : ''));
     if (!parts.length) parts.push('данные РК');
     return parts.join(' · ');
   }
 
   function getRegimeControlMarkKindLabel(kind) {
-    if (kind === 'neutral') return 'НТ';
+    if (kind === 'neutral') return 'ОМ';
     if (kind === 'throttle') return 'Тяга';
     if (kind === 'power') return 'Мощн.';
     if (kind === 'connection') return 'СОЕД';
@@ -9748,7 +9796,7 @@
     grid.appendChild(createShiftInfoCell('Скорости РК', summary.speedRules ? String(summary.speedRules) : '—', summary.speedRules ? '' : 'muted'));
     grid.appendChild(createShiftInfoCell('Сигналы РК', summary.signalObjects ? String(summary.signalObjects) : '—', summary.signalObjects ? '' : 'muted'));
     grid.appendChild(createShiftInfoCell('Метки РК', summary.controlMarks ? String(summary.controlMarks) : '—', summary.controlMarks ? '' : 'muted'));
-    grid.appendChild(createShiftInfoCell('НТ РК', summary.neutralMarks ? String(summary.neutralMarks) : '—', summary.neutralMarks ? 'warning' : 'muted'));
+    grid.appendChild(createShiftInfoCell('ОМ РК', summary.neutralMarks ? String(summary.neutralMarks) : '—', summary.neutralMarks ? 'warning' : 'muted'));
     grid.appendChild(createShiftInfoCell('Объекты РК', summary.objects ? String(summary.objects) : '—', summary.objects ? '' : 'muted'));
     grid.appendChild(createShiftInfoCell('Участки', summary.sectors ? String(summary.sectors) : '0', summary.sectors ? '' : 'muted'));
     grid.appendChild(createShiftInfoCell('Дата РК', formatDateLabel(summary.updatedAt), summary.updatedAt ? '' : 'muted'));
@@ -9819,7 +9867,7 @@
 
       var marksTitle = document.createElement('div');
       marksTitle.className = 'poekhali-shift-route';
-      marksTitle.textContent = 'Ближайшие метки РК по участку ' + activeSector + ': НТ, тяговые позиции, СОЕД, ЭДТ. Нажатие открывает место на профиле.';
+      marksTitle.textContent = 'Ближайшие метки РК по участку ' + activeSector + ': ОМ, тяговые позиции, СОЕД, ЭДТ. Нажатие открывает место на профиле.';
       marksList.appendChild(marksTitle);
 
       for (var m = 0; m < activeControlMarks.length; m++) {
@@ -10801,6 +10849,34 @@
       input.addEventListener('change', captureWarningDraft);
     });
 
+    var quickInput = document.createElement('input');
+    quickInput.type = 'text';
+    quickInput.inputMode = 'text';
+    quickInput.autocomplete = 'off';
+    quickInput.placeholder = 'Быстро: 3732км 9пк скорость 25';
+    quickInput.value = '';
+    var quickField = createField('Быстрое ПР', quickInput);
+    quickField.classList.add('is-wide');
+    var quickActions = document.createElement('div');
+    quickActions.className = 'poekhali-warning-form-actions';
+    var quickBtn = document.createElement('button');
+    quickBtn.type = 'button';
+    quickBtn.className = 'poekhali-secondary-action';
+    quickBtn.textContent = 'Добавить быстро';
+    quickBtn.addEventListener('click', function() {
+      var result = createWarningFromQuickText(quickInput.value, Number(sectorSelect.value), validUntilInput.value);
+      tracker.warningBulkMessage = result.warning
+        ? 'Добавлено ПР: ' + formatWarningRange(result.warning) + ' · ' + result.warning.speed + ' км/ч'
+        : 'ПР не добавлено: ' + result.error;
+      if (result.warning) {
+        tracker.editingWarningId = '';
+        setWarningFormDraft(null);
+      }
+      renderOpsSheet();
+      requestDraw();
+    });
+    quickActions.appendChild(quickBtn);
+
     var grid = document.createElement('div');
     grid.className = 'poekhali-ops-grid is-warning-grid';
     grid.appendChild(createField('Участок', sectorSelect));
@@ -10834,6 +10910,9 @@
         var nextStart = Math.max(startCoordinate, endCoordinate);
         updateWarningFormDraft(Number(sectorSelect.value), nextStart, nextStart + 1000, speedInput.value, '', validUntilInput.value);
       }
+      tracker.warningBulkMessage = saved ? 'Добавлено ПР: ' + formatWarningRange(saved) + ' · ' + saved.speed + ' км/ч' : 'ПР не добавлено: проверь км/пк и скорость';
+      renderOpsSheet();
+      requestDraw();
     });
     formActions.appendChild(saveBtn);
     if (editing) {
@@ -10996,6 +11075,8 @@
 
     section.appendChild(head);
     section.appendChild(syncNote);
+    section.appendChild(quickField);
+    section.appendChild(quickActions);
     section.appendChild(grid);
     section.appendChild(formActions);
     if (isPoekhaliDebugUiEnabled()) {
@@ -13695,6 +13776,16 @@
     return String(way);
   }
 
+  function getCurrentSignalObjectFileKey() {
+    var way = normalizeWayNumber(tracker.wayNumber);
+    var stores = tracker.trackObjectsByFile || {};
+    var preferred = way === 1 ? (tracker.even ? '1n' : '1') : (tracker.even ? '2' : '2n');
+    if (stores[preferred]) return preferred;
+    var base = String(way);
+    if (stores[base]) return base;
+    return getCurrentObjectFileKey();
+  }
+
   function mergeRegimeTrackObjects(baseObjects, regimeObjects) {
     var result = Array.isArray(baseObjects) ? baseObjects.slice() : [];
     var seen = {};
@@ -13721,6 +13812,11 @@
     var store = getCurrentTrackObjectStore();
     var key = getSectorKey(sector);
     var base = store && store.bySector && store.bySector[key] ? store.bySector[key] : [];
+    var signalStore = tracker.trackObjectsByFile && tracker.trackObjectsByFile[getCurrentSignalObjectFileKey()];
+    if (signalStore && signalStore !== store && signalStore.bySector && Array.isArray(signalStore.bySector[key])) {
+      var signalItems = signalStore.bySector[key].filter(function(item) { return item && item.type === '1'; });
+      base = base.filter(function(item) { return !item || item.type !== '1'; }).concat(signalItems);
+    }
     return mergeRegimeTrackObjects(base.concat(getUserObjectsForSector(sector)), getRegimeTrackObjectsForSector(sector));
   }
 
@@ -14316,8 +14412,8 @@
 
   function getSpeedRulePriority(rule) {
     if (!rule) return 0;
+    if (rule.source === 'warning') return 80;
     if (rule.source === 'manual') return 60;
-    if (rule.source === 'warning') return 50;
     if (rule.source === 'document') return 40;
     if (rule.source === 'regime') return 30;
     if (rule.source === 'object') return 20;
@@ -14533,8 +14629,11 @@
 
   function findNextTrackObjectForDirection(center, sector, type) {
     if (!isRealNumber(sector) || !isFinite(center)) return null;
+    var currentWay = normalizeWayNumber(tracker.wayNumber);
     var objects = getTrackObjectsForSector(sector).filter(function(item) {
-      return item && item.type === type && isFinite(item.coordinate);
+      if (!item || item.type !== type || !isFinite(item.coordinate)) return false;
+      var objectWay = getWayNumberFromObjectFileKey(item.fileKey);
+      return !objectWay || !currentWay || objectWay === currentWay;
     }).sort(function(a, b) {
       return a.coordinate - b.coordinate;
     });
@@ -14544,9 +14643,10 @@
       var anchor = getObjectApproachAnchor(item, center);
       if (anchor === null || !isFinite(anchor)) continue;
       var distance = getDirectionalDistance(anchor, center, tracker.even);
-      // Stations are navigation objects, not zones to keep pinned after entry.
-      // If the head has passed the approach anchor, drop this station and move to the next object.
-      if (!isFinite(distance) || distance < 0) continue;
+      // Stations/signals must be true approach targets: after the head passes
+      // the direction anchor they are behind us, so the distance must not grow.
+      if (!isFinite(distance) || distance < -5) continue;
+      if (distance < 0) distance = 0;
       if (!best || distance < best.distance) {
         best = {
           item: item,
@@ -14738,6 +14838,7 @@
       distanceMeters: distance,
       etaSeconds: Math.max(0, Math.round(Number(candidate.etaSeconds) || 0)),
       priority: isFinite(Number(candidate.priority)) ? Number(candidate.priority) : getNavigationTargetPriority(candidate.kind),
+      speedKmh: Math.max(0, Math.round(Number(candidate.speedKmh) || 0)),
       updatedAt: String(candidate.updatedAt || new Date().toISOString())
     };
   }
@@ -14751,6 +14852,11 @@
         best = item;
         continue;
       }
+      if (item.priority >= 90 && best.priority < 90) {
+        best = item;
+        continue;
+      }
+      if (best.priority >= 90 && item.priority < 90) continue;
       if (item.distanceMeters < best.distanceMeters - 5) {
         best = item;
         continue;
@@ -14787,6 +14893,7 @@
         coordinate: getDirectionEndCoordinate(run.activeRestrictionStart, run.activeRestrictionEnd, tracker.even),
         distanceMeters: activeDistance,
         etaSeconds: estimateEtaSeconds(activeDistance, speed),
+        priority: run.activeRestrictionSource === 'warning' ? 95 : undefined,
         updatedAt: run.activeRestrictionUpdatedAt
       });
     }
@@ -15372,6 +15479,7 @@
         coordinate: getDirectionEndCoordinate(active.start, active.end, tracker.even),
         distanceMeters: active.distanceToEnd,
         etaSeconds: estimateEtaSeconds(active.distanceToEnd, speed),
+        priority: active.source === 'warning' ? 95 : undefined,
         updatedAt: active.updatedAt
       });
     }
@@ -15509,13 +15617,16 @@
     var speedText = getNavigationSpeedText(navTarget);
     var distanceEta = formatLiveHudDistanceEta(navTarget);
     if (navTarget.kind === 'restriction_end') {
+      if (navTarget.source === 'warning') {
+        return speedText ? 'ПР ' + speedText + ': вытянем хвост через ' + distanceEta : 'Вытянем хвост через ' + distanceEta;
+      }
       return speedText ? 'Ограничение ' + speedText + ' ещё ' + distanceEta : 'До конца ограничения ' + distanceEta;
     }
     if (navTarget.kind === 'restriction') {
       return speedText ? 'Впереди ограничение ' + speedText + ' через ' + distanceEta : 'Впереди ограничение через ' + distanceEta;
     }
     if (navTarget.kind === 'warning') {
-      return speedText ? 'Предупреждение ' + speedText + ' через ' + distanceEta : 'Предупреждение через ' + distanceEta;
+      return speedText ? 'ПР ' + speedText + ' через ' + distanceEta : 'ПР через ' + distanceEta;
     }
     return formatSharedPoekhaliNavigationTargetDisplay(navTarget) || fb || '—';
   }
@@ -15954,7 +16065,9 @@
       if (shouldLabel && labelX - minGap > labelRight) {
         var stationLabel = formatHumanTrackObjectName(station.name, 'station', station.coordinate).toUpperCase();
         var stationLabelWidth = Math.min(220, Math.max(64, stationLabel.length * 7.2));
-        drawText(ctx, stationLabel, labelX, layout.profileTop + 7, {
+        var stationLabelY = layout.profileTop - 8;
+        if (!reserveLabel(labelLayout, labelX, stationLabelY - 5, stationLabelWidth, 16, isPreview ? 8 : 6)) continue;
+        drawText(ctx, stationLabel, labelX, stationLabelY, {
           size: 10,
           weight: 850,
           color: isRegimeStation ? 'rgba(251, 146, 60, 0.36)' : 'rgba(238, 242, 248, 0.32)',
@@ -16005,8 +16118,9 @@
       ctx.fill();
       ctx.globalAlpha = 1;
 
-      if (signalDistance <= APK_LABEL_FOCUS_RADIUS_M && x - lastLabelX > (isPreview ? 76 : 92) && reserveLabel(labelLayout, x, y - 70, 48, 14, isPreview ? 8 : 5)) {
-        drawText(ctx, getDisplayTrackObjectName(signal), x, y - 70, {
+      var signalLabelY = y - (isPreview ? 78 : 86);
+      if (signalDistance <= APK_LABEL_FOCUS_RADIUS_M && x - lastLabelX > (isPreview ? 76 : 92) && reserveLabel(labelLayout, x, signalLabelY, 52, 16, isPreview ? 10 : 8)) {
+        drawText(ctx, getDisplayTrackObjectName(signal), x, signalLabelY, {
           size: 8,
           weight: 850,
           color: 'rgba(238, 242, 248, 0.72)',
@@ -16090,7 +16204,7 @@
       ctx.globalAlpha = 1;
 
       if (!markFocus || drawnLabels >= maxLabels) continue;
-      var label = neutral ? 'НТ' : brakeEnd ? 'КТ' : String(mark.name || '');
+      var label = neutral ? 'ОМ' : brakeEnd ? 'КТ' : String(mark.name || '');
       if (!label) continue;
       var width = Math.min(primaryBrakeMark ? 44 : 68, Math.max(primaryBrakeMark ? 28 : 32, label.length * 7 + 12));
       var labelY = primaryBrakeMark ? stemEnd - 7 : stemEnd + 13;
@@ -17339,7 +17453,7 @@
 
     if (!activeSpeed && !nextWarning && nextNeutralMark && !isPreview) {
       var neutralDistance = Math.abs(nextNeutralMark.coordinate - center);
-      var neutralText = 'РК НТ · ' + Math.round(neutralDistance) + ' м';
+      var neutralText = 'РК ОМ · ' + Math.round(neutralDistance) + ' м';
       var neutralWidth = Math.min(124, Math.max(74, neutralText.length * 6 + 18));
       var neutralX = layout.viewportRight - neutralWidth - 8;
       var neutralY = layout.trackY - 48;
