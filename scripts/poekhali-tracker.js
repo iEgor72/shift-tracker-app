@@ -3582,7 +3582,7 @@
     if (!alert || !alert.key) return null;
     var now = Date.now();
     var repeatMs = alert.level === 'danger' ? LIVE_ALERT_DANGER_REPEAT_MS : LIVE_ALERT_REPEAT_MS;
-    var shouldBuzz = tracker.liveAlertLastKey !== alert.key || !tracker.liveAlertLastAt || now - tracker.liveAlertLastAt >= repeatMs;
+    var shouldBuzz = !alert.silentHaptic && (tracker.liveAlertLastKey !== alert.key || !tracker.liveAlertLastAt || now - tracker.liveAlertLastAt >= repeatMs);
     tracker.liveAlert = {
       key: alert.key,
       kind: alert.kind || '',
@@ -3590,6 +3590,7 @@
       title: typeof alert.title === 'string' ? alert.title : 'Предупреждение',
       text: alert.text || '',
       distanceMeters: Math.max(0, Math.round(Number(alert.distanceMeters) || 0)),
+      silentHaptic: !!alert.silentHaptic,
       ts: now,
       expiresAt: now + LIVE_ALERT_VISIBLE_MS,
       notified: shouldBuzz
@@ -3663,7 +3664,8 @@
       level: isNear ? 'danger' : 'warning',
       title: '',
       text: text,
-      distanceMeters: distance
+      distanceMeters: distance,
+      silentHaptic: speed < 3
     };
   }
 
