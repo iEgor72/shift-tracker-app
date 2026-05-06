@@ -366,6 +366,7 @@
     directionVoteMeters: 0,
     directionVoteSamples: 0,
     directionSource: '',
+    effectiveSignalDirectionCache: null,
     previewCoordinate: null,
     previewSector: null,
     previewDragActive: false,
@@ -1129,16 +1130,46 @@
     return even ? 'ЧЕТ' : 'НЕЧЕТ';
   }
 
-  function getEffectiveSignalDirectionEven() {
-    var suggestion = getShiftRouteSuggestion();
-    if (suggestion && suggestion.status === 'ready') return !!suggestion.even;
-    var details = getPoekhaliTrainDetails();
+  function getEffectiveSignalDirectionCacheKey(details) {
     var shift = details && details.shift ? details.shift : null;
-    var to = normalizeRouteName(shift && shift.route_to || '');
-    var from = normalizeRouteName(shift && shift.route_from || '');
-    if (to.indexOf('постыш') >= 0 && from.indexOf('постыш') < 0) return false;
-    if (to.indexOf('комсом') >= 0 && from.indexOf('комсом') < 0) return true;
-    return !!tracker.even;
+    var map = tracker.currentMap || DEFAULT_MAP || {};
+    return [
+      tracker.assetsLoaded ? '1' : '0',
+      tracker.even ? '1' : '0',
+      tracker.directionSource || '',
+      normalizeWayNumber(tracker.wayNumber),
+      getMapKey(map),
+      shift && shift.id ? String(shift.id) : '',
+      normalizeRouteName(shift && shift.route_from || ''),
+      normalizeRouteName(shift && shift.route_to || ''),
+      String(details && details.trainNumber || '')
+    ].join('|');
+  }
+
+  function getEffectiveSignalDirectionEven() {
+    var details = getPoekhaliTrainDetails();
+    var cacheKey = getEffectiveSignalDirectionCacheKey(details);
+    var now = Date.now ? Date.now() : new Date().getTime();
+    var cached = tracker.effectiveSignalDirectionCache;
+    if (cached && cached.key === cacheKey && now - cached.at < 750) return !!cached.even;
+
+    var result = !!tracker.even;
+    var suggestion = getShiftRouteSuggestion();
+    if (suggestion && suggestion.status === 'ready') {
+      result = !!suggestion.even;
+    } else {
+      var shift = details && details.shift ? details.shift : null;
+      var to = normalizeRouteName(shift && shift.route_to || '');
+      var from = normalizeRouteName(shift && shift.route_from || '');
+      if (to.indexOf('постыш') >= 0 && from.indexOf('постыш') < 0) result = false;
+      else if (to.indexOf('комсом') >= 0 && from.indexOf('комсом') < 0) result = true;
+    }
+    tracker.effectiveSignalDirectionCache = {
+      key: cacheKey,
+      at: now,
+      even: !!result
+    };
+    return !!result;
   }
 
   function formatSignalNameForDirection(name, even) {
@@ -14721,11 +14752,11 @@
     return result;
   }
 
-  function getObjectApproachAnchor(item, center) {
+  function getObjectApproachAnchor(item, center, even) {
     if (!item || !isFinite(item.coordinate)) return null;
     var start = Math.max(0, Math.round(Number(item.coordinate) || 0));
     var end = Math.max(start, Math.round(Number(item.end) || start));
-    return getDirectionStartCoordinate(start, end, tracker.even);
+    return getDirectionStartCoordinate(start, end, even === undefined || even === null ? tracker.even : !!even);
   }
 
   function findCurrentStationForProjection(projection) {
@@ -14780,9 +14811,9 @@
     var best = null;
     for (var i = 0; i < objects.length; i++) {
       var item = objects[i];
-      var anchor = getObjectApproachAnchor(item, center);
-      if (anchor === null || !isFinite(anchor)) continue;
       var navigationEven = type === '1' ? getEffectiveSignalDirectionEven() : tracker.even;
+      var anchor = getObjectApproachAnchor(item, center, navigationEven);
+      if (anchor === null || !isFinite(anchor)) continue;
       var distance = getDirectionalDistance(anchor, center, navigationEven);
       // Stations/signals must be true approach targets: after the head passes
       // the direction anchor they are behind us, so the distance must not grow.
