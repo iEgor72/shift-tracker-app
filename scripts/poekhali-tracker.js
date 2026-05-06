@@ -3488,6 +3488,14 @@
     }) || '—';
   }
 
+  function resolveKomsomolskTrackStationName(coordinate) {
+    var numericCoordinate = Math.max(0, Math.round(Number(coordinate) || 0));
+    if (numericCoordinate >= 3810000 && numericCoordinate <= 3816500) return 'Комсомольск-2';
+    if (numericCoordinate >= 350000 && numericCoordinate <= 365000) return 'Комсомольск Груз';
+    if ((numericCoordinate >= 320000 && numericCoordinate < 350000) || numericCoordinate <= 5000) return 'Комсомольск Сорт';
+    return 'Комсомольск Сорт';
+  }
+
   function formatHumanTrackObjectName(value, kind, coordinate) {
     if (typeof window !== 'undefined' && typeof window.formatPoekhaliHumanObjectName === 'function') {
       return window.formatPoekhaliHumanObjectName(value, kind, coordinate);
@@ -3495,8 +3503,7 @@
     var text = String(value || '').replace(/\s+/g, ' ').trim().replace(/^ст\.?\s+/i, '');
     if (!text) return '';
     var lowerText = text.toLowerCase();
-    var numericCoordinate = Math.max(0, Math.round(Number(coordinate) || 0));
-    if (lowerText === 'комсом') text = numericCoordinate >= 3812000 && numericCoordinate <= 3816000 ? 'Комсомольск-2' : 'Комсомольск';
+    if (lowerText === 'комсом' || lowerText === 'комсомольск') text = resolveKomsomolskTrackStationName(coordinate);
     else if (lowerText === 'хальгас') text = 'Хальгасо';
     else if (lowerText === 'хурму') text = 'Хурмули';
     else if (lowerText === 'скоро') text = 'Огр.';
