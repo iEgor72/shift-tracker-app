@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-06 22:37:42 +0000
+Generated: 2026-05-06 22:42:13 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `1989653` | 2026-05-06T22:42:04+00:00 | iEgor72 | fix(poekhali): focus signals ahead of train head |
+| `fb99c42` | 2026-05-06T22:37:46+00:00 | iEgor72 | chore(memory): refresh after station signal fix |
 | `974c916` | 2026-05-06T22:37:34+00:00 | iEgor72 | fix(poekhali): keep station name while inside station |
 | `1e19b9e` | 2026-05-06T22:32:37+00:00 | iEgor72 | chore(memory): refresh after Apkan signal fix |
 | `bef206f` | 2026-05-06T22:32:25+00:00 | iEgor72 | fix(poekhali): add manual Apkan signals |
@@ -42,5 +44,3 @@ Generated: 2026-05-06 22:37:42 +0000
 | `efd3d51` | 2026-05-06T00:45:02+00:00 | iEgor72 | fix(poekhali): polish track switch button |
 | `ffc61c5` | 2026-05-06T00:42:30+00:00 | iEgor72 | chore(memory): refresh project state |
 | `a49f1cf` | 2026-05-06T00:42:23+00:00 | iEgor72 | fix(poekhali): show track switch near gps |
-| `999a495` | 2026-05-06T00:39:09+00:00 | iEgor72 | chore(memory): refresh project state |
-| `93e6efa` | 2026-05-06T00:39:04+00:00 | iEgor72 | feat(poekhali): support manual track speed selection |
