@@ -1244,6 +1244,7 @@
       var dateTimeText = getShiftDateTimeLineLabel(p);
       var durationText = getShiftDurationLabelText(f.dur);
       var typeHtml = buildShiftTypeHtml(shift, typeLabel, shiftPending);
+      var directionHtml = buildShiftDirectionHtml(directionText);
       var dateTimeHtml = buildShiftDateTimeHtml(dateTimeText);
       var durationHtml = buildShiftDurationHtml(durationText);
       var fuelNoteHtml = buildShiftFuelConsumptionHtml(shift);
@@ -1266,6 +1267,7 @@
               dateTimeHtml +
               durationHtml +
             '</div>' +
+            directionHtml +
             fuelNoteHtml +
             '<div class="shift-income-row">' +
               incomeLabelHtml +
