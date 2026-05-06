@@ -140,6 +140,63 @@
     { id: 'apkVisualParity', title: 'Сверка с APK', detail: 'Поезд, станции, светофоры, скорости, уклоны и км/пк визуально сверены с реальным Поехали.' },
     { id: 'profileOverlap', title: 'Нет критичных наложений', detail: 'На рабочих участках профиль, состав, ПР, скорости, РК и объекты не мешают чтению.' }
   ];
+  var MANUAL_BAM_SPEED_RULES = [
+    { sector: 18, start: 3799896, end: 3801977, speed: 70, wayNumber: 1, name: 'БАМ 70 · Силинка П1' },
+    { sector: 18, start: 3795000, end: 3799896, speed: 70, name: 'БАМ 70 · Силинка — ПП 3796' },
+    { sector: 18, start: 3788300, end: 3789700, speed: 60, wayNumber: 1, name: 'БАМ 60 · ПП 3796 П1' },
+    { sector: 18, start: 3789800, end: 3793800, speed: 60, wayNumber: 1, name: 'БАМ 60 · ПП 3796 П1' },
+    { sector: 18, start: 3793900, end: 3795100, speed: 70, wayNumber: 1, name: 'БАМ 70 · ПП 3796 П1' },
+    { sector: 18, start: 3787846, end: 3795100, speed: 70, wayNumber: 2, name: 'БАМ 70 · ПП 3796 П2' },
+    { sector: 18, start: 3789976, end: 3792106, speed: 40, wayNumber: 1, name: 'БАМ 40 · Хальгасо П1' },
+    { sector: 18, start: 3787846, end: 3789976, speed: 70, wayNumber: 2, name: 'БАМ 70 · Хальгасо П2' },
+    { sector: 18, start: 3775256, end: 3789976, speed: 70, name: 'БАМ 70 · Хальгасо — Лиан' },
+    { sector: 18, start: 3775256, end: 3777532, speed: 60, name: 'БАМ 60 · Лиан' },
+    { sector: 18, start: 3763395, end: 3775256, speed: 70, name: 'БАМ 70 · Лиан — Холони' },
+    { sector: 18, start: 3763395, end: 3766487, speed: 80, wayNumber: 1, name: 'БАМ 80 · Холони П1' },
+    { sector: 18, start: 3760303, end: 3763395, speed: 60, wayNumber: 2, name: 'БАМ 60 · Холони П2' },
+    { sector: 18, start: 3751329, end: 3763395, speed: 80, name: 'БАМ 80 · Холони — Хурмули' },
+    { sector: 18, start: 3751000, end: 3751700, speed: 60, name: 'БАМ 60 · 3751км10пк—3752км7пк' },
+    { sector: 18, start: 3751329, end: 3753840, speed: 60, wayNumber: 1, name: 'БАМ 60 · Хурмули П1' },
+    { sector: 18, start: 3740241, end: 3751329, speed: 60, name: 'БАМ 60 · Хурмули — Мавринский' },
+    { sector: 18, start: 3740241, end: 3742434, speed: 60, wayNumber: 1, name: 'БАМ 60 · Мавринский П1' },
+    { sector: 18, start: 3732000, end: 3740241, speed: 70, name: 'БАМ 70 · Мавринский — ПП 3732' },
+    { sector: 18, start: 3727400, end: 3732000, speed: 60, wayNumber: 1, name: 'БАМ 60 · ПП 3732 — Пиль П1' },
+    { sector: 18, start: 3727400, end: 3732000, speed: 60, wayNumber: 2, name: 'БАМ 60 · ПП 3732 — Пиль П2' },
+    { sector: 18, start: 3732800, end: 3732900, speed: 40, wayNumber: 2, name: 'БАМ 40 · 3732км9пк П2' },
+    { sector: 18, start: 3727400, end: 3731115, speed: 60, name: 'БАМ 60 · Пиль' },
+    { sector: 18, start: 3715453, end: 3727400, speed: 70, name: 'БАМ 70 · Пиль — Горин' },
+    { sector: 18, start: 3722500, end: 3723800, speed: 60, name: 'БАМ 60 · 3723км5пк—3724км8пк' },
+    { sector: 18, start: 3715453, end: 3717863, speed: 70, wayNumber: 1, name: 'БАМ 70 · Горин П1' },
+    { sector: 18, start: 3701207, end: 3715453, speed: 60, name: 'БАМ 60 · Горин — Харпичан' },
+    { sector: 18, start: 3701207, end: 3703007, speed: 60, wayNumber: 1, name: 'БАМ 60 · Харпичан П1' },
+    { sector: 18, start: 3686926, end: 3701207, speed: 70, name: 'БАМ 70 · Харпичан — Катама' },
+    { sector: 18, start: 3686926, end: 3689415, speed: 60, wayNumber: 1, name: 'БАМ 60 · Катама П1' },
+    { sector: 18, start: 3677625, end: 3686926, speed: 70, name: 'БАМ 70 · Катама — Эворон' },
+    { sector: 18, start: 3677625, end: 3679549, speed: 60, wayNumber: 1, name: 'БАМ 60 · Эворон П1' },
+    { sector: 18, start: 3660000, end: 3677625, speed: 60, name: 'БАМ 60 · Эворон — Апкан — Мони' },
+    { sector: 18, start: 3658458, end: 3660072, speed: 60, wayNumber: 1, name: 'БАМ 60 · Мони П1' },
+    { sector: 18, start: 3658006, end: 3659645, speed: 60, wayNumber: 2, name: 'БАМ 60 · Мони П2' },
+    { sector: 18, start: 3633716, end: 3658458, speed: 70, wayNumber: 1, name: 'БАМ 70 · Мони — Болен П1' },
+    { sector: 18, start: 3633530, end: 3658006, speed: 70, wayNumber: 2, name: 'БАМ 70 · Мони — Болен П2' },
+    { sector: 18, start: 3633716, end: 3638813, speed: 70, wayNumber: 1, name: 'БАМ 70 · Болен П1' },
+    { sector: 18, start: 3633530, end: 3638022, speed: 70, wayNumber: 2, name: 'БАМ 70 · Болен П2' },
+    { sector: 18, start: 3625360, end: 3633716, speed: 70, name: 'БАМ 70 · Болен — Дуки' },
+    { sector: 18, start: 3625300, end: 3627700, speed: 60, name: 'БАМ 60 · 3626км3пк—3628км7пк' },
+    { sector: 18, start: 3625360, end: 3628048, speed: 70, wayNumber: 1, name: 'БАМ 70 · Дуки П1' },
+    { sector: 18, start: 3615693, end: 3625360, speed: 70, name: 'БАМ 70 · Дуки — Постышево' },
+    { sector: 18, start: 3613632, end: 3615693, speed: 60, wayNumber: 1, name: 'БАМ 60 · Постышево П1' }
+  ];
+
+  var MANUAL_BAM_CONTROL_MARKS = [
+    { sector: 18, coordinate: 3730000, kind: 'neutral', name: 'ОМ' },
+    { sector: 18, coordinate: 3691600, kind: 'neutral', name: 'ОМ' },
+    { sector: 18, coordinate: 3693600, kind: 'neutral', name: 'ОМ' },
+    { sector: 18, coordinate: 3640300, kind: 'neutral', name: 'ОМ' },
+    { sector: 18, coordinate: 3642600, kind: 'neutral', name: 'ОМ' },
+    { sector: 18, coordinate: 3647000, kind: 'neutral', name: 'ОМ' },
+    { sector: 18, coordinate: 3652600, kind: 'neutral', name: 'ОМ' }
+  ];
+
   var THEME = {
     bg: '#0C0C10',
     bgDeep: '#090A0F',
@@ -5181,6 +5238,47 @@
     return result;
   }
 
+  function appendManualBamSpeedRules(rules, left, right, sector) {
+    if (getSectorKey(sector) !== '18') return;
+    for (var i = 0; i < MANUAL_BAM_SPEED_RULES.length; i++) {
+      var item = MANUAL_BAM_SPEED_RULES[i];
+      if (!item || getSectorKey(item.sector) !== getSectorKey(sector)) continue;
+      if (item.wayNumber && normalizeWayNumber(item.wayNumber) !== normalizeWayNumber(tracker.wayNumber)) continue;
+      var rule = {
+        coordinate: Math.min(item.start, item.end),
+        end: Math.max(item.start, item.end),
+        length: Math.abs(item.end - item.start),
+        speed: item.speed,
+        name: item.name || ('БАМ ' + item.speed),
+        source: 'manual',
+        sourceName: 'Сверено вручную',
+        sourceCode: 'BAM-MANUAL',
+        confidence: 'manual-user'
+      };
+      if (isFinite(left) && isFinite(right) && !isObjectInRange(rule, left, right)) continue;
+      rules.push(rule);
+    }
+  }
+
+  function getManualBamControlMarksForSector(sector) {
+    if (getSectorKey(sector) !== '18') return [];
+    var result = [];
+    for (var i = 0; i < MANUAL_BAM_CONTROL_MARKS.length; i++) {
+      var item = MANUAL_BAM_CONTROL_MARKS[i];
+      if (!item || getSectorKey(item.sector) !== getSectorKey(sector)) continue;
+      result.push({
+        sector: item.sector,
+        coordinate: item.coordinate,
+        kind: item.kind || 'neutral',
+        name: item.name || 'ОМ',
+        sourceName: 'Сверено вручную',
+        sourceCode: 'BAM-MANUAL',
+        confidence: 'manual-user'
+      });
+    }
+    return result;
+  }
+
   function getRawDraftForSector(sector) {
     return tracker.rawDraftsBySector[getSectorKey(sector)] || null;
   }
@@ -6710,7 +6808,8 @@
   }
 
   function getRegimeControlMarksForSector(sector) {
-    return tracker.regimeControlMarksBySector[getSectorKey(sector)] || [];
+    var base = tracker.regimeControlMarksBySector[getSectorKey(sector)] || [];
+    return base.concat(getManualBamControlMarksForSector(sector));
   }
 
   function getRegimeControlMarksInWindow(left, right, sector) {
@@ -13678,6 +13777,7 @@
     }
     appendRegimeSpeedRules(rules, left, right, sector);
     appendDocumentSpeedRules(rules, left, right, sector);
+    appendManualBamSpeedRules(rules, left, right, sector);
     rules.sort(function(a, b) {
       return a.coordinate - b.coordinate;
     });
@@ -14197,6 +14297,7 @@
 
   function getSpeedRulePriority(rule) {
     if (!rule) return 0;
+    if (rule.source === 'manual') return 60;
     if (rule.source === 'warning') return 50;
     if (rule.source === 'document') return 40;
     if (rule.source === 'regime') return 30;
@@ -14207,6 +14308,7 @@
 
   function getSpeedRulePrefix(rule) {
     if (!rule) return 'ОГР';
+    if (rule.source === 'manual') return 'БАМ';
     if (rule.source === 'warning') return 'ПР';
     if (rule.source === 'document') return 'ДОК';
     if (rule.source === 'regime') return 'РК';
@@ -14920,6 +15022,7 @@
     }
     appendRegimeSpeedRules(rules, left, right, sector);
     appendDocumentSpeedRules(rules, left, right, sector);
+    appendManualBamSpeedRules(rules, left, right, sector);
     var warnings = getWarningsForSector(sector, left, right);
     for (var j = 0; j < warnings.length; j++) {
       var warning = warnings[j];
