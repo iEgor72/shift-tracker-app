@@ -188,6 +188,18 @@
     { sector: 18, start: 3613632, end: 3615693, speed: 60, wayNumber: 1, name: 'БАМ 60 · Постышево П1' }
   ];
 
+  var MANUAL_BAM_TRACK_OBJECTS = [
+    // Апкан отсутствует в импортированном XML: добавляем станцию и сигналы вручную,
+    // чтобы не висел один случайный Н1 посреди перегона.
+    { sector: 18, type: '2', coordinate: 3669000, length: 300, name: 'Апкан' },
+    { sector: 18, type: '1', coordinate: 3667850, name: 'Ч', directionEven: true },
+    { sector: 18, type: '1', coordinate: 3669350, name: 'Ч1', wayNumber: 1, directionEven: true },
+    { sector: 18, type: '1', coordinate: 3669350, name: 'Ч2', wayNumber: 2, directionEven: true },
+    { sector: 18, type: '1', coordinate: 3670150, name: 'Н', directionEven: false },
+    { sector: 18, type: '1', coordinate: 3668650, name: 'Н1', wayNumber: 1, directionEven: false },
+    { sector: 18, type: '1', coordinate: 3668650, name: 'Н2', wayNumber: 2, directionEven: false }
+  ];
+
   var MANUAL_BAM_CONTROL_MARKS = [
     { sector: 18, coordinate: 3730000, kind: 'neutral', name: 'ОМ' },
     { sector: 18, coordinate: 3691600, kind: 'neutral', name: 'ОМ' },
@@ -3567,6 +3579,7 @@
     'катама': 'Катама',
     'эворон': 'Эворон',
     'мони': 'Мони',
+    'апкан': 'Апкан',
     'болен': 'Болен',
     'дуки': 'Дуки'
   };
@@ -5325,6 +5338,34 @@
       if (isFinite(left) && isFinite(right) && !isObjectInRange(rule, left, right)) continue;
       rules.push(rule);
     }
+  }
+
+  function getManualBamTrackObjectsForSector(sector) {
+    if (getSectorKey(sector) !== '18') return [];
+    var currentWay = normalizeWayNumber(tracker.wayNumber);
+    var result = [];
+    for (var i = 0; i < MANUAL_BAM_TRACK_OBJECTS.length; i++) {
+      var item = MANUAL_BAM_TRACK_OBJECTS[i];
+      if (!item || getSectorKey(item.sector) !== getSectorKey(sector)) continue;
+      if (item.wayNumber && normalizeWayNumber(item.wayNumber) !== currentWay) continue;
+      if (item.directionEven !== undefined && !!item.directionEven !== !!tracker.even) continue;
+      var length = Math.max(0, Math.round(Number(item.length) || 0));
+      var coordinate = Math.max(0, Math.round(Number(item.coordinate) || 0));
+      result.push({
+        type: String(item.type || ''),
+        coordinate: coordinate,
+        length: length,
+        end: coordinate + length,
+        name: String(item.name || '').trim(),
+        sector: item.sector,
+        fileKey: item.wayNumber ? String(normalizeWayNumber(item.wayNumber)) : '',
+        source: 'manual',
+        sourceName: 'Сверено вручную',
+        sourceCode: 'BAM-MANUAL',
+        confidence: 'manual-user'
+      });
+    }
+    return result;
   }
 
   function getManualBamControlMarksForSector(sector) {
@@ -13817,7 +13858,10 @@
       var signalItems = signalStore.bySector[key].filter(function(item) { return item && item.type === '1'; });
       base = base.filter(function(item) { return !item || item.type !== '1'; }).concat(signalItems);
     }
-    return mergeRegimeTrackObjects(base.concat(getUserObjectsForSector(sector)), getRegimeTrackObjectsForSector(sector));
+    return mergeRegimeTrackObjects(
+      base.concat(getManualBamTrackObjectsForSector(sector)).concat(getUserObjectsForSector(sector)),
+      getRegimeTrackObjectsForSector(sector)
+    );
   }
 
   function getAllTrackObjectsForSector(sector) {
