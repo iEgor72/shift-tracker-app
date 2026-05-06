@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "title": "Актуальные скорости из документов",
-  "generatedAt": "2026-05-05T12:13:31.330466+00:00",
+  "generatedAt": "2026-05-06T00:38:00.314762+00:00",
   "sources": [
     {
       "code": "BAM",
@@ -42,20 +42,20 @@
     }
   ],
   "counts": {
-    "rules": 217,
-    "activeRules": 206,
+    "rules": 260,
+    "activeRules": 249,
     "bySource": {
-      "BAM": 33,
-      "VLCH": 80,
-      "VSG": 104
+      "BAM": 45,
+      "VLCH": 96,
+      "VSG": 119
     },
     "bySector": {
       "7": 1,
-      "9": 77,
-      "12": 7,
-      "13": 79,
-      "14": 19,
-      "18": 25
+      "9": 93,
+      "12": 8,
+      "13": 89,
+      "14": 23,
+      "18": 37
     }
   },
   "rules": [
@@ -433,7 +433,8 @@
       "end": 3625000,
       "length": 8700,
       "speed": 70,
-      "name": "Уст 70",
+      "wayNumber": 1,
+      "name": "Уст 70 П1",
       "appliesTo": "cargo",
       "targetSectors": [
         18
@@ -448,14 +449,39 @@
       "sourcePath": "/assets/docs/speeds/Скоростя БАМ Парк Д Приказ № 161.pdf",
       "sourceUpdatedAt": "2026-04-08",
       "page": 1,
+      "startKm": 3616,
+      "startPk": 1,
+      "endKm": 3625,
+      "endPk": 1,
+      "coordinate": 3616300,
+      "end": 3625000,
+      "length": 8700,
+      "speed": 60,
+      "wayNumber": 2,
+      "name": "Уст 60 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        18
+      ],
+      "confidence": "speed-table-base",
+      "raw": "Постышево-Дуки (в том числе для соединенных поездов нечетным поездам ) г 70 60 12 12 3619 км 5 пк 3620 км 5 пк 3616 км 4 пк - 3625 км 8 пк-70 км/ч (пасс - 80)",
+      "id": "bam-0019"
+    },
+    {
+      "sourceCode": "BAM",
+      "sourceName": "БАМ",
+      "sourcePath": "/assets/docs/speeds/Скоростя БАМ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 1,
       "startKm": 3625,
       "startPk": 1,
-      "endKm": 3660,
+      "endKm": 3635,
       "endPk": 1,
       "coordinate": 3625000,
-      "end": 3660000,
-      "length": 35000,
+      "end": 3635000,
+      "length": 10000,
       "speed": 70,
+      "wayNumber": 0,
       "name": "Уст 70",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -463,7 +489,55 @@
       ],
       "confidence": "speed-table-base",
       "raw": "3625 Дуки-Болен (в том числе соединенных четных поездов) г 70 70 60 40 40 11 11 3632 км 6 пк 3633 км 3626 км 3 пк - 3628 км 7 пк - 60 км /ч (все) 3629 км 2 пк - 3634 км 8 пк -70 км/ч (пасс -",
-      "id": "bam-0019"
+      "id": "bam-0020"
+    },
+    {
+      "sourceCode": "BAM",
+      "sourceName": "БАМ",
+      "sourcePath": "/assets/docs/speeds/Скоростя БАМ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 1,
+      "startKm": 3635,
+      "startPk": 1,
+      "endKm": 3660,
+      "endPk": 1,
+      "coordinate": 3635000,
+      "end": 3660000,
+      "length": 25000,
+      "speed": 70,
+      "wayNumber": 0,
+      "name": "Уст 70",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        18
+      ],
+      "confidence": "speed-table-base",
+      "raw": "3635 70 70 70 70 3 путь-40 4 путь -25 6 путь - 15 14/10 - 40 км/ч 10/8 - 40 км/ч (3658 пк 10 3659 пк 1 съезд -2/4-40 км/ч) по съездам № 3-1, 9-7 - 40 км/ч Стрелочные переводы №№ 15 и 16 по боковому направлению - 25 км/ч 6/8 - 15 км/ч 29 22 - 3658 3651 пк 6-70 ",
+      "id": "bam-0021"
+    },
+    {
+      "sourceCode": "BAM",
+      "sourceName": "БАМ",
+      "sourcePath": "/assets/docs/speeds/Скоростя БАМ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 1,
+      "startKm": 3660,
+      "startPk": 1,
+      "endKm": 3669,
+      "endPk": 1,
+      "coordinate": 3660000,
+      "end": 3669000,
+      "length": 9000,
+      "speed": 60,
+      "wayNumber": 1,
+      "name": "Уст 60 П1",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        18
+      ],
+      "confidence": "speed-table-base",
+      "raw": "3660 Мони-Апкан обр.мест 3660 км 8 г 60 70 60 40 км/ч 2-4 /9-7/ 5-11 - 40 км/ч Съезд 6/8 3/1- 25 км (1 главный путъ) 10 19 3661 -",
+      "id": "bam-0022"
     },
     {
       "sourceCode": "BAM",
@@ -479,14 +553,15 @@
       "end": 3669000,
       "length": 9000,
       "speed": 70,
-      "name": "Уст 70",
+      "wayNumber": 2,
+      "name": "Уст 70 П2",
       "appliesTo": "cargo",
       "targetSectors": [
         18
       ],
       "confidence": "speed-table-base",
       "raw": "3660 Мони-Апкан обр.мест 3660 км 8 г 60 70 60 40 км/ч 2-4 /9-7/ 5-11 - 40 км/ч Съезд 6/8 3/1- 25 км (1 главный путъ) 10 19 3661 -",
-      "id": "bam-0020"
+      "id": "bam-0023"
     },
     {
       "sourceCode": "BAM",
@@ -502,6 +577,7 @@
       "end": 3679000,
       "length": 10000,
       "speed": 60,
+      "wayNumber": 0,
       "name": "Уст 60",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -509,7 +585,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "3669 Апкан-Эворон г 60 60 40 12 14 3670 -",
-      "id": "bam-0021"
+      "id": "bam-0024"
     },
     {
       "sourceCode": "BAM",
@@ -525,14 +601,39 @@
       "end": 3688000,
       "length": 9000,
       "speed": 70,
-      "name": "Уст 70",
+      "wayNumber": 1,
+      "name": "Уст 70 П1",
       "appliesTo": "cargo",
       "targetSectors": [
         18
       ],
       "confidence": "speed-table-base",
       "raw": "3679 Эворон-Катама г 70 60 40 9 9 3682 3684",
-      "id": "bam-0022"
+      "id": "bam-0025"
+    },
+    {
+      "sourceCode": "BAM",
+      "sourceName": "БАМ",
+      "sourcePath": "/assets/docs/speeds/Скоростя БАМ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 1,
+      "startKm": 3679,
+      "startPk": 1,
+      "endKm": 3688,
+      "endPk": 1,
+      "coordinate": 3679000,
+      "end": 3688000,
+      "length": 9000,
+      "speed": 60,
+      "wayNumber": 2,
+      "name": "Уст 60 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        18
+      ],
+      "confidence": "speed-table-base",
+      "raw": "3679 Эворон-Катама г 70 60 40 9 9 3682 3684",
+      "id": "bam-0026"
     },
     {
       "sourceCode": "BAM",
@@ -548,14 +649,39 @@
       "end": 3702000,
       "length": 14000,
       "speed": 70,
-      "name": "Уст 70",
+      "wayNumber": 1,
+      "name": "Уст 70 П1",
       "appliesTo": "cargo",
       "targetSectors": [
         18
       ],
       "confidence": "speed-table-base",
       "raw": "3688 Катама-Харпичан обр.мест 3692 км 6 обр.мест 3694 км 6 г 70 60 60 40 по съездам № 1-3, № 10-12, № 6-8, № 2-4 - 40 км/ч 13 16 3697 3696",
-      "id": "bam-0023"
+      "id": "bam-0027"
+    },
+    {
+      "sourceCode": "BAM",
+      "sourceName": "БАМ",
+      "sourcePath": "/assets/docs/speeds/Скоростя БАМ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 1,
+      "startKm": 3688,
+      "startPk": 1,
+      "endKm": 3702,
+      "endPk": 1,
+      "coordinate": 3688000,
+      "end": 3702000,
+      "length": 14000,
+      "speed": 60,
+      "wayNumber": 2,
+      "name": "Уст 60 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        18
+      ],
+      "confidence": "speed-table-base",
+      "raw": "3688 Катама-Харпичан обр.мест 3692 км 6 обр.мест 3694 км 6 г 70 60 60 40 по съездам № 1-3, № 10-12, № 6-8, № 2-4 - 40 км/ч 13 16 3697 3696",
+      "id": "bam-0028"
     },
     {
       "sourceCode": "BAM",
@@ -571,6 +697,7 @@
       "end": 3715000,
       "length": 13000,
       "speed": 60,
+      "wayNumber": 0,
       "name": "Уст 60",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -578,7 +705,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "3702 Харпичан-Горин г 60 60 40 14 14 3706 3712",
-      "id": "bam-0024"
+      "id": "bam-0029"
     },
     {
       "sourceCode": "BAM",
@@ -594,6 +721,7 @@
       "end": 3725000,
       "length": 10000,
       "speed": 70,
+      "wayNumber": 0,
       "name": "Уст 70",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -601,7 +729,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "3715 Горин-Пиль г 70 70 2 путь -40 3 путь -40 8 путь - 25 км/ч По боковому 16 11 3718 3723 3 7 723 км 5 ПК - 3724 км 8 ПК - 60(груз)",
-      "id": "bam-0025"
+      "id": "bam-0030"
     },
     {
       "sourceCode": "BAM",
@@ -617,6 +745,7 @@
       "end": 3732000,
       "length": 7000,
       "speed": 60,
+      "wayNumber": 0,
       "name": "Уст 60",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -624,7 +753,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "3725 Пиль Путевой пост3732 обр.мест 3730 км 10 г 60 60 60 40 13 11 3733 - 1 главный путь",
-      "id": "bam-0026"
+      "id": "bam-0031"
     },
     {
       "sourceCode": "BAM",
@@ -640,6 +769,7 @@
       "end": 3740000,
       "length": 8000,
       "speed": 70,
+      "wayNumber": 0,
       "name": "Уст 70",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -647,7 +777,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "3732 Путевой пост 3732 Мавринский г 70 70 40 40 по съезду № 1-3 - 6 6",
-      "id": "bam-0027"
+      "id": "bam-0032"
     },
     {
       "sourceCode": "BAM",
@@ -663,6 +793,7 @@
       "end": 3751000,
       "length": 11000,
       "speed": 60,
+      "wayNumber": 0,
       "name": "Уст 60",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -670,7 +801,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "3740 Мавринский - Хурмули г 60 60 25 13 14 3744 км 8 пк 3742 км 2 пк",
-      "id": "bam-0028"
+      "id": "bam-0033"
     },
     {
       "sourceCode": "BAM",
@@ -686,14 +817,63 @@
       "end": 3760000,
       "length": 9000,
       "speed": 80,
-      "name": "Уст 80",
+      "wayNumber": 1,
+      "name": "Уст 80 П1",
       "appliesTo": "cargo",
       "targetSectors": [
         18
       ],
       "confidence": "speed-table-base",
       "raw": "3751 Хурмули - Холони г 80 60 4-25 км/ч 3-25 км/ч 2- 40 км/ч по межстрелочному участку № 33-35 - 25 км/ч 11 10 3756 км 3755 км 2 пк 3751 км 10 пк - 3752 км 7 пк - 60 км/ч (все)",
-      "id": "bam-0029"
+      "id": "bam-0034"
+    },
+    {
+      "sourceCode": "BAM",
+      "sourceName": "БАМ",
+      "sourcePath": "/assets/docs/speeds/Скоростя БАМ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 2,
+      "startKm": 3751,
+      "startPk": 1,
+      "endKm": 3760,
+      "endPk": 1,
+      "coordinate": 3751000,
+      "end": 3760000,
+      "length": 9000,
+      "speed": 60,
+      "wayNumber": 2,
+      "name": "Уст 60 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        18
+      ],
+      "confidence": "speed-table-base",
+      "raw": "3751 Хурмули - Холони г 80 60 4-25 км/ч 3-25 км/ч 2- 40 км/ч по межстрелочному участку № 33-35 - 25 км/ч 11 10 3756 км 3755 км 2 пк 3751 км 10 пк - 3752 км 7 пк - 60 км/ч (все)",
+      "id": "bam-0035"
+    },
+    {
+      "sourceCode": "BAM",
+      "sourceName": "БАМ",
+      "sourcePath": "/assets/docs/speeds/Скоростя БАМ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 2,
+      "startKm": 3760,
+      "startPk": 1,
+      "endKm": 3775,
+      "endPk": 1,
+      "coordinate": 3760000,
+      "end": 3775000,
+      "length": 15000,
+      "speed": 70,
+      "wayNumber": 1,
+      "name": "Уст 70 П1",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        18
+      ],
+      "confidence": "speed-table-base",
+      "raw": "3760 Холони - Лиан г 70 80 60 40 по съездам № 1-3, 2- 4, 6-8, 10-12 - 40 км/ч 16 11 - 3771 км",
+      "id": "bam-0036"
     },
     {
       "sourceCode": "BAM",
@@ -709,14 +889,15 @@
       "end": 3775000,
       "length": 15000,
       "speed": 80,
-      "name": "Уст 80",
+      "wayNumber": 2,
+      "name": "Уст 80 П2",
       "appliesTo": "cargo",
       "targetSectors": [
         18
       ],
       "confidence": "speed-table-base",
       "raw": "3760 Холони - Лиан г 70 80 60 40 по съездам № 1-3, 2- 4, 6-8, 10-12 - 40 км/ч 16 11 - 3771 км",
-      "id": "bam-0030"
+      "id": "bam-0037"
     },
     {
       "sourceCode": "BAM",
@@ -726,20 +907,93 @@
       "page": 2,
       "startKm": 3775,
       "startPk": 1,
-      "endKm": 3796,
+      "endKm": 3789,
       "endPk": 1,
       "coordinate": 3775000,
-      "end": 3796000,
-      "length": 21000,
+      "end": 3789000,
+      "length": 14000,
       "speed": 70,
-      "name": "Уст 70",
+      "wayNumber": 1,
+      "name": "Уст 70 П1",
       "appliesTo": "cargo",
       "targetSectors": [
         18
       ],
       "confidence": "speed-table-base",
       "raw": "3775 Лиан-Хальгасо г 70 60 40 18 15 - 3786",
-      "id": "bam-0031"
+      "id": "bam-0038"
+    },
+    {
+      "sourceCode": "BAM",
+      "sourceName": "БАМ",
+      "sourcePath": "/assets/docs/speeds/Скоростя БАМ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 2,
+      "startKm": 3775,
+      "startPk": 1,
+      "endKm": 3789,
+      "endPk": 1,
+      "coordinate": 3775000,
+      "end": 3789000,
+      "length": 14000,
+      "speed": 60,
+      "wayNumber": 2,
+      "name": "Уст 60 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        18
+      ],
+      "confidence": "speed-table-base",
+      "raw": "3775 Лиан-Хальгасо г 70 60 40 18 15 - 3786",
+      "id": "bam-0039"
+    },
+    {
+      "sourceCode": "BAM",
+      "sourceName": "БАМ",
+      "sourcePath": "/assets/docs/speeds/Скоростя БАМ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 2,
+      "startKm": 3789,
+      "startPk": 1,
+      "endKm": 3796,
+      "endPk": 1,
+      "coordinate": 3789000,
+      "end": 3796000,
+      "length": 7000,
+      "speed": 40,
+      "wayNumber": 1,
+      "name": "Уст 40 П1",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        18
+      ],
+      "confidence": "speed-table-base",
+      "raw": "3789 Хальгасо - 40 70 4-40 км/ч 6-40 км/ч 8- 40 км/ч 3-25 км/ч 5 путь - 15 9 11 3792 - 3789 пк 3-3790 пк 7-60 км/ч-1 путь станции 3790 пк 8-3794 пк 8-60 км/ч-1 путь перегона 3794 пк 9-3796 пк 1-70 км/ч-1 путь перегона",
+      "id": "bam-0040"
+    },
+    {
+      "sourceCode": "BAM",
+      "sourceName": "БАМ",
+      "sourcePath": "/assets/docs/speeds/Скоростя БАМ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 2,
+      "startKm": 3789,
+      "startPk": 1,
+      "endKm": 3796,
+      "endPk": 1,
+      "coordinate": 3789000,
+      "end": 3796000,
+      "length": 7000,
+      "speed": 70,
+      "wayNumber": 2,
+      "name": "Уст 70 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        18
+      ],
+      "confidence": "speed-table-base",
+      "raw": "3789 Хальгасо - 40 70 4-40 км/ч 6-40 км/ч 8- 40 км/ч 3-25 км/ч 5 путь - 15 9 11 3792 - 3789 пк 3-3790 пк 7-60 км/ч-1 путь станции 3790 пк 8-3794 пк 8-60 км/ч-1 путь перегона 3794 пк 9-3796 пк 1-70 км/ч-1 путь перегона",
+      "id": "bam-0041"
     },
     {
       "sourceCode": "BAM",
@@ -755,14 +1009,63 @@
       "end": 3799000,
       "length": 3000,
       "speed": 70,
-      "name": "Уст 70",
+      "wayNumber": 1,
+      "name": "Уст 70 П1",
       "appliesTo": "cargo",
       "targetSectors": [
         18
       ],
       "confidence": "speed-table-base",
       "raw": "3796 Путевой пост 3796 Силинка г 70 40 70 по стрелочному переводу № 1/1с - 4 6",
-      "id": "bam-0032"
+      "id": "bam-0042"
+    },
+    {
+      "sourceCode": "BAM",
+      "sourceName": "БАМ",
+      "sourcePath": "/assets/docs/speeds/Скоростя БАМ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 2,
+      "startKm": 3796,
+      "startPk": 1,
+      "endKm": 3799,
+      "endPk": 1,
+      "coordinate": 3796000,
+      "end": 3799000,
+      "length": 3000,
+      "speed": 40,
+      "wayNumber": 2,
+      "name": "Уст 40 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        18
+      ],
+      "confidence": "speed-table-base",
+      "raw": "3796 Путевой пост 3796 Силинка г 70 40 70 по стрелочному переводу № 1/1с - 4 6",
+      "id": "bam-0043"
+    },
+    {
+      "sourceCode": "BAM",
+      "sourceName": "БАМ",
+      "sourcePath": "/assets/docs/speeds/Скоростя БАМ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 2,
+      "startKm": 3799,
+      "startPk": 1,
+      "endKm": 3812,
+      "endPk": 1,
+      "coordinate": 3799000,
+      "end": 3812000,
+      "length": 13000,
+      "speed": 60,
+      "wayNumber": 1,
+      "name": "Уст 60 П1",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        18
+      ],
+      "confidence": "speed-table-base",
+      "raw": "3799 Силинка - Комсомольск 2 г 60 70 25 3 путь 40 13 16 3807 км 3804 км 3800 км 5 пк - 3800 км 6 пк - 60 км/ч (все)",
+      "id": "bam-0044"
     },
     {
       "sourceCode": "BAM",
@@ -778,14 +1081,15 @@
       "end": 3812000,
       "length": 13000,
       "speed": 70,
-      "name": "Уст 70",
+      "wayNumber": 2,
+      "name": "Уст 70 П2",
       "appliesTo": "cargo",
       "targetSectors": [
         18
       ],
       "confidence": "speed-table-base",
       "raw": "3799 Силинка - Комсомольск 2 г 60 70 25 3 путь 40 13 16 3807 км 3804 км 3800 км 5 пк - 3800 км 6 пк - 60 км/ч (все)",
-      "id": "bam-0033"
+      "id": "bam-0045"
     },
     {
       "sourceCode": "VSG",
@@ -807,7 +1111,7 @@
       ],
       "confidence": "high",
       "raw": "2 км 7 ПК - 3 км 10 ПК - 60 км/ч (все)",
-      "id": "vsg-0034"
+      "id": "vsg-0046"
     },
     {
       "sourceCode": "VSG",
@@ -829,7 +1133,7 @@
       ],
       "confidence": "high",
       "raw": "п 80 80 9 км 1 ПК - 9 км 1 ПК - 60 км/ч (все)",
-      "id": "vsg-0035"
+      "id": "vsg-0047"
     },
     {
       "sourceCode": "VSG",
@@ -851,7 +1155,7 @@
       ],
       "confidence": "high",
       "raw": "- - - - 9 км 2 ПК - 11 км 7 ПК - 60 км/ч (все)",
-      "id": "vsg-0036"
+      "id": "vsg-0048"
     },
     {
       "sourceCode": "VSG",
@@ -873,7 +1177,7 @@
       ],
       "confidence": "high",
       "raw": "17 1 км 1 пк - 1 км 6 пк 60 км/ч (все)",
-      "id": "vsg-0037"
+      "id": "vsg-0049"
     },
     {
       "sourceCode": "VSG",
@@ -895,7 +1199,7 @@
       ],
       "confidence": "high",
       "raw": "Пивань -Гайтер 40 46 35 5 км 6 пк - 28 км 8 пк 60 км/ч (все)",
-      "id": "vsg-0038"
+      "id": "vsg-0050"
     },
     {
       "sourceCode": "VSG",
@@ -917,7 +1221,7 @@
       ],
       "confidence": "high",
       "raw": "29 31 км 1 пк - 33 км 10 пк - 70 км/ч (все)",
-      "id": "vsg-0039"
+      "id": "vsg-0051"
     },
     {
       "sourceCode": "VSG",
@@ -939,7 +1243,7 @@
       ],
       "confidence": "low",
       "raw": "40 км 1 пк- 80 км/ч (все)",
-      "id": "vsg-0040"
+      "id": "vsg-0052"
     },
     {
       "sourceCode": "VSG",
@@ -961,7 +1265,7 @@
       ],
       "confidence": "medium",
       "raw": "г 70 70 70 60 42 пк 5-51 пк 1-40 км/ч (новострой)",
-      "id": "vsg-0041"
+      "id": "vsg-0053"
     },
     {
       "sourceCode": "VSG",
@@ -983,7 +1287,7 @@
       ],
       "confidence": "high",
       "raw": "48 км 6 пк - 48 км 10 пк 60 км/ч (груз)",
-      "id": "vsg-0042"
+      "id": "vsg-0054"
     },
     {
       "sourceCode": "VSG",
@@ -1005,7 +1309,7 @@
       ],
       "confidence": "high",
       "raw": "Картель - Селихин 50 км 1 пк - 50 км 6 пк 60 км/ч (груз)",
-      "id": "vsg-0043"
+      "id": "vsg-0055"
     },
     {
       "sourceCode": "VSG",
@@ -1027,7 +1331,7 @@
       ],
       "confidence": "high",
       "raw": "обр.мест 43 км 7 пк 50 сек 50 сек 50 сек 50 сек 50 км 7 пк - 50 км 9 пк -60 км/ч (все)",
-      "id": "vsg-0044"
+      "id": "vsg-0056"
     },
     {
       "sourceCode": "VSG",
@@ -1049,7 +1353,7 @@
       ],
       "confidence": "high",
       "raw": "(Ч/Н) 42 км 7 пк - 48 км 10 пк - 60 км/ч (все)",
-      "id": "vsg-0045"
+      "id": "vsg-0057"
     },
     {
       "sourceCode": "VSG",
@@ -1071,7 +1375,7 @@
       ],
       "confidence": "high",
       "raw": "50 км 7 пк - 50 км 10 пк - 60 км/ч (все)",
-      "id": "vsg-0046"
+      "id": "vsg-0058"
     },
     {
       "sourceCode": "VSG",
@@ -1093,7 +1397,7 @@
       ],
       "confidence": "low",
       "raw": "51 км 4 пк -40 км/ч (все)",
-      "id": "vsg-0047"
+      "id": "vsg-0059"
     },
     {
       "sourceCode": "VSG",
@@ -1115,7 +1419,7 @@
       ],
       "confidence": "high",
       "raw": "(Ч/Н) п 60 60 60 40 51 км 1 пк -55 км 10 пк -40 км/ч (все)",
-      "id": "vsg-0048"
+      "id": "vsg-0060"
     },
     {
       "sourceCode": "VSG",
@@ -1137,7 +1441,7 @@
       ],
       "confidence": "high",
       "raw": "Дополнительная проба 40 км/ч 64 км 9 пк - 66 км 5 - 50 км/ч (все)",
-      "id": "vsg-0049"
+      "id": "vsg-0061"
     },
     {
       "sourceCode": "VSG",
@@ -1159,7 +1463,7 @@
       ],
       "confidence": "high",
       "raw": "Нечет.70 км - 68 км 50 сек 50 сек 69 км 9 пк-71 км 9 пк-50 км/ч (все)",
-      "id": "vsg-0050"
+      "id": "vsg-0062"
     },
     {
       "sourceCode": "VSG",
@@ -1181,7 +1485,7 @@
       ],
       "confidence": "low",
       "raw": "81 км пк 7 пк- 81 км 8 пк- 40 км/ч (все)",
-      "id": "vsg-0051"
+      "id": "vsg-0063"
     },
     {
       "sourceCode": "VSG",
@@ -1203,7 +1507,7 @@
       ],
       "confidence": "high",
       "raw": "73,1 40 13 10 73 км 1 пк - 74 км 4 пк - 40 км/ч (все)",
-      "id": "vsg-0052"
+      "id": "vsg-0064"
     },
     {
       "sourceCode": "VSG",
@@ -1225,7 +1529,7 @@
       ],
       "confidence": "high",
       "raw": "п 60 80 60 60 75 км 4 пк- 75 км 6 пк - 40 км/ч (все)",
-      "id": "vsg-0053"
+      "id": "vsg-0065"
     },
     {
       "sourceCode": "VSG",
@@ -1247,7 +1551,7 @@
       ],
       "confidence": "high",
       "raw": "76 км 1 пк - 76 км 3 пк - 60 км/ч (все)",
-      "id": "vsg-0054"
+      "id": "vsg-0066"
     },
     {
       "sourceCode": "VSG",
@@ -1269,7 +1573,7 @@
       ],
       "confidence": "high",
       "raw": "80 км 8 пк - 81 км 8 пк - 40 км/ч (все)",
-      "id": "vsg-0055"
+      "id": "vsg-0067"
     },
     {
       "sourceCode": "VSG",
@@ -1291,7 +1595,7 @@
       ],
       "confidence": "high",
       "raw": "88 км 1 пк - 88 км 10 пк - 60 км/ч (все)",
-      "id": "vsg-0056"
+      "id": "vsg-0068"
     },
     {
       "sourceCode": "VSG",
@@ -1313,7 +1617,7 @@
       ],
       "confidence": "high",
       "raw": "40 км/ч 90 км 1 пк - 90 км 10 пк- 60 км/ч (все)",
-      "id": "vsg-0057"
+      "id": "vsg-0069"
     },
     {
       "sourceCode": "VSG",
@@ -1335,7 +1639,7 @@
       ],
       "confidence": "high",
       "raw": "91 км 1 пк - 92 км 10 пк - 60 км/ч (все)",
-      "id": "vsg-0058"
+      "id": "vsg-0070"
     },
     {
       "sourceCode": "VSG",
@@ -1357,7 +1661,7 @@
       ],
       "confidence": "high",
       "raw": "93 км 1 пк - 94 км 5 пк - 70 км/ч (пас)",
-      "id": "vsg-0059"
+      "id": "vsg-0071"
     },
     {
       "sourceCode": "VSG",
@@ -1379,7 +1683,7 @@
       ],
       "confidence": "high",
       "raw": "102 км 6 пк 100 км 5 пк 95 км 1 пк - 95 км 10 пк - 70 км/ч (все)",
-      "id": "vsg-0060"
+      "id": "vsg-0072"
     },
     {
       "sourceCode": "VSG",
@@ -1401,7 +1705,7 @@
       ],
       "confidence": "high",
       "raw": "96 км 1 пк - 96 км 4 пк - 40 км/ч (все)",
-      "id": "vsg-0061"
+      "id": "vsg-0073"
     },
     {
       "sourceCode": "VSG",
@@ -1423,7 +1727,7 @@
       ],
       "confidence": "high",
       "raw": "96 км 5 пк - 96 км 10 пк - 60 км/ч (все)",
-      "id": "vsg-0062"
+      "id": "vsg-0074"
     },
     {
       "sourceCode": "VSG",
@@ -1445,7 +1749,7 @@
       ],
       "confidence": "high",
       "raw": "г 97 км 1 пк - 104 км 2 пк - 60 км/ч (все)",
-      "id": "vsg-0063"
+      "id": "vsg-0075"
     },
     {
       "sourceCode": "VSG",
@@ -1467,7 +1771,7 @@
       ],
       "confidence": "high",
       "raw": "104 км 3 пк- 105 км 4 пк - 40 км/ч (все)",
-      "id": "vsg-0064"
+      "id": "vsg-0076"
     },
     {
       "sourceCode": "VSG",
@@ -1489,7 +1793,7 @@
       ],
       "confidence": "high",
       "raw": "105 км 5 пк - 109 км 10 пк - 60 км/ч (все)",
-      "id": "vsg-0065"
+      "id": "vsg-0077"
     },
     {
       "sourceCode": "VSG",
@@ -1511,7 +1815,7 @@
       ],
       "confidence": "high",
       "raw": "97 км 1 пк - 100 км 6 пк - 40 км/ч (все)",
-      "id": "vsg-0066"
+      "id": "vsg-0078"
     },
     {
       "sourceCode": "VSG",
@@ -1533,7 +1837,7 @@
       ],
       "confidence": "high",
       "raw": "п 80 80 70 70 97 км 1 пк - 97 км 7 пк - 60 км/ч (все)",
-      "id": "vsg-0067"
+      "id": "vsg-0079"
     },
     {
       "sourceCode": "VSG",
@@ -1555,7 +1859,7 @@
       ],
       "confidence": "high",
       "raw": "100 км 7 пк - 104 км 2 пк - 60 км/ч (все)",
-      "id": "vsg-0068"
+      "id": "vsg-0080"
     },
     {
       "sourceCode": "VSG",
@@ -1577,7 +1881,7 @@
       ],
       "confidence": "high",
       "raw": "103 км 6 пк - 103 км 7 пк - 40 км/ч (все)",
-      "id": "vsg-0069"
+      "id": "vsg-0081"
     },
     {
       "sourceCode": "VSG",
@@ -1599,7 +1903,7 @@
       ],
       "confidence": "high",
       "raw": "105 км 8 пк - 111 км 9 пк - 60 км/ч (все)",
-      "id": "vsg-0070"
+      "id": "vsg-0082"
     },
     {
       "sourceCode": "VSG",
@@ -1621,7 +1925,7 @@
       ],
       "confidence": "high",
       "raw": "П Гурское - Почепта г 60 60 60 60 4 - 40 2/4;7/5;11/9;10/16 -40 км/ч Для сборных, пассаж 122 км 3 пк 112 км 1 пк - 112 км 3 пк- 40 км/ч (все)",
-      "id": "vsg-0071"
+      "id": "vsg-0083"
     },
     {
       "sourceCode": "VSG",
@@ -1643,7 +1947,7 @@
       ],
       "confidence": "high",
       "raw": "п 60 60 60 60 850м 550м 113 км 8 пк - 114 км 2 пк- 40 км/ч (все)",
-      "id": "vsg-0072"
+      "id": "vsg-0084"
     },
     {
       "sourceCode": "VSG",
@@ -1665,7 +1969,7 @@
       ],
       "confidence": "high",
       "raw": "124 г 124 км 4 пк- 124 км 9 пк - 40 км/ч (все)",
-      "id": "vsg-0073"
+      "id": "vsg-0085"
     },
     {
       "sourceCode": "VSG",
@@ -1687,7 +1991,7 @@
       ],
       "confidence": "high",
       "raw": "П Сагджему-Уктур 40 по прямому направления 8 7 138 км 1 пк - 138 км 1 пк - 60 км/ч (все)",
-      "id": "vsg-0074"
+      "id": "vsg-0086"
     },
     {
       "sourceCode": "VSG",
@@ -1709,7 +2013,7 @@
       ],
       "confidence": "high",
       "raw": "147 км 1 ПК - 148 км 4 ПК - 40 км/ч (все)",
-      "id": "vsg-0075"
+      "id": "vsg-0087"
     },
     {
       "sourceCode": "VSG",
@@ -1731,7 +2035,7 @@
       ],
       "confidence": "medium",
       "raw": "148 пк 5-149 пк 10- 70 км/ч (все)",
-      "id": "vsg-0076"
+      "id": "vsg-0088"
     },
     {
       "sourceCode": "VSG",
@@ -1753,7 +2057,7 @@
       ],
       "confidence": "high",
       "raw": "60 80 60 60 151 км 1 пк - 152 км 3 пк -40 км/ч (все)",
-      "id": "vsg-0077"
+      "id": "vsg-0089"
     },
     {
       "sourceCode": "VSG",
@@ -1775,7 +2079,7 @@
       ],
       "confidence": "high",
       "raw": "153 км 4 пк - 153 км 5 пк - 40 км/ч (все",
-      "id": "vsg-0078"
+      "id": "vsg-0090"
     },
     {
       "sourceCode": "VSG",
@@ -1797,7 +2101,7 @@
       ],
       "confidence": "medium",
       "raw": "138 пк 4-139 пк 10 -60 км/ч (все)",
-      "id": "vsg-0079"
+      "id": "vsg-0091"
     },
     {
       "sourceCode": "VSG",
@@ -1819,7 +2123,7 @@
       ],
       "confidence": "high",
       "raw": "139.3 обр.мест 140 км 5 пк 40 (тупик) - 15 км/ч бывшая 15 15 60 км/ч 60 км/ч 140 км 3 пк - 141 км 6 пк - 80 км/ч (все)",
-      "id": "vsg-0080"
+      "id": "vsg-0092"
     },
     {
       "sourceCode": "VSG",
@@ -1841,7 +2145,7 @@
       ],
       "confidence": "high",
       "raw": "обр.мест 146 км 7 пк станция аксака 800м 500м 141 км 7 пк - 145 км 6 пк - 60 км/ч (все)",
-      "id": "vsg-0081"
+      "id": "vsg-0093"
     },
     {
       "sourceCode": "VSG",
@@ -1863,7 +2167,7 @@
       ],
       "confidence": "high",
       "raw": "147 км 1 ПК - 148 км 4 ПК - 60 км/ч (все)",
-      "id": "vsg-0082"
+      "id": "vsg-0094"
     },
     {
       "sourceCode": "VSG",
@@ -1885,7 +2189,7 @@
       ],
       "confidence": "medium",
       "raw": "150 пк 10 - 153 пк 5 - 50 км/ч (все)",
-      "id": "vsg-0083"
+      "id": "vsg-0095"
     },
     {
       "sourceCode": "VSG",
@@ -1907,7 +2211,7 @@
       ],
       "confidence": "high",
       "raw": "153 км 6 пк - 155 км 8 пк - 40 км/ч (все)",
-      "id": "vsg-0084"
+      "id": "vsg-0096"
     },
     {
       "sourceCode": "VSG",
@@ -1929,7 +2233,7 @@
       ],
       "confidence": "high",
       "raw": "155 км 9 пк- 158 км 9 пк - 60 км/ч (все)",
-      "id": "vsg-0085"
+      "id": "vsg-0097"
     },
     {
       "sourceCode": "VSG",
@@ -1951,7 +2255,7 @@
       ],
       "confidence": "high",
       "raw": "160 км 6 пк - 161 км 7 пк- 60 км/ч (все)",
-      "id": "vsg-0086"
+      "id": "vsg-0098"
     },
     {
       "sourceCode": "VSG",
@@ -1973,7 +2277,7 @@
       ],
       "confidence": "high",
       "raw": "г 70 70 60 60 163 км 5 пк - 172 км 10 пк - 60 км/ч (все)",
-      "id": "vsg-0087"
+      "id": "vsg-0099"
     },
     {
       "sourceCode": "VSG",
@@ -1995,7 +2299,7 @@
       ],
       "confidence": "high",
       "raw": "Кенай - Оунэ 40 км/ч № 10-12, 7-5, 3-1, 2-4 10/12 - 173 км 5 пк- 174 км 9 пк - 60 км/ч (все)",
-      "id": "vsg-0088"
+      "id": "vsg-0100"
     },
     {
       "sourceCode": "VSG",
@@ -2017,7 +2321,7 @@
       ],
       "confidence": "high",
       "raw": "обр.мест 166 км 4 пк 6 путь -25 40 км/ч 37 21 177 км 1 пк - 181 км 8 пк - 60 км/ч (все)",
-      "id": "vsg-0089"
+      "id": "vsg-0101"
     },
     {
       "sourceCode": "VSG",
@@ -2039,7 +2343,7 @@
       ],
       "confidence": "high",
       "raw": "14,15,17 - 25 км/ч 161 км 8 пк- 161 км 10 пк - 40 км/ч (все)",
-      "id": "vsg-0090"
+      "id": "vsg-0102"
     },
     {
       "sourceCode": "VSG",
@@ -2061,7 +2365,7 @@
       ],
       "confidence": "high",
       "raw": "163 км 4 пк- 177 км 3 пк - 60 км/ч (все)",
-      "id": "vsg-0091"
+      "id": "vsg-0103"
     },
     {
       "sourceCode": "VSG",
@@ -2083,7 +2387,7 @@
       ],
       "confidence": "high",
       "raw": "177 км 10 пк- 181 км 6 пк - 60 км/ч (все)",
-      "id": "vsg-0092"
+      "id": "vsg-0104"
     },
     {
       "sourceCode": "VSG",
@@ -2105,7 +2409,7 @@
       ],
       "confidence": "high",
       "raw": "№107-105, №103-101 181 км 9 пк - 183 км 10 пк - 60 км/ч (все)",
-      "id": "vsg-0093"
+      "id": "vsg-0105"
     },
     {
       "sourceCode": "VSG",
@@ -2127,7 +2431,7 @@
       ],
       "confidence": "high",
       "raw": "г 50 25 195 км 4 пк - 195 км 5 пк - 50 км/ч (все)",
-      "id": "vsg-0094"
+      "id": "vsg-0106"
     },
     {
       "sourceCode": "VSG",
@@ -2149,7 +2453,7 @@
       ],
       "confidence": "high",
       "raw": "Откосная - 25 196 км 3 пк - 196 км 6 пк - 50 км/ч (все)",
-      "id": "vsg-0095"
+      "id": "vsg-0107"
     },
     {
       "sourceCode": "VSG",
@@ -2172,7 +2476,7 @@
       ],
       "confidence": "high",
       "raw": "205 км 1 пк - 206 км 1 пк- 209 км 3 пк - 40 км/ч (чет, все)",
-      "id": "vsg-0096"
+      "id": "vsg-0108"
     },
     {
       "sourceCode": "VSG",
@@ -2194,7 +2498,7 @@
       ],
       "confidence": "high",
       "raw": "209.9 25 12 16 211 км 1 пк - 211 км 8 пк - 60 км/ч (все)",
-      "id": "vsg-0097"
+      "id": "vsg-0109"
     },
     {
       "sourceCode": "VSG",
@@ -2216,7 +2520,7 @@
       ],
       "confidence": "high",
       "raw": "п 70 50 215 км 5 пк - 215 км 9 пк - 60 км/ч (все)",
-      "id": "vsg-0098"
+      "id": "vsg-0110"
     },
     {
       "sourceCode": "VSG",
@@ -2238,7 +2542,7 @@
       ],
       "confidence": "high",
       "raw": "192 км 6 пк - 193 км 2 пк - 60 км/ч(все)",
-      "id": "vsg-0099"
+      "id": "vsg-0111"
     },
     {
       "sourceCode": "VSG",
@@ -2260,7 +2564,7 @@
       ],
       "confidence": "high",
       "raw": "- 197 км 6 пк 193 км 5 пк - 194 км 1 пк - 60 км/ч(все)",
-      "id": "vsg-0100"
+      "id": "vsg-0112"
     },
     {
       "sourceCode": "VSG",
@@ -2282,7 +2586,7 @@
       ],
       "confidence": "high",
       "raw": "г 60 70 60 60 194 км 6 пк - 195 км 6 пк - 60 км/ч(все)",
-      "id": "vsg-0101"
+      "id": "vsg-0113"
     },
     {
       "sourceCode": "VSG",
@@ -2304,7 +2608,7 @@
       ],
       "confidence": "high",
       "raw": "197 км 2 пк - 197 км 2 пк - 60 км/ч(все)",
-      "id": "vsg-0102"
+      "id": "vsg-0114"
     },
     {
       "sourceCode": "VSG",
@@ -2326,7 +2630,7 @@
       ],
       "confidence": "high",
       "raw": "П - - 40 км/ч 40 км/ч 190 км 9 пк - 190 км 10 пк - 40 км/ч (все)",
-      "id": "vsg-0103"
+      "id": "vsg-0115"
     },
     {
       "sourceCode": "VSG",
@@ -2348,7 +2652,7 @@
       ],
       "confidence": "high",
       "raw": "(Ч) 1200м 800м 193 км 9 пк - 196 км 7 пк - 60 км/ч (все)",
-      "id": "vsg-0104"
+      "id": "vsg-0116"
     },
     {
       "sourceCode": "VSG",
@@ -2370,7 +2674,7 @@
       ],
       "confidence": "medium",
       "raw": "197 пк 8 - 198 пк 3-40 км/ч (все)",
-      "id": "vsg-0105"
+      "id": "vsg-0117"
     },
     {
       "sourceCode": "VSG",
@@ -2392,7 +2696,7 @@
       ],
       "confidence": "high",
       "raw": "п 80 60 60 15 км/ч 197 км 8 пк - 198 км 4 пк-40 км/ч (все)",
-      "id": "vsg-0106"
+      "id": "vsg-0118"
     },
     {
       "sourceCode": "VSG",
@@ -2415,7 +2719,7 @@
       ],
       "confidence": "high",
       "raw": "205 км 6 пк - 208 км 7 пк - 40 км/ч (все)",
-      "id": "vsg-0107"
+      "id": "vsg-0119"
     },
     {
       "sourceCode": "VSG",
@@ -2435,7 +2739,7 @@
       "targetSectors": [],
       "confidence": "high",
       "raw": "(Ч/Н) п 60 60 40 60 208 км 3 пк - 208 км 3 пк - 40 км/ч (все)",
-      "id": "vsg-0108"
+      "id": "vsg-0120"
     },
     {
       "sourceCode": "VSG",
@@ -2457,7 +2761,7 @@
       ],
       "confidence": "high",
       "raw": "г 5;7; 9;11 - по съездам №2-4, №10-12, - - 218 км 9 пк - 220 км 8 пк - 40 км/ч (все)",
-      "id": "vsg-0109"
+      "id": "vsg-0121"
     },
     {
       "sourceCode": "VSG",
@@ -2467,12 +2771,13 @@
       "page": 2,
       "startKm": 2,
       "startPk": 1,
-      "endKm": 9,
+      "endKm": 3,
       "endPk": 1,
       "coordinate": 2000,
-      "end": 9000,
-      "length": 7000,
+      "end": 3000,
+      "length": 1000,
       "speed": 70,
+      "wayNumber": 0,
       "name": "Уст 70",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -2480,7 +2785,31 @@
       ],
       "confidence": "speed-table-base",
       "raw": "2 Новый мир - Амурский г 70 70 40 40 13 11 - - 1 путь",
-      "id": "vsg-0110"
+      "id": "vsg-0122"
+    },
+    {
+      "sourceCode": "VSG",
+      "sourceName": "ВСГ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВСГ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 3,
+      "startKm": 3,
+      "startPk": 1,
+      "endKm": 9,
+      "endPk": 1,
+      "coordinate": 3000,
+      "end": 9000,
+      "length": 6000,
+      "speed": 60,
+      "wayNumber": 0,
+      "name": "Уст 60",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        12
+      ],
+      "confidence": "speed-table-base",
+      "raw": "П (Н/Ч) 3,4,6 60 ля сборных, пасса 122 км 3 пк 112 км 1 пк - 112 км 3 пк- 40 км/ч (все)",
+      "id": "vsg-0123"
     },
     {
       "sourceCode": "VSG",
@@ -2496,6 +2825,7 @@
       "end": 12000,
       "length": 3000,
       "speed": 80,
+      "wayNumber": 0,
       "name": "Уст 80",
       "appliesTo": "passenger",
       "targetSectors": [
@@ -2503,7 +2833,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "п 80 80 9 км 1 ПК - 9 км 1 ПК - 60 км/ч (все)",
-      "id": "vsg-0111"
+      "id": "vsg-0124"
     },
     {
       "sourceCode": "VSG",
@@ -2519,6 +2849,7 @@
       "end": 17000,
       "length": 5000,
       "speed": 60,
+      "wayNumber": 0,
       "name": "Уст 60",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -2526,7 +2857,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "12.7 Амурский -Пивань обр.мест 14 км 10 пк г 60 60 40 5 5 14 км 9 пк -",
-      "id": "vsg-0112"
+      "id": "vsg-0125"
     },
     {
       "sourceCode": "VSG",
@@ -2542,6 +2873,7 @@
       "end": 29000,
       "length": 12000,
       "speed": 60,
+      "wayNumber": 0,
       "name": "Уст 60",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -2549,7 +2881,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "17 Пивань -Гайтер г 60 60 60 60 40 46 35 16 км 3 пк 12 км 1 пк 1 путь перегона",
-      "id": "vsg-0113"
+      "id": "vsg-0126"
     },
     {
       "sourceCode": "VSG",
@@ -2559,20 +2891,93 @@
       "page": 2,
       "startKm": 29,
       "startPk": 1,
-      "endKm": 42,
+      "endKm": 40,
       "endPk": 1,
       "coordinate": 29000,
-      "end": 42000,
-      "length": 13000,
+      "end": 40000,
+      "length": 11000,
       "speed": 80,
-      "name": "Уст 80",
+      "wayNumber": 1,
+      "name": "Уст 80 П1",
       "appliesTo": "cargo",
       "targetSectors": [
         13
       ],
       "confidence": "speed-table-base",
       "raw": "29 Гайтер - Картель обр.мест 37 км 4 пк обр.мест 39 км 10 пк г 80 60 60 60 40 14 13 35 км 8 пк 35 км 9 пк 1 путь перегона",
-      "id": "vsg-0114"
+      "id": "vsg-0127"
+    },
+    {
+      "sourceCode": "VSG",
+      "sourceName": "ВСГ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВСГ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 2,
+      "startKm": 29,
+      "startPk": 1,
+      "endKm": 40,
+      "endPk": 1,
+      "coordinate": 29000,
+      "end": 40000,
+      "length": 11000,
+      "speed": 60,
+      "wayNumber": 2,
+      "name": "Уст 60 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        13
+      ],
+      "confidence": "speed-table-base",
+      "raw": "29 Гайтер - Картель обр.мест 37 км 4 пк обр.мест 39 км 10 пк г 80 60 60 60 40 14 13 35 км 8 пк 35 км 9 пк 1 путь перегона",
+      "id": "vsg-0128"
+    },
+    {
+      "sourceCode": "VSG",
+      "sourceName": "ВСГ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВСГ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 7,
+      "startKm": 40,
+      "startPk": 1,
+      "endKm": 42,
+      "endPk": 1,
+      "coordinate": 40000,
+      "end": 42000,
+      "length": 2000,
+      "speed": 130,
+      "wayNumber": 1,
+      "name": "Уст 130 П1",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        13
+      ],
+      "confidence": "speed-table-base",
+      "raw": "40 118 124 130 137 144 153 163 174 186",
+      "id": "vsg-0129"
+    },
+    {
+      "sourceCode": "VSG",
+      "sourceName": "ВСГ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВСГ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 7,
+      "startKm": 40,
+      "startPk": 1,
+      "endKm": 42,
+      "endPk": 1,
+      "coordinate": 40000,
+      "end": 42000,
+      "length": 2000,
+      "speed": 137,
+      "wayNumber": 2,
+      "name": "Уст 137 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        13
+      ],
+      "confidence": "speed-table-base",
+      "raw": "40 118 124 130 137 144 153 163 174 186",
+      "id": "vsg-0130"
     },
     {
       "sourceCode": "VSG",
@@ -2588,6 +2993,7 @@
       "end": 51000,
       "length": 9000,
       "speed": 70,
+      "wayNumber": 0,
       "name": "Уст 70",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -2595,7 +3001,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "42 Картель - Селихин обр.мест 43 км 7 пк г 70 70 70 60 40 12 14 45 км 4 пк 49 км 10 пк 1 путь перегона",
-      "id": "vsg-0115"
+      "id": "vsg-0131"
     },
     {
       "sourceCode": "VSG",
@@ -2611,6 +3017,7 @@
       "end": 52000,
       "length": 1000,
       "speed": 60,
+      "wayNumber": 0,
       "name": "Уст 60",
       "appliesTo": "passenger",
       "targetSectors": [
@@ -2618,7 +3025,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "(Ч/Н) п 60 60 60 40 51 км 1 пк -55 км 10 пк -40 км/ч (все)",
-      "id": "vsg-0116"
+      "id": "vsg-0132"
     },
     {
       "sourceCode": "VSG",
@@ -2628,12 +3035,13 @@
       "page": 2,
       "startKm": 52,
       "startPk": 1,
-      "endKm": 73,
+      "endKm": 62,
       "endPk": 1,
       "coordinate": 52000,
-      "end": 73000,
-      "length": 21000,
+      "end": 62000,
+      "length": 10000,
       "speed": 60,
+      "wayNumber": 0,
       "name": "Уст 60",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -2641,7 +3049,31 @@
       ],
       "confidence": "speed-table-base",
       "raw": "52 Селихин - Эльдиган обр.мест 47 км 4 пк г 60 60 60 40 40 40 16 14 I, IА / 1 путь перегона",
-      "id": "vsg-0117"
+      "id": "vsg-0133"
+    },
+    {
+      "sourceCode": "VSG",
+      "sourceName": "ВСГ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВСГ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 3,
+      "startKm": 62,
+      "startPk": 1,
+      "endKm": 73,
+      "endPk": 1,
+      "coordinate": 62000,
+      "end": 73000,
+      "length": 11000,
+      "speed": 60,
+      "wayNumber": 0,
+      "name": "Уст 60",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        13
+      ],
+      "confidence": "speed-table-base",
+      "raw": "62 60 60 60 60 40 №6 (тупик) - 25 км/ч 40 км/ч 20 12 - 70 км 8 пк I / 1 путь перегона",
+      "id": "vsg-0134"
     },
     {
       "sourceCode": "VSG",
@@ -2651,20 +3083,69 @@
       "page": 3,
       "startKm": 73,
       "startPk": 1,
-      "endKm": 95,
+      "endKm": 82,
       "endPk": 1,
       "coordinate": 73000,
-      "end": 95000,
-      "length": 22000,
-      "speed": 70,
-      "name": "Уст 70",
+      "end": 82000,
+      "length": 9000,
+      "speed": 60,
+      "wayNumber": 1,
+      "name": "Уст 60 П1",
       "appliesTo": "cargo",
       "targetSectors": [
         13
       ],
       "confidence": "speed-table-base",
       "raw": "73,1 Тудур - Пони обр.мест 81 км 5 пк г 60 70 60 60 40 13 10 - - I, IА /1 путь перегона",
-      "id": "vsg-0118"
+      "id": "vsg-0135"
+    },
+    {
+      "sourceCode": "VSG",
+      "sourceName": "ВСГ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВСГ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 3,
+      "startKm": 73,
+      "startPk": 1,
+      "endKm": 82,
+      "endPk": 1,
+      "coordinate": 73000,
+      "end": 82000,
+      "length": 9000,
+      "speed": 70,
+      "wayNumber": 2,
+      "name": "Уст 70 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        13
+      ],
+      "confidence": "speed-table-base",
+      "raw": "73,1 Тудур - Пони обр.мест 81 км 5 пк г 60 70 60 60 40 13 10 - - I, IА /1 путь перегона",
+      "id": "vsg-0136"
+    },
+    {
+      "sourceCode": "VSG",
+      "sourceName": "ВСГ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВСГ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 3,
+      "startKm": 82,
+      "startPk": 1,
+      "endKm": 95,
+      "endPk": 1,
+      "coordinate": 82000,
+      "end": 95000,
+      "length": 13000,
+      "speed": 60,
+      "wayNumber": 0,
+      "name": "Уст 60",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        13
+      ],
+      "confidence": "speed-table-base",
+      "raw": "82 60 60 60 40 40 40 км/ч НР18 СУав (пути не общего) - 25 км/ч. 21 18 89 км 4 пк 86 км 6 пк I / 1 путь перегона",
+      "id": "vsg-0137"
     },
     {
       "sourceCode": "VSG",
@@ -2680,6 +3161,7 @@
       "end": 97000,
       "length": 2000,
       "speed": 80,
+      "wayNumber": 0,
       "name": "Уст 80",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -2687,7 +3169,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "95 Кун -Гурское обр.мест 99 км 6 пк обр.мест 107 км 6 пк г 80 80 60 60 40 22 24 102 км 6 пк I / 1 путь перегона",
-      "id": "vsg-0119"
+      "id": "vsg-0138"
     },
     {
       "sourceCode": "VSG",
@@ -2697,12 +3179,13 @@
       "page": 3,
       "startKm": 97,
       "startPk": 1,
-      "endKm": 112,
+      "endKm": 100,
       "endPk": 1,
       "coordinate": 97000,
-      "end": 112000,
-      "length": 15000,
+      "end": 100000,
+      "length": 3000,
       "speed": 80,
+      "wayNumber": 0,
       "name": "Уст 80",
       "appliesTo": "passenger",
       "targetSectors": [
@@ -2710,7 +3193,31 @@
       ],
       "confidence": "speed-table-base",
       "raw": "п 80 80 70 70 97 км 1 пк - 97 км 7 пк - 60 км/ч (все)",
-      "id": "vsg-0120"
+      "id": "vsg-0139"
+    },
+    {
+      "sourceCode": "VSG",
+      "sourceName": "ВСГ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВСГ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 6,
+      "startKm": 100,
+      "startPk": 1,
+      "endKm": 112,
+      "endPk": 1,
+      "coordinate": 100000,
+      "end": 112000,
+      "length": 12000,
+      "speed": 100,
+      "wayNumber": 0,
+      "name": "Уст 100",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        13
+      ],
+      "confidence": "speed-table-base",
+      "raw": "Менее 100 осей Не менее 4 секунд Менее 100 осей Не менее 4 секунд",
+      "id": "vsg-0140"
     },
     {
       "sourceCode": "VSG",
@@ -2726,6 +3233,7 @@
       "end": 113700,
       "length": 1700,
       "speed": 60,
+      "wayNumber": 0,
       "name": "Уст 60",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -2733,7 +3241,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "112.7 Гурское - Почепта обр.мест 122 км 9 пк г 60 60 60 3 - 25 4 - 40 6 - 40 2/4;7/5;11/9;10/16 -40 км/ч 16 17 Д 117 км 10 пк ж 1 путь перегона",
-      "id": "vsg-0121"
+      "id": "vsg-0141"
     },
     {
       "sourceCode": "VSG",
@@ -2749,6 +3257,7 @@
       "end": 124000,
       "length": 10300,
       "speed": 60,
+      "wayNumber": 0,
       "name": "Уст 60",
       "appliesTo": "passenger",
       "targetSectors": [
@@ -2756,7 +3265,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "п 60 60 60 60 850м 550м 113 км 8 пк - 114 км 2 пк- 40 км/ч (все)",
-      "id": "vsg-0122"
+      "id": "vsg-0142"
     },
     {
       "sourceCode": "VSG",
@@ -2772,14 +3281,39 @@
       "end": 130000,
       "length": 6000,
       "speed": 80,
-      "name": "Уст 80",
+      "wayNumber": 1,
+      "name": "Уст 80 П1",
       "appliesTo": "cargo",
       "targetSectors": [
         13
       ],
       "confidence": "speed-table-base",
       "raw": "124 Почепта-Сагджему г 80 60 40 40 по съезду №2-4, 6-8, 3-1 - 40 м/ч 8 6 - 127 км 1 пк 1 путь перегона",
-      "id": "vsg-0123"
+      "id": "vsg-0143"
+    },
+    {
+      "sourceCode": "VSG",
+      "sourceName": "ВСГ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВСГ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 4,
+      "startKm": 124,
+      "startPk": 1,
+      "endKm": 130,
+      "endPk": 1,
+      "coordinate": 124000,
+      "end": 130000,
+      "length": 6000,
+      "speed": 60,
+      "wayNumber": 2,
+      "name": "Уст 60 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        13
+      ],
+      "confidence": "speed-table-base",
+      "raw": "124 Почепта-Сагджему г 80 60 40 40 по съезду №2-4, 6-8, 3-1 - 40 м/ч 8 6 - 127 км 1 пк 1 путь перегона",
+      "id": "vsg-0144"
     },
     {
       "sourceCode": "VSG",
@@ -2795,6 +3329,7 @@
       "end": 139000,
       "length": 9000,
       "speed": 80,
+      "wayNumber": 0,
       "name": "Уст 80",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -2802,7 +3337,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "130.2 Сагджему-Уктур г 80 80 40 СТР НР № 1,2,5,8 - 60 км/ч по прямому направления 8 7 - 134 км 5 пк 138 км 1 пк - 138 км 1 пк - 60 км/ч (все)",
-      "id": "vsg-0124"
+      "id": "vsg-0145"
     },
     {
       "sourceCode": "VSG",
@@ -2818,14 +3353,39 @@
       "end": 162000,
       "length": 23000,
       "speed": 80,
-      "name": "Уст 80",
+      "wayNumber": 1,
+      "name": "Уст 80 П1",
       "appliesTo": "cargo",
       "targetSectors": [
         13
       ],
       "confidence": "speed-table-base",
       "raw": "139.3 Уктур - Кенай обр.мест 140 км 5 пк обр.мест 146 км 7 пк г 80 60 60 40 40 по пути № 4 (тупик) - 15 км/ч бывшая станция аксака 15 - 144 км 5 пк 1 путь перегона",
-      "id": "vsg-0125"
+      "id": "vsg-0146"
+    },
+    {
+      "sourceCode": "VSG",
+      "sourceName": "ВСГ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВСГ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 4,
+      "startKm": 139,
+      "startPk": 1,
+      "endKm": 162,
+      "endPk": 1,
+      "coordinate": 139000,
+      "end": 162000,
+      "length": 23000,
+      "speed": 60,
+      "wayNumber": 2,
+      "name": "Уст 60 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        13
+      ],
+      "confidence": "speed-table-base",
+      "raw": "139.3 Уктур - Кенай обр.мест 140 км 5 пк обр.мест 146 км 7 пк г 80 60 60 40 40 по пути № 4 (тупик) - 15 км/ч бывшая станция аксака 15 - 144 км 5 пк 1 путь перегона",
+      "id": "vsg-0147"
     },
     {
       "sourceCode": "VSG",
@@ -2841,6 +3401,7 @@
       "end": 181000,
       "length": 19000,
       "speed": 70,
+      "wayNumber": 0,
       "name": "Уст 70",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -2848,30 +3409,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "162.4 Кенай - Оунэ обр.мест 166 км 4 пк обр.мест 170 км 3 пк г 70 70 60 60 40 км/ч 6 путь -25 По съездам № 10-12, 7-5, 3-1, 2-4 10/12 - 40 км/ч по стрелочным переводам № 14,15,17 - 25 км/ч 37 21 - 168 км 5 пк 1 главный путь перегона",
-      "id": "vsg-0126"
-    },
-    {
-      "sourceCode": "VSG",
-      "sourceName": "ВСГ",
-      "sourcePath": "/assets/docs/speeds/Скоростя ВСГ Парк Д Приказ № 161.pdf",
-      "sourceUpdatedAt": "2026-04-08",
-      "page": 4,
-      "startKm": 181,
-      "startPk": 1,
-      "endKm": 188,
-      "endPk": 1,
-      "coordinate": 181000,
-      "end": 188000,
-      "length": 7000,
-      "speed": 70,
-      "name": "Уст 70",
-      "appliesTo": "cargo",
-      "targetSectors": [
-        13
-      ],
-      "confidence": "speed-table-base",
-      "raw": "181.8 Оунэ - Косграмбо г 60 70 По съездам №14-16, №22- 24, №18-20, №7-5, №1-3, №107-105, №103-101 40 км/ч по съездам № 26-28 - 25 км/ч 7 7 - 186 км 9 пк 181 км 9 пк - 183 км 10 пк - 60 км/ч (все) 184 км 1 пк - 184 км 4 пк - 60 (гр.)70 (пас) 185 км 1 пк - 187 к",
-      "id": "vsg-0127"
+      "id": "vsg-0148"
     },
     {
       "sourceCode": "VSG",
@@ -2887,6 +3425,7 @@
       "end": 188000,
       "length": 7000,
       "speed": 60,
+      "wayNumber": 0,
       "name": "Уст 60",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -2894,7 +3433,31 @@
       ],
       "confidence": "speed-table-base",
       "raw": "181.8 Оунэ - Новый Кузнецовский г 60 60 60 60 40 4 путь- 25 км/ч Путь 6 и 7-25 км/ч (тупик) 19 11 - 189 км 1 пк 1 главный путь",
-      "id": "vsg-0128"
+      "id": "vsg-0149"
+    },
+    {
+      "sourceCode": "VSG",
+      "sourceName": "ВСГ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВСГ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 4,
+      "startKm": 181,
+      "startPk": 1,
+      "endKm": 188,
+      "endPk": 1,
+      "coordinate": 181000,
+      "end": 188000,
+      "length": 7000,
+      "speed": 70,
+      "wayNumber": 2,
+      "name": "Уст 70 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        13
+      ],
+      "confidence": "speed-table-base",
+      "raw": "181.8 Оунэ - Косграмбо г 60 70 По съездам №14-16, №22- 24, №18-20, №7-5, №1-3, №107-105, №103-101 40 км/ч по съездам № 26-28 - 25 км/ч 7 7 - 186 км 9 пк 181 км 9 пк - 183 км 10 пк - 60 км/ч (все) 184 км 1 пк - 184 км 4 пк - 60 (гр.)70 (пас) 185 км 1 пк - 187 к",
+      "id": "vsg-0150"
     },
     {
       "sourceCode": "VSG",
@@ -2910,6 +3473,7 @@
       "end": 190000,
       "length": 2000,
       "speed": 60,
+      "wayNumber": 0,
       "name": "Уст 60",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -2917,7 +3481,31 @@
       ],
       "confidence": "speed-table-base",
       "raw": "188.3 Косграмбо - Откосная г 60 60 25 2 - 25 км/ч 3 путь 40 км/ч По стрелочным переводам № 2, 3, 6 - 25 км/ч По стрелочным переводам № 1,4 - 40 км/ч 10 9 - 194 км 10 пк 194 пк.1-195 пк.3-50 км/ч (все)",
-      "id": "vsg-0129"
+      "id": "vsg-0151"
+    },
+    {
+      "sourceCode": "VSG",
+      "sourceName": "ВСГ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВСГ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 5,
+      "startKm": 190,
+      "startPk": 1,
+      "endKm": 195,
+      "endPk": 1,
+      "coordinate": 190000,
+      "end": 195000,
+      "length": 5000,
+      "speed": 60,
+      "wayNumber": 1,
+      "name": "Уст 60 П1",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        14
+      ],
+      "confidence": "speed-table-base",
+      "raw": "190.6 Новый Кузнецовский - Тоннель г 60 70 60 60 40 20 10 - 1 главный путь",
+      "id": "vsg-0152"
     },
     {
       "sourceCode": "VSG",
@@ -2933,14 +3521,15 @@
       "end": 195000,
       "length": 5000,
       "speed": 70,
-      "name": "Уст 70",
+      "wayNumber": 2,
+      "name": "Уст 70 П2",
       "appliesTo": "cargo",
       "targetSectors": [
         14
       ],
       "confidence": "speed-table-base",
       "raw": "190.6 Новый Кузнецовский - Тоннель г 60 70 60 60 40 20 10 - 1 главный путь",
-      "id": "vsg-0130"
+      "id": "vsg-0153"
     },
     {
       "sourceCode": "VSG",
@@ -2956,6 +3545,7 @@
       "end": 196000,
       "length": 1000,
       "speed": 50,
+      "wayNumber": 0,
       "name": "Уст 50",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -2963,7 +3553,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "195.1 Откосная - Кузнецовский г 50 50 25 25 3 - 40 км/ч по стрелочным переводам № 2,3 по стрелочным переводам № 1,6 40 км/ч 15 16 - 203 км 3 пк 195 км 4 пк - 195 км 5 пк - 50 км/ч (все) 196 км 3 пк - 196 км 6 пк - 50 км/ч (все)",
-      "id": "vsg-0131"
+      "id": "vsg-0154"
     },
     {
       "sourceCode": "VSG",
@@ -2979,14 +3569,39 @@
       "end": 197700,
       "length": 1700,
       "speed": 80,
-      "name": "Уст 80",
+      "wayNumber": 1,
+      "name": "Уст 80 П1",
       "appliesTo": "cargo",
       "targetSectors": [
         14
       ],
       "confidence": "speed-table-base",
       "raw": "196.9 Тоннель - Мули г 80 60 60 40 40 км/ч № 4, 2 (тупик) 15 км/ч 6 10 199 км 6 пк - 1 главный путь",
-      "id": "vsg-0132"
+      "id": "vsg-0155"
+    },
+    {
+      "sourceCode": "VSG",
+      "sourceName": "ВСГ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВСГ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 5,
+      "startKm": 196,
+      "startPk": 1,
+      "endKm": 197,
+      "endPk": 1,
+      "coordinate": 196000,
+      "end": 197700,
+      "length": 1700,
+      "speed": 60,
+      "wayNumber": 2,
+      "name": "Уст 60 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        14
+      ],
+      "confidence": "speed-table-base",
+      "raw": "196.9 Тоннель - Мули г 80 60 60 40 40 км/ч № 4, 2 (тупик) 15 км/ч 6 10 199 км 6 пк - 1 главный путь",
+      "id": "vsg-0156"
     },
     {
       "sourceCode": "VSG",
@@ -3002,14 +3617,39 @@
       "end": 202000,
       "length": 4300,
       "speed": 80,
-      "name": "Уст 80",
+      "wayNumber": 1,
+      "name": "Уст 80 П1",
       "appliesTo": "passenger",
       "targetSectors": [
         14
       ],
       "confidence": "speed-table-base",
       "raw": "п 80 60 60 197 км 8 пк - 198 км 4 пк-40 км/ч (все )",
-      "id": "vsg-0133"
+      "id": "vsg-0157"
+    },
+    {
+      "sourceCode": "VSG",
+      "sourceName": "ВСГ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВСГ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 5,
+      "startKm": 197,
+      "startPk": 1,
+      "endKm": 202,
+      "endPk": 1,
+      "coordinate": 197700,
+      "end": 202000,
+      "length": 4300,
+      "speed": 60,
+      "wayNumber": 2,
+      "name": "Уст 60 П2",
+      "appliesTo": "passenger",
+      "targetSectors": [
+        14
+      ],
+      "confidence": "speed-table-base",
+      "raw": "п 80 60 60 197 км 8 пк - 198 км 4 пк-40 км/ч (все )",
+      "id": "vsg-0158"
     },
     {
       "sourceCode": "VSG",
@@ -3025,6 +3665,7 @@
       "end": 203000,
       "length": 1000,
       "speed": 60,
+      "wayNumber": 0,
       "name": "Уст 60",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -3032,7 +3673,31 @@
       ],
       "confidence": "speed-table-base",
       "raw": "202.3 Мули - Высокогорная г 60 60 40 60 40 8 17 204 км 6 пк - 1 главный путь",
-      "id": "vsg-0134"
+      "id": "vsg-0159"
+    },
+    {
+      "sourceCode": "VSG",
+      "sourceName": "ВСГ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВСГ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 5,
+      "startKm": 203,
+      "startPk": 1,
+      "endKm": 208,
+      "endPk": 1,
+      "coordinate": 203000,
+      "end": 208000,
+      "length": 5000,
+      "speed": 45,
+      "wayNumber": 1,
+      "name": "Уст 45 П1",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        14
+      ],
+      "confidence": "speed-table-base",
+      "raw": "203.1 Кузнецовский - Соллу г 45 50 35 9 12 205 км 1 пк - 206 км 1 пк- 209 км 3 пк - 40 км/ч (чет, все) 206 км 1 пк-209 км 3 пк - 40 км/ч (нечет, все)",
+      "id": "vsg-0160"
     },
     {
       "sourceCode": "VSG",
@@ -3048,14 +3713,39 @@
       "end": 208000,
       "length": 5000,
       "speed": 50,
-      "name": "Уст 50",
+      "wayNumber": 2,
+      "name": "Уст 50 П2",
       "appliesTo": "cargo",
       "targetSectors": [
         14
       ],
       "confidence": "speed-table-base",
       "raw": "203.1 Кузнецовский - Соллу г 45 50 35 9 12 205 км 1 пк - 206 км 1 пк- 209 км 3 пк - 40 км/ч (чет, все) 206 км 1 пк-209 км 3 пк - 40 км/ч (нечет, все)",
-      "id": "vsg-0135"
+      "id": "vsg-0161"
+    },
+    {
+      "sourceCode": "VSG",
+      "sourceName": "ВСГ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВСГ Парк Д Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 5,
+      "startKm": 208,
+      "startPk": 1,
+      "endKm": 209,
+      "endPk": 1,
+      "coordinate": 208000,
+      "end": 209000,
+      "length": 1000,
+      "speed": 40,
+      "wayNumber": 1,
+      "name": "Уст 40 П1",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        13
+      ],
+      "confidence": "speed-table-base",
+      "raw": "208.4 Высокогорная г 40 60 60 40 5;7; 9;11 - 25 км/ч 4;9; -40 км/ч 13 - 15 км/ч по съездам №2-4, №10-12, №22-24, №27-25,№3-1, №29-31 - 40 км/ч - - 218 км 9 пк - 220 км 8 пк - 40 км/ч (все)",
+      "id": "vsg-0162"
     },
     {
       "sourceCode": "VSG",
@@ -3071,14 +3761,15 @@
       "end": 209000,
       "length": 1000,
       "speed": 60,
-      "name": "Уст 60",
+      "wayNumber": 2,
+      "name": "Уст 60 П2",
       "appliesTo": "cargo",
       "targetSectors": [
         13
       ],
       "confidence": "speed-table-base",
       "raw": "208.4 Высокогорная г 40 60 60 40 5;7; 9;11 - 25 км/ч 4;9; -40 км/ч 13 - 15 км/ч по съездам №2-4, №10-12, №22-24, №27-25,№3-1, №29-31 - 40 км/ч - - 218 км 9 пк - 220 км 8 пк - 40 км/ч (все)",
-      "id": "vsg-0136"
+      "id": "vsg-0163"
     },
     {
       "sourceCode": "VSG",
@@ -3094,6 +3785,7 @@
       "end": 209000,
       "length": 800,
       "speed": 60,
+      "wayNumber": 0,
       "name": "Уст 60",
       "appliesTo": "passenger",
       "targetSectors": [
@@ -3101,7 +3793,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "(Ч/Н) п 60 60 40 60 208 км 3 пк - 208 км 3 пк - 40 км/ч (все)",
-      "id": "vsg-0137"
+      "id": "vsg-0164"
     },
     {
       "sourceCode": "VLCH",
@@ -3123,7 +3815,7 @@
       ],
       "confidence": "high",
       "raw": "9.1 г 80 80 1 60 км/ч 60 км/ч 60 км/ч 60 км/ч 9 км 4 пк - 11 км 1 пк- 40 км/ч (все)",
-      "id": "vlch-0138"
+      "id": "vlch-0165"
     },
     {
       "sourceCode": "VLCH",
@@ -3145,7 +3837,7 @@
       ],
       "confidence": "high",
       "raw": "г 80 80 50 сек 50 сек 50 сек 50 сек 31 км 2 пк- 32 км 10 пк - 80 км/ч (все)",
-      "id": "vlch-0139"
+      "id": "vlch-0166"
     },
     {
       "sourceCode": "VLCH",
@@ -3167,7 +3859,7 @@
       ],
       "confidence": "high",
       "raw": "35 км 1 пк - 38 км 1 пк - 80 км/ч (все)",
-      "id": "vlch-0140"
+      "id": "vlch-0167"
     },
     {
       "sourceCode": "VLCH",
@@ -3189,7 +3881,7 @@
       ],
       "confidence": "high",
       "raw": "38 км 2 пк - 38 км 5 пк - 80 км/ч (все)",
-      "id": "vlch-0141"
+      "id": "vlch-0168"
     },
     {
       "sourceCode": "VLCH",
@@ -3211,7 +3903,7 @@
       ],
       "confidence": "high",
       "raw": "38 км 6 пк - 39 км 10 пк - 80 км/ч (все)",
-      "id": "vlch-0142"
+      "id": "vlch-0169"
     },
     {
       "sourceCode": "VLCH",
@@ -3233,7 +3925,7 @@
       ],
       "confidence": "high",
       "raw": "43 км 1 пк - 43 км 10 пк - 80 км/ч (все)",
-      "id": "vlch-0143"
+      "id": "vlch-0170"
     },
     {
       "sourceCode": "VLCH",
@@ -3255,7 +3947,7 @@
       ],
       "confidence": "high",
       "raw": "44 км 9 пк - 45 км 4 пк - 80 км/ч (все)",
-      "id": "vlch-0144"
+      "id": "vlch-0171"
     },
     {
       "sourceCode": "VLCH",
@@ -3277,7 +3969,7 @@
       ],
       "confidence": "high",
       "raw": "46 км 1 пк - 47 км 5 пк - 80 км/ч (все)",
-      "id": "vlch-0145"
+      "id": "vlch-0172"
     },
     {
       "sourceCode": "VLCH",
@@ -3299,7 +3991,7 @@
       ],
       "confidence": "medium",
       "raw": "П обр.мест 60 км 4 пк 64 км.4-8-60 км/ч (все)",
-      "id": "vlch-0146"
+      "id": "vlch-0173"
     },
     {
       "sourceCode": "VLCH",
@@ -3321,7 +4013,7 @@
       ],
       "confidence": "high",
       "raw": "обр.мест 79 км 2 пк п 80 80 40 - - 50 сек 50 сек 71 км 1-76 км 10-60 км/ч (все)",
-      "id": "vlch-0147"
+      "id": "vlch-0174"
     },
     {
       "sourceCode": "VLCH",
@@ -3343,7 +4035,7 @@
       ],
       "confidence": "high",
       "raw": "82 км 9 пк 89 км 8 пк 79 км 6-80 км 6 - 70 км/ч (все)",
-      "id": "vlch-0148"
+      "id": "vlch-0175"
     },
     {
       "sourceCode": "VLCH",
@@ -3365,7 +4057,7 @@
       ],
       "confidence": "high",
       "raw": "Вандан - Форель 50 сек 50 сек 50 сек 50 сек 80 км 7 пк - 80 км 7 пк - 60 км/ч (все)",
-      "id": "vlch-0149"
+      "id": "vlch-0176"
     },
     {
       "sourceCode": "VLCH",
@@ -3387,7 +4079,7 @@
       ],
       "confidence": "high",
       "raw": "обр.мест 79 км 2 пк 40 18 25 80 км 8 пк - 84 км 7 пк - 60 км/ч (все)",
-      "id": "vlch-0150"
+      "id": "vlch-0177"
     },
     {
       "sourceCode": "VLCH",
@@ -3409,7 +4101,7 @@
       ],
       "confidence": "low",
       "raw": "обр.мест 85 км 6 пк п 70 80 84 км 8- 50 км/ч(деф. моста) (все)",
-      "id": "vlch-0151"
+      "id": "vlch-0178"
     },
     {
       "sourceCode": "VLCH",
@@ -3431,7 +4123,7 @@
       ],
       "confidence": "high",
       "raw": "88 км 1 пк - 94 км 10 пк -60 км/ч (все)",
-      "id": "vlch-0152"
+      "id": "vlch-0179"
     },
     {
       "sourceCode": "VLCH",
@@ -3453,7 +4145,7 @@
       ],
       "confidence": "high",
       "raw": "110 км 7 пк - 112 км 10 пк - 60 км/ч (все)",
-      "id": "vlch-0153"
+      "id": "vlch-0180"
     },
     {
       "sourceCode": "VLCH",
@@ -3475,7 +4167,7 @@
       ],
       "confidence": "high",
       "raw": "П Дальневост. - Литовко 40 10 10 800 м 600 м 116 км 5 пк - 116 км 10 пк - 80 км/ч (гр,пасс)",
-      "id": "vlch-0154"
+      "id": "vlch-0181"
     },
     {
       "sourceCode": "VLCH",
@@ -3497,7 +4189,7 @@
       ],
       "confidence": "high",
       "raw": "путь скорость - 130 км 6 пк 118 км 5 пк - 118 км 5 пк - 60 км/ч (все)",
-      "id": "vlch-0155"
+      "id": "vlch-0182"
     },
     {
       "sourceCode": "VLCH",
@@ -3519,7 +4211,7 @@
       ],
       "confidence": "high",
       "raw": "118.5 ост. 25 по стрелочным 124 км 6 пк - 127 км 10 пк - 60 км/ч (все)",
-      "id": "vlch-0156"
+      "id": "vlch-0183"
     },
     {
       "sourceCode": "VLCH",
@@ -3541,7 +4233,7 @@
       ],
       "confidence": "high",
       "raw": "переводам № - - 50 сек 50 сек 128 км 1 пк - 128 км 10 пк - 70 км/ч(пасс)",
-      "id": "vlch-0157"
+      "id": "vlch-0184"
     },
     {
       "sourceCode": "VLCH",
@@ -3563,7 +4255,7 @@
       ],
       "confidence": "high",
       "raw": "80 80 3 129 км 1 пк - 130 км 4 пк - 60 км/ч (все)",
-      "id": "vlch-0158"
+      "id": "vlch-0185"
     },
     {
       "sourceCode": "VLCH",
@@ -3585,7 +4277,7 @@
       ],
       "confidence": "high",
       "raw": "(Ч/Н) 130 км 5 пк - 130 км 8 пк - 70 км/ч (пасс)",
-      "id": "vlch-0159"
+      "id": "vlch-0186"
     },
     {
       "sourceCode": "VLCH",
@@ -3607,7 +4299,7 @@
       ],
       "confidence": "high",
       "raw": "138 км 8 пк - 146 км 7 пк - 60 км/ч (все)",
-      "id": "vlch-0160"
+      "id": "vlch-0187"
     },
     {
       "sourceCode": "VLCH",
@@ -3629,7 +4321,7 @@
       ],
       "confidence": "high",
       "raw": "(Н/Ч) 149 км 2 пк - 155 км 5 пк - 60 км/ч (все)",
-      "id": "vlch-0161"
+      "id": "vlch-0188"
     },
     {
       "sourceCode": "VLCH",
@@ -3651,7 +4343,7 @@
       ],
       "confidence": "medium",
       "raw": "159 км 7 пк 166 км 8 пк 167 пк 9-168 пк 8-70 км/ч,",
-      "id": "vlch-0162"
+      "id": "vlch-0189"
     },
     {
       "sourceCode": "VLCH",
@@ -3673,7 +4365,7 @@
       ],
       "confidence": "medium",
       "raw": "169 пк 8-170 пк 2-70 км/ч",
-      "id": "vlch-0163"
+      "id": "vlch-0190"
     },
     {
       "sourceCode": "VLCH",
@@ -3695,7 +4387,7 @@
       ],
       "confidence": "high",
       "raw": "50 сек 50 сек 50 км/ч 50 км/ч 156 км 10 пк- 160 км 10 пк- 60 км/ч (все)",
-      "id": "vlch-0164"
+      "id": "vlch-0191"
     },
     {
       "sourceCode": "VLCH",
@@ -3717,7 +4409,7 @@
       ],
       "confidence": "high",
       "raw": "900 м 600 м 161 км 1 пк - 161 км 5 пк - 80 км/ч (все)",
-      "id": "vlch-0165"
+      "id": "vlch-0192"
     },
     {
       "sourceCode": "VLCH",
@@ -3739,7 +4431,7 @@
       ],
       "confidence": "high",
       "raw": "161 км 6 пк - 161 км 10 пк 80 км/ч (пасс)",
-      "id": "vlch-0166"
+      "id": "vlch-0193"
     },
     {
       "sourceCode": "VLCH",
@@ -3761,7 +4453,7 @@
       ],
       "confidence": "high",
       "raw": "162 км 1 пк - 164 км 4 пк - 80 км/ч (все)",
-      "id": "vlch-0167"
+      "id": "vlch-0194"
     },
     {
       "sourceCode": "VLCH",
@@ -3783,7 +4475,7 @@
       ],
       "confidence": "high",
       "raw": "167 км 9 пк- 168 км 8 пк - 80 км/ч",
-      "id": "vlch-0168"
+      "id": "vlch-0195"
     },
     {
       "sourceCode": "VLCH",
@@ -3805,7 +4497,7 @@
       ],
       "confidence": "high",
       "raw": "168 км 9 пк - 169 км 7 пк - 80 км/ч (все)",
-      "id": "vlch-0169"
+      "id": "vlch-0196"
     },
     {
       "sourceCode": "VLCH",
@@ -3827,7 +4519,7 @@
       ],
       "confidence": "high",
       "raw": "169 км 8 пк - 170 км 2 пк 80 км/ч (груз,пасс.)",
-      "id": "vlch-0170"
+      "id": "vlch-0197"
     },
     {
       "sourceCode": "VLCH",
@@ -3849,7 +4541,7 @@
       ],
       "confidence": "high",
       "raw": "170 км 3 пк - 170 км 4 пк - 80 км/ч (все)",
-      "id": "vlch-0171"
+      "id": "vlch-0198"
     },
     {
       "sourceCode": "VLCH",
@@ -3871,7 +4563,7 @@
       ],
       "confidence": "high",
       "raw": "177 км 4 пк 186 км 6 пк 178 км 1 пк - 178 км 5 пк - 70 км/ч",
-      "id": "vlch-0172"
+      "id": "vlch-0199"
     },
     {
       "sourceCode": "VLCH",
@@ -3893,7 +4585,7 @@
       ],
       "confidence": "medium",
       "raw": "по стрелочным 50 км/ч 50 км/ч 50 км/ч 50 км/ч 172 пк 10-173 пк 8-60 км/ч (все)",
-      "id": "vlch-0173"
+      "id": "vlch-0200"
     },
     {
       "sourceCode": "VLCH",
@@ -3915,7 +4607,7 @@
       ],
       "confidence": "medium",
       "raw": "обр.мест 175 км 5 пк 4,6,8,10,5,7,10,13 174 пк 1-176 пк 10-60 км/ч (все)",
-      "id": "vlch-0174"
+      "id": "vlch-0201"
     },
     {
       "sourceCode": "VLCH",
@@ -3937,7 +4629,7 @@
       ],
       "confidence": "high",
       "raw": "189 км 1 пк - 191 км 7 пк - 60 км/ч (все)",
-      "id": "vlch-0175"
+      "id": "vlch-0202"
     },
     {
       "sourceCode": "VLCH",
@@ -3959,7 +4651,7 @@
       ],
       "confidence": "medium",
       "raw": "198 км 10 пк 200 км 5 пк 194 пк 5-195 пк 2-60 км/ч",
-      "id": "vlch-0176"
+      "id": "vlch-0203"
     },
     {
       "sourceCode": "VLCH",
@@ -3981,7 +4673,7 @@
       ],
       "confidence": "high",
       "raw": "192.5 12 12 194 км 5 пк- 195 км 2 пк 60 км/ч (груз, пасс)",
-      "id": "vlch-0177"
+      "id": "vlch-0204"
     },
     {
       "sourceCode": "VLCH",
@@ -4003,7 +4695,7 @@
       ],
       "confidence": "medium",
       "raw": "199 пк 10-202 пк 7 - 60 км/ч (все)",
-      "id": "vlch-0178"
+      "id": "vlch-0205"
     },
     {
       "sourceCode": "VLCH",
@@ -4025,7 +4717,7 @@
       ],
       "confidence": "medium",
       "raw": "210 пк 3-211 пк 1-70 км/ч (все)",
-      "id": "vlch-0179"
+      "id": "vlch-0206"
     },
     {
       "sourceCode": "VLCH",
@@ -4047,7 +4739,7 @@
       ],
       "confidence": "medium",
       "raw": "Дополнительная проба 215 пк 7-216 пк 1- 70 км/ч (пасс) 60 км/ч (груз)",
-      "id": "vlch-0180"
+      "id": "vlch-0207"
     },
     {
       "sourceCode": "VLCH",
@@ -4069,7 +4761,7 @@
       ],
       "confidence": "medium",
       "raw": "Нечет.216 км - 215 км 40 21 8 221 пк 10-222 пк 1-70 км/ч (все)",
-      "id": "vlch-0181"
+      "id": "vlch-0208"
     },
     {
       "sourceCode": "VLCH",
@@ -4091,7 +4783,7 @@
       ],
       "confidence": "medium",
       "raw": "229 км 5 пк 232 км 2 пк 223 пк 7-224 пк 10-70 км/ч",
-      "id": "vlch-0182"
+      "id": "vlch-0209"
     },
     {
       "sourceCode": "VLCH",
@@ -4113,7 +4805,7 @@
       ],
       "confidence": "medium",
       "raw": "242 пк 5-243 пк 1- 60 км/ч (все)",
-      "id": "vlch-0183"
+      "id": "vlch-0210"
     },
     {
       "sourceCode": "VLCH",
@@ -4135,7 +4827,7 @@
       ],
       "confidence": "medium",
       "raw": "обр.мест 252 км 4 пк 243 пк 10-246 пк 6-70 км/ч (все)",
-      "id": "vlch-0184"
+      "id": "vlch-0211"
     },
     {
       "sourceCode": "VLCH",
@@ -4157,7 +4849,7 @@
       ],
       "confidence": "medium",
       "raw": "247 пк 10-248 пк 10-70 км/ч (все)",
-      "id": "vlch-0185"
+      "id": "vlch-0212"
     },
     {
       "sourceCode": "VLCH",
@@ -4179,7 +4871,7 @@
       ],
       "confidence": "medium",
       "raw": "269 км 8 пк 273 км 4 пк 268 пк 1-269 пк 10-70 км/ч (пасс)60 км/ч (груз)",
-      "id": "vlch-0186"
+      "id": "vlch-0213"
     },
     {
       "sourceCode": "VLCH",
@@ -4201,7 +4893,7 @@
       ],
       "confidence": "high",
       "raw": "г 80 80 50 сек 50 сек 50 сек 50 сек 270 км 1 пк - 272 км 9 пк 70 км/ч (все)",
-      "id": "vlch-0187"
+      "id": "vlch-0214"
     },
     {
       "sourceCode": "VLCH",
@@ -4223,7 +4915,7 @@
       ],
       "confidence": "medium",
       "raw": "П п 80 80 292 пк 8-293 пк 10-80 км/ч (пасс)70 км/ч (груз)",
-      "id": "vlch-0188"
+      "id": "vlch-0215"
     },
     {
       "sourceCode": "VLCH",
@@ -4245,7 +4937,7 @@
       ],
       "confidence": "medium",
       "raw": "294 пк 9-296 пк 7-60 км/ч (все)",
-      "id": "vlch-0189"
+      "id": "vlch-0216"
     },
     {
       "sourceCode": "VLCH",
@@ -4267,7 +4959,7 @@
       ],
       "confidence": "medium",
       "raw": "путь скорость съезд скорость 323 км 4 пк 328 км 6 пк 330 пк 4-331 пк 7-60 км/ч",
-      "id": "vlch-0190"
+      "id": "vlch-0217"
     },
     {
       "sourceCode": "VLCH",
@@ -4289,7 +4981,7 @@
       ],
       "confidence": "high",
       "raw": "317.1 8 25 км/ч 2/4 50 км/ч 50 км/ч 50 км/ч 50 км/ч 316 км 10 пк-317 км 2 пк- 60 км/ч",
-      "id": "vlch-0191"
+      "id": "vlch-0218"
     },
     {
       "sourceCode": "VLCH",
@@ -4311,7 +5003,7 @@
       ],
       "confidence": "high",
       "raw": "Комсомольск на Амуре 351 км 8 пк - 354 км 9 пк - 40 км/ч (все)",
-      "id": "vlch-0192"
+      "id": "vlch-0219"
     },
     {
       "sourceCode": "VLCH",
@@ -4333,7 +5025,7 @@
       ],
       "confidence": "high",
       "raw": "Сортировочный 348 км 7 пк - 348 км 9 пк- 60 км/ч (все)",
-      "id": "vlch-0193"
+      "id": "vlch-0220"
     },
     {
       "sourceCode": "VLCH",
@@ -4355,7 +5047,7 @@
       ],
       "confidence": "high",
       "raw": "351 км 8 пк - 353 км 1 пк - 60 км/ч (все)",
-      "id": "vlch-0194"
+      "id": "vlch-0221"
     },
     {
       "sourceCode": "VLCH",
@@ -4375,7 +5067,7 @@
       "targetSectors": [],
       "confidence": "high",
       "raw": "Дземги Пути - 32, 33, 34, 36, 37, 38 - 40 11 12 600 м 350 м 850 м 550 м 354 км 4 пк - 356 км 9 пк - 40 км/ч (все)",
-      "id": "vlch-0195"
+      "id": "vlch-0222"
     },
     {
       "sourceCode": "VLCH",
@@ -4395,7 +5087,7 @@
       "targetSectors": [],
       "confidence": "high",
       "raw": "362 км 5 пк - 362 км 9 пк - 40 км/ч (все)",
-      "id": "vlch-0196"
+      "id": "vlch-0223"
     },
     {
       "sourceCode": "VLCH",
@@ -4415,7 +5107,7 @@
       "targetSectors": [],
       "confidence": "high",
       "raw": "п 60 60 40 362 км 10 пк - 363 км 7 пк - 60 км/ч (все)",
-      "id": "vlch-0197"
+      "id": "vlch-0224"
     },
     {
       "sourceCode": "VLCH",
@@ -4431,6 +5123,7 @@
       "end": 19000,
       "length": 10000,
       "speed": 80,
+      "wayNumber": 0,
       "name": "Уст 80",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -4438,7 +5131,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "9.1 г 80 80 25 съездам № 8- 10,42-44,48-50 - 25 км/ч 25 25 17 км 6 пк 14 км 5 пк 15 пк 8-70 км/ч (порожний)",
-      "id": "vlch-0198"
+      "id": "vlch-0225"
     },
     {
       "sourceCode": "VLCH",
@@ -4454,6 +5147,7 @@
       "end": 24500,
       "length": 5500,
       "speed": 80,
+      "wayNumber": 0,
       "name": "Уст 80",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -4461,7 +5155,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "19.2 Утиный - Джармен обр.мест 25 км 1 пк г 80 80 40 15 12 26 км 8 пк 27 км 1 пк",
-      "id": "vlch-0199"
+      "id": "vlch-0226"
     },
     {
       "sourceCode": "VLCH",
@@ -4477,6 +5171,7 @@
       "end": 30000,
       "length": 5500,
       "speed": 25,
+      "wayNumber": 0,
       "name": "Уст 25",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -4484,7 +5179,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "г ост. 25 24 км 6 пк - 127 км 10 пк - 60 км/ч (все)",
-      "id": "vlch-0200"
+      "id": "vlch-0227"
     },
     {
       "sourceCode": "VLCH",
@@ -4494,12 +5189,13 @@
       "page": 1,
       "startKm": 30,
       "startPk": 1,
-      "endKm": 48,
+      "endKm": 40,
       "endPk": 1,
       "coordinate": 30000,
-      "end": 48000,
-      "length": 18000,
+      "end": 40000,
+      "length": 10000,
       "speed": 80,
+      "wayNumber": 0,
       "name": "Уст 80",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -4507,7 +5203,55 @@
       ],
       "confidence": "speed-table-base",
       "raw": "30.1 Джармен - Парт.Соп. обр.мест 32 км 9 пк обр.мест 44 км 4 пк г 80 80 40 16 15 39 км 6 пк 45 км 2 пк 38 пк 2-5-70 км/ч (порожний)",
-      "id": "vlch-0201"
+      "id": "vlch-0228"
+    },
+    {
+      "sourceCode": "VLCH",
+      "sourceName": "ВЛЧ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВЛЧ Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 7,
+      "startKm": 40,
+      "startPk": 1,
+      "endKm": 48,
+      "endPk": 1,
+      "coordinate": 40000,
+      "end": 48000,
+      "length": 8000,
+      "speed": 124,
+      "wayNumber": 1,
+      "name": "Уст 124 П1",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        9
+      ],
+      "confidence": "speed-table-base",
+      "raw": "40 118 124 130 137 144 153 163 174 186",
+      "id": "vlch-0229"
+    },
+    {
+      "sourceCode": "VLCH",
+      "sourceName": "ВЛЧ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВЛЧ Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 7,
+      "startKm": 40,
+      "startPk": 1,
+      "endKm": 48,
+      "endPk": 1,
+      "coordinate": 40000,
+      "end": 48000,
+      "length": 8000,
+      "speed": 130,
+      "wayNumber": 2,
+      "name": "Уст 130 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        9
+      ],
+      "confidence": "speed-table-base",
+      "raw": "40 118 124 130 137 144 153 163 174 186",
+      "id": "vlch-0230"
     },
     {
       "sourceCode": "VLCH",
@@ -4523,6 +5267,7 @@
       "end": 65000,
       "length": 17000,
       "speed": 80,
+      "wayNumber": 0,
       "name": "Уст 80",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -4530,7 +5275,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "48.3 Парт.Соп - Джелюмкен обр.мест 60 км 4 пк г 80 80 40 17 18 51 км 8 пк 61 км 2 пк",
-      "id": "vlch-0202"
+      "id": "vlch-0231"
     },
     {
       "sourceCode": "VLCH",
@@ -4546,6 +5291,7 @@
       "end": 80000,
       "length": 15000,
       "speed": 80,
+      "wayNumber": 0,
       "name": "Уст 80",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -4553,7 +5299,31 @@
       ],
       "confidence": "speed-table-base",
       "raw": "65.4 Джелюмкен - Вандан обр.мест 79 км 2 пк г 80 80 40 32 16 - 75 км 8 пк 6 7 6 пк 2-3-60 км/ч (все)",
-      "id": "vlch-0203"
+      "id": "vlch-0232"
+    },
+    {
+      "sourceCode": "VLCH",
+      "sourceName": "ВЛЧ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВЛЧ Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 1,
+      "startKm": 80,
+      "startPk": 1,
+      "endKm": 95,
+      "endPk": 1,
+      "coordinate": 80000,
+      "end": 95000,
+      "length": 15000,
+      "speed": 70,
+      "wayNumber": 1,
+      "name": "Уст 70 П1",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        9
+      ],
+      "confidence": "speed-table-base",
+      "raw": "80.3 Вандан - Форель обр.мест 79 км 2 пк обр.мест 85 км 6 пк г 70 80 40 18 25 82 км 9 пк 89 км 8 пк 7 8 8 8 8 9 км 6-80 км 6 - 70 км/ч (все)",
+      "id": "vlch-0233"
     },
     {
       "sourceCode": "VLCH",
@@ -4569,14 +5339,15 @@
       "end": 95000,
       "length": 15000,
       "speed": 80,
-      "name": "Уст 80",
+      "wayNumber": 2,
+      "name": "Уст 80 П2",
       "appliesTo": "cargo",
       "targetSectors": [
         9
       ],
       "confidence": "speed-table-base",
       "raw": "80.3 Вандан - Форель обр.мест 79 км 2 пк обр.мест 85 км 6 пк г 70 80 40 18 25 82 км 9 пк 89 км 8 пк 7 8 8 8 8 9 км 6-80 км 6 - 70 км/ч (все)",
-      "id": "vlch-0204"
+      "id": "vlch-0234"
     },
     {
       "sourceCode": "VLCH",
@@ -4586,12 +5357,13 @@
       "page": 1,
       "startKm": 95,
       "startPk": 1,
-      "endKm": 110,
+      "endKm": 100,
       "endPk": 1,
       "coordinate": 95000,
-      "end": 110000,
-      "length": 15000,
+      "end": 100000,
+      "length": 5000,
       "speed": 60,
+      "wayNumber": 0,
       "name": "Уст 60",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -4599,7 +5371,31 @@
       ],
       "confidence": "speed-table-base",
       "raw": "95.9 Форель - Дальневост. обр.мест 100 км 4 пк обр.мест 106 км 9 пк обр.мест 109 км 5 пк г 60 60 40 17 19 97 км 7 пк 105 км 6 пк",
-      "id": "vlch-0205"
+      "id": "vlch-0235"
+    },
+    {
+      "sourceCode": "VLCH",
+      "sourceName": "ВЛЧ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВЛЧ Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 6,
+      "startKm": 100,
+      "startPk": 1,
+      "endKm": 110,
+      "endPk": 1,
+      "coordinate": 100000,
+      "end": 110000,
+      "length": 10000,
+      "speed": 100,
+      "wayNumber": 0,
+      "name": "Уст 100",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        9
+      ],
+      "confidence": "speed-table-base",
+      "raw": "Менее 100 осей Не менее 4 секунд Менее 100 осей Не менее 4 секунд",
+      "id": "vlch-0236"
     },
     {
       "sourceCode": "VLCH",
@@ -4609,20 +5405,117 @@
       "page": 1,
       "startKm": 110,
       "startPk": 1,
-      "endKm": 156,
+      "endKm": 118,
       "endPk": 1,
       "coordinate": 110000,
-      "end": 156000,
-      "length": 46000,
+      "end": 118000,
+      "length": 8000,
       "speed": 80,
-      "name": "Уст 80",
+      "wayNumber": 1,
+      "name": "Уст 80 П1",
       "appliesTo": "cargo",
       "targetSectors": [
         9
       ],
       "confidence": "speed-table-base",
       "raw": "110.2 Дальневост. - Литовко г 80 60 40 10 10 112 км 8 пк 115 км 5 пк 116 пк 5-10 70 км/ч (порожний)",
-      "id": "vlch-0206"
+      "id": "vlch-0237"
+    },
+    {
+      "sourceCode": "VLCH",
+      "sourceName": "ВЛЧ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВЛЧ Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 1,
+      "startKm": 110,
+      "startPk": 1,
+      "endKm": 118,
+      "endPk": 1,
+      "coordinate": 110000,
+      "end": 118000,
+      "length": 8000,
+      "speed": 60,
+      "wayNumber": 2,
+      "name": "Уст 60 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        9
+      ],
+      "confidence": "speed-table-base",
+      "raw": "110.2 Дальневост. - Литовко г 80 60 40 10 10 112 км 8 пк 115 км 5 пк 116 пк 5-10 70 км/ч (порожний)",
+      "id": "vlch-0238"
+    },
+    {
+      "sourceCode": "VLCH",
+      "sourceName": "ВЛЧ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВЛЧ Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 2,
+      "startKm": 118,
+      "startPk": 1,
+      "endKm": 138,
+      "endPk": 1,
+      "coordinate": 118000,
+      "end": 138000,
+      "length": 20000,
+      "speed": 70,
+      "wayNumber": 0,
+      "name": "Уст 70",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        9
+      ],
+      "confidence": "speed-table-base",
+      "raw": "118.5 70 70 путь скорость по стрелочным переводам № 2,5,16,17- 40 км/ч 26 18 - 130 км 6 пк 1 1 1 6 1 1 6 18 км 5 пк - 118 км 5 пк - 60 км/ч (все)",
+      "id": "vlch-0239"
+    },
+    {
+      "sourceCode": "VLCH",
+      "sourceName": "ВЛЧ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВЛЧ Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 2,
+      "startKm": 138,
+      "startPk": 1,
+      "endKm": 156,
+      "endPk": 1,
+      "coordinate": 138000,
+      "end": 156000,
+      "length": 18000,
+      "speed": 70,
+      "wayNumber": 1,
+      "name": "Уст 70 П1",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        9
+      ],
+      "confidence": "speed-table-base",
+      "raw": "138.1 70 60 60 40 19 24 149 км 5 пк 140 км 10 пк 138 км 6 (стр)- 50 км/ч 138 км 8 пк - 146 км 7 пк - 60 км/ч (все) 149 км 2 пк - 155 км 5 пк - 60 км/ч (все)",
+      "id": "vlch-0240"
+    },
+    {
+      "sourceCode": "VLCH",
+      "sourceName": "ВЛЧ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВЛЧ Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 2,
+      "startKm": 138,
+      "startPk": 1,
+      "endKm": 156,
+      "endPk": 1,
+      "coordinate": 138000,
+      "end": 156000,
+      "length": 18000,
+      "speed": 60,
+      "wayNumber": 2,
+      "name": "Уст 60 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        9
+      ],
+      "confidence": "speed-table-base",
+      "raw": "138.1 70 60 60 40 19 24 149 км 5 пк 140 км 10 пк 138 км 6 (стр)- 50 км/ч 138 км 8 пк - 146 км 7 пк - 60 км/ч (все) 149 км 2 пк - 155 км 5 пк - 60 км/ч (все)",
+      "id": "vlch-0241"
     },
     {
       "sourceCode": "VLCH",
@@ -4638,14 +5531,39 @@
       "end": 171000,
       "length": 15000,
       "speed": 80,
-      "name": "Уст 80",
+      "wayNumber": 1,
+      "name": "Уст 80 П1",
       "appliesTo": "cargo",
       "targetSectors": [
         9
       ],
       "confidence": "speed-table-base",
       "raw": "156.2 Нусхи - Сельгон обр.мест 161 км 1 пк г 80 60 40 15 17 159 км 7 пк 166 км 8 пк 167 пк 9-168 пк 8-70 км/ч,",
-      "id": "vlch-0207"
+      "id": "vlch-0242"
+    },
+    {
+      "sourceCode": "VLCH",
+      "sourceName": "ВЛЧ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВЛЧ Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 2,
+      "startKm": 156,
+      "startPk": 1,
+      "endKm": 171,
+      "endPk": 1,
+      "coordinate": 156000,
+      "end": 171000,
+      "length": 15000,
+      "speed": 60,
+      "wayNumber": 2,
+      "name": "Уст 60 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        9
+      ],
+      "confidence": "speed-table-base",
+      "raw": "156.2 Нусхи - Сельгон обр.мест 161 км 1 пк г 80 60 40 15 17 159 км 7 пк 166 км 8 пк 167 пк 9-168 пк 8-70 км/ч,",
+      "id": "vlch-0243"
     },
     {
       "sourceCode": "VLCH",
@@ -4661,14 +5579,39 @@
       "end": 192000,
       "length": 21000,
       "speed": 80,
-      "name": "Уст 80",
+      "wayNumber": 1,
+      "name": "Уст 80 П1",
       "appliesTo": "cargo",
       "targetSectors": [
         9
       ],
       "confidence": "speed-table-base",
       "raw": "171.3 Сельгон - Харпи обр.мест 175 км 5 пк г 80 70 2,3,6,8 - 40 км/ч 4 путь - 25 по стрелочным переводам № 4,6,8,10,5,7,10,13 ,15 - 40 км/ч 23 22 177 км 4 пк 186 км 6 пк 178 км 1 пк - 178 км 5 пк - 70 км/ч",
-      "id": "vlch-0208"
+      "id": "vlch-0244"
+    },
+    {
+      "sourceCode": "VLCH",
+      "sourceName": "ВЛЧ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВЛЧ Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 2,
+      "startKm": 171,
+      "startPk": 1,
+      "endKm": 192,
+      "endPk": 1,
+      "coordinate": 171000,
+      "end": 192000,
+      "length": 21000,
+      "speed": 70,
+      "wayNumber": 2,
+      "name": "Уст 70 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        9
+      ],
+      "confidence": "speed-table-base",
+      "raw": "171.3 Сельгон - Харпи обр.мест 175 км 5 пк г 80 70 2,3,6,8 - 40 км/ч 4 путь - 25 по стрелочным переводам № 4,6,8,10,5,7,10,13 ,15 - 40 км/ч 23 22 177 км 4 пк 186 км 6 пк 178 км 1 пк - 178 км 5 пк - 70 км/ч",
+      "id": "vlch-0245"
     },
     {
       "sourceCode": "VLCH",
@@ -4684,14 +5627,39 @@
       "end": 203000,
       "length": 11000,
       "speed": 80,
-      "name": "Уст 80",
+      "wayNumber": 1,
+      "name": "Уст 80 П1",
       "appliesTo": "cargo",
       "targetSectors": [
         9
       ],
       "confidence": "speed-table-base",
       "raw": "192.5 Харпи - Хевчен обр.мест 194 км 3 пк г 80 60 40 12 12 198 км 10 пк 200 км 5 пк 194 пк 5-195 пк 2-60 км/ч",
-      "id": "vlch-0209"
+      "id": "vlch-0246"
+    },
+    {
+      "sourceCode": "VLCH",
+      "sourceName": "ВЛЧ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВЛЧ Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 2,
+      "startKm": 192,
+      "startPk": 1,
+      "endKm": 203,
+      "endPk": 1,
+      "coordinate": 192000,
+      "end": 203000,
+      "length": 11000,
+      "speed": 60,
+      "wayNumber": 2,
+      "name": "Уст 60 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        9
+      ],
+      "confidence": "speed-table-base",
+      "raw": "192.5 Харпи - Хевчен обр.мест 194 км 3 пк г 80 60 40 12 12 198 км 10 пк 200 км 5 пк 194 пк 5-195 пк 2-60 км/ч",
+      "id": "vlch-0247"
     },
     {
       "sourceCode": "VLCH",
@@ -4707,6 +5675,7 @@
       "end": 223000,
       "length": 20000,
       "speed": 80,
+      "wayNumber": 0,
       "name": "Уст 80",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -4714,7 +5683,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "203.7 г 80 80 40 21 8 207 км 5 пк 216 км 8 пк 202 км 8 пк - 9 пк - 60 км/ч (все) 210 пк 3-211 пк 1-70 км/ч (все) 211 пк 2-5-70 км/ч (пасс) 60 км/ч (груз) 211 пк 6-10-70 км/ч (все) 215 пк 7-216 пк 1- 70 км/ч (пасс) 60 км/ч (груз) 221 пк 4-9-60 км/ч 70 км/ч (пас",
-      "id": "vlch-0210"
+      "id": "vlch-0248"
     },
     {
       "sourceCode": "VLCH",
@@ -4730,14 +5699,39 @@
       "end": 239000,
       "length": 16000,
       "speed": 80,
-      "name": "Уст 80",
+      "wayNumber": 1,
+      "name": "Уст 80 П1",
       "appliesTo": "cargo",
       "targetSectors": [
         9
       ],
       "confidence": "speed-table-base",
       "raw": "223.1 Алькан -Болонь обр.мест 227 км 1 пк обр.мест 231 км 1 пк обр.мест 234 км 9 пк г 80 70 40 17 18 229 км 5 пк 232 км 2 пк 223 пк 7-224 пк 10-70 км/ч",
-      "id": "vlch-0211"
+      "id": "vlch-0249"
+    },
+    {
+      "sourceCode": "VLCH",
+      "sourceName": "ВЛЧ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВЛЧ Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 3,
+      "startKm": 223,
+      "startPk": 1,
+      "endKm": 239,
+      "endPk": 1,
+      "coordinate": 223000,
+      "end": 239000,
+      "length": 16000,
+      "speed": 70,
+      "wayNumber": 2,
+      "name": "Уст 70 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        9
+      ],
+      "confidence": "speed-table-base",
+      "raw": "223.1 Алькан -Болонь обр.мест 227 км 1 пк обр.мест 231 км 1 пк обр.мест 234 км 9 пк г 80 70 40 17 18 229 км 5 пк 232 км 2 пк 223 пк 7-224 пк 10-70 км/ч",
+      "id": "vlch-0250"
     },
     {
       "sourceCode": "VLCH",
@@ -4753,6 +5747,7 @@
       "end": 258000,
       "length": 19000,
       "speed": 80,
+      "wayNumber": 0,
       "name": "Уст 80",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -4760,7 +5755,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "239.3 Болонь - Менгон обр.мест 249 км 4 пк обр.мест 252 км 4 пк обр.мест 256 км 8 пк г 80 80 40 22 17 - 254 км 8 пк 254 пк 4-7-70 км/ч",
-      "id": "vlch-0212"
+      "id": "vlch-0251"
     },
     {
       "sourceCode": "VLCH",
@@ -4776,6 +5771,7 @@
       "end": 266000,
       "length": 8000,
       "speed": 80,
+      "wayNumber": 0,
       "name": "Уст 80",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -4783,7 +5779,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "258 Менгон - Тейсин обр.мест 264 км 4 пк г 80 80 40 8 8 261 км 7 пк -",
-      "id": "vlch-0213"
+      "id": "vlch-0252"
     },
     {
       "sourceCode": "VLCH",
@@ -4799,6 +5795,7 @@
       "end": 276000,
       "length": 10000,
       "speed": 80,
+      "wayNumber": 0,
       "name": "Уст 80",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -4806,7 +5803,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "266 Тейсин-Эльбан г 80 80 40 9 9 269 км 8 пк 273 км 4 пк 268 пк 1-269 пк 10-70 км/ч (пасс)60 км/ч (груз) 270 км 1 пк - 272 км 9 пк 70 км/ч (все)",
-      "id": "vlch-0214"
+      "id": "vlch-0253"
     },
     {
       "sourceCode": "VLCH",
@@ -4822,6 +5819,7 @@
       "end": 297000,
       "length": 21000,
       "speed": 80,
+      "wayNumber": 0,
       "name": "Уст 80",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -4829,7 +5827,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "276 Эльбан - Подали обр.мест 291 км 3 пк г 80 80 40 20 19 285 км 2 пк 289 км 4 пк 291 км 1 -7 пк - 60 км/ч (все) 291 км 8 пк-10 пк 70 км/ч (пасс)60 км/ч (груз) 292 пк 1- пк - 80 км/ч (пасс) 70 км/ч (груз) 292 пк 2-7-80 км/ч (пасс) 60 км/ч (груз) 292 пк 8-293 п",
-      "id": "vlch-0215"
+      "id": "vlch-0254"
     },
     {
       "sourceCode": "VLCH",
@@ -4845,6 +5843,7 @@
       "end": 303000,
       "length": 6000,
       "speed": 60,
+      "wayNumber": 0,
       "name": "Уст 60",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -4852,7 +5851,7 @@
       ],
       "confidence": "speed-table-base",
       "raw": "297 Подали - Известковый обр.мест 299 км 1 пк г 60 60 40 12 7 300 км 6 пк",
-      "id": "vlch-0216"
+      "id": "vlch-0255"
     },
     {
       "sourceCode": "VLCH",
@@ -4862,12 +5861,13 @@
       "page": 3,
       "startKm": 303,
       "startPk": 1,
-      "endKm": 353,
+      "endKm": 317,
       "endPk": 1,
       "coordinate": 303000,
-      "end": 353100,
-      "length": 50100,
+      "end": 317000,
+      "length": 14000,
       "speed": 60,
+      "wayNumber": 0,
       "name": "Уст 60",
       "appliesTo": "cargo",
       "targetSectors": [
@@ -4875,7 +5875,103 @@
       ],
       "confidence": "speed-table-base",
       "raw": "303 Изаестковый-Мылки обр.мест 316 км 2 пк г 60 60 40 19 21 307 км 5 пк 305 км 5 пк",
-      "id": "vlch-0217"
+      "id": "vlch-0256"
+    },
+    {
+      "sourceCode": "VLCH",
+      "sourceName": "ВЛЧ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВЛЧ Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 3,
+      "startKm": 317,
+      "startPk": 1,
+      "endKm": 339,
+      "endPk": 1,
+      "coordinate": 317000,
+      "end": 339000,
+      "length": 22000,
+      "speed": 80,
+      "wayNumber": 1,
+      "name": "Уст 80 П1",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        9
+      ],
+      "confidence": "speed-table-base",
+      "raw": "317.1 Мылки - КСМ сорт обр.мест 320 км 8 пк обр.мест 325 км 1 пк 80 60 путь скорость съезд скорость 13 14 323 км 4 пк 328 км 6 пк 330 пк 4-331 пк 7-60 км/ч 316 км 10 пк-317 км 2 пк- 60 км/ч (главный путь станции)",
+      "id": "vlch-0257"
+    },
+    {
+      "sourceCode": "VLCH",
+      "sourceName": "ВЛЧ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВЛЧ Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 3,
+      "startKm": 317,
+      "startPk": 1,
+      "endKm": 339,
+      "endPk": 1,
+      "coordinate": 317000,
+      "end": 339000,
+      "length": 22000,
+      "speed": 60,
+      "wayNumber": 2,
+      "name": "Уст 60 П2",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        9
+      ],
+      "confidence": "speed-table-base",
+      "raw": "317.1 Мылки - КСМ сорт обр.мест 320 км 8 пк обр.мест 325 км 1 пк 80 60 путь скорость съезд скорость 13 14 323 км 4 пк 328 км 6 пк 330 пк 4-331 пк 7-60 км/ч 316 км 10 пк-317 км 2 пк- 60 км/ч (главный путь станции)",
+      "id": "vlch-0258"
+    },
+    {
+      "sourceCode": "VLCH",
+      "sourceName": "ВЛЧ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВЛЧ Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 4,
+      "startKm": 339,
+      "startPk": 1,
+      "endKm": 353,
+      "endPk": 1,
+      "coordinate": 339000,
+      "end": 353100,
+      "length": 14100,
+      "speed": 40,
+      "wayNumber": 0,
+      "name": "Уст 40",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        9
+      ],
+      "confidence": "speed-table-base",
+      "raw": "339 Сортировк Комсомольск Сортировочный парк «Хурба» 40 по пути № 44, 45,47, 49 - 40 км/час, съездам № 401-403, № 402- 404, № 405-407, № 406-408, - 40/40 км/час, по боковому направлению стрелочных переводов № 410, 414, 416, 412, 417, 411, 413, 415, 419 2 2",
+      "id": "vlch-0259"
+    },
+    {
+      "sourceCode": "VLCH",
+      "sourceName": "ВЛЧ",
+      "sourcePath": "/assets/docs/speeds/Скоростя ВЛЧ Приказ № 161.pdf",
+      "sourceUpdatedAt": "2026-04-08",
+      "page": 4,
+      "startKm": 339,
+      "startPk": 1,
+      "endKm": 353,
+      "endPk": 1,
+      "coordinate": 339000,
+      "end": 353100,
+      "length": 14100,
+      "speed": 25,
+      "wayNumber": 1,
+      "name": "Уст 25 П1",
+      "appliesTo": "cargo",
+      "targetSectors": [
+        9
+      ],
+      "confidence": "speed-table-base",
+      "raw": "339 Комсомольск Сортировочный парк «В» 25/40 по съездам № 2-4, № 10-12, № 40-42, № 7-9 - 40 км/час. по боковому направлению стрелочных переводов № 5, 18, 34, 44, 48, 50, 125, 131, 153, 155 - 40 км/час 4 4",
+      "id": "vlch-0260"
     }
   ]
 }

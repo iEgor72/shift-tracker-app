@@ -6246,6 +6246,7 @@
       sourceCode: String(item.sourceCode || '').trim(),
       sourcePath: String(item.sourcePath || '').trim(),
       sourceUpdatedAt: String(item.sourceUpdatedAt || '').trim(),
+      wayNumber: Math.max(0, Math.round(parseNumber(item.wayNumber) || 0)),
       confidence: String(item.confidence || 'medium').trim(),
       appliesTo: String(item.appliesTo || 'all').trim(),
       page: Math.round(parseNumber(item.page) || 0),
@@ -12792,13 +12793,17 @@
 
   function updateModeButtons() {
     setDirectionButton();
-    setText('btnPoekhaliWay', 'П ' + tracker.wayNumber);
+    setText('btnPoekhaliWay', 'П:' + normalizeWayNumber(tracker.wayNumber));
     syncPoekhaliLiveButton();
     setMapButton();
     setOpsButton();
     var wayBtn = byId('btnPoekhaliWay');
     var mapBtn = byId('btnPoekhaliMap');
-    if (wayBtn) wayBtn.classList.add('is-hidden');
+    if (wayBtn) {
+      wayBtn.classList.remove('is-hidden');
+      wayBtn.title = 'Переключить путь: скорости будут считаться для выбранного пути';
+      wayBtn.setAttribute('aria-label', wayBtn.title);
+    }
     if (mapBtn) mapBtn.classList.add('is-hidden');
   }
 
@@ -13639,6 +13644,7 @@
     for (var i = 0; i < sectorRules.length; i++) {
       var rule = sectorRules[i];
       if (!isDocumentSpeedRuleUsable(rule)) continue;
+      if (rule.wayNumber && normalizeWayNumber(rule.wayNumber) !== normalizeWayNumber(tracker.wayNumber)) continue;
       if (isFinite(left) && isFinite(right) && !isObjectInRange(rule, left, right)) continue;
       result.push(rule);
     }
@@ -17239,13 +17245,17 @@
     }
     drawBottomBar(ctx, w, h, displayProjection);
     setDirectionButton();
-    setText('btnPoekhaliWay', 'П ' + tracker.wayNumber);
+    setText('btnPoekhaliWay', 'П:' + normalizeWayNumber(tracker.wayNumber));
     syncPoekhaliLiveButton();
     setMapButton();
     setOpsButton();
     var wayBtn = byId('btnPoekhaliWay');
     var mapBtn = byId('btnPoekhaliMap');
-    if (wayBtn) wayBtn.classList.add('is-hidden');
+    if (wayBtn) {
+      wayBtn.classList.remove('is-hidden');
+      wayBtn.title = 'Переключить путь: скорости будут считаться для выбранного пути';
+      wayBtn.setAttribute('aria-label', wayBtn.title);
+    }
     if (mapBtn) mapBtn.classList.add('is-hidden');
   }
 
@@ -17527,7 +17537,8 @@
     var wayBtn = byId('btnPoekhaliWay');
     if (wayBtn) {
       wayBtn.addEventListener('click', function() {
-        tracker.wayNumber = tracker.wayNumber === 1 ? 2 : 1;
+        tracker.wayNumber = normalizeWayNumber(tracker.wayNumber) === 1 ? 2 : 1;
+        updateModeButtons();
         updateActiveRunNavigationState();
         requestDraw();
       });

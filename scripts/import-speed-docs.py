@@ -124,20 +124,48 @@ def parse_km_axis_cell(value: str | None) -> int | None:
 
 
 def extract_speed_values_from_table_row(row: list[str | None], type_col: int) -> list[int]:
-    values: list[int] = []
-    for col in range(type_col + 1, min(len(row), type_col + 17)):
+    return [entry["speed"] for entry in extract_way_speed_entries_from_table_row(row, type_col)]
+
+
+def extract_way_speed_entries_from_table_row(row: list[str | None], type_col: int) -> list[dict]:
+    cells: list[dict] = []
+    for col in range(max(0, type_col + 1), min(len(row), type_col + 18)):
         text = normalize_line(row[col] or "")
         if not text:
             continue
         lower = text.lower()
-        if "км/ч" in lower or "км /ч" in lower or "пк" in lower or "км" in lower:
+        if "км/ч" in lower or "км /ч" in lower or "пк" in lower or ("км" in lower and not re.fullmatch(r"\d{2,3}", text)):
             break
         for match in re.finditer(r"(?<!\d)(\d{2,3})(?!\d)", text):
             value = int(match.group(1))
             if 20 <= value <= 160:
-                values.append(value)
-    return values
+                cells.append({"col": col, "speed": value})
+    if not cells:
+        return []
+    first = cells[0]["speed"]
+    second = cells[1]["speed"] if len(cells) > 1 else first
+    if first == second:
+        return [{"wayNumber": 0, "speed": first}]
+    return [
+        {"wayNumber": 1, "speed": first},
+        {"wayNumber": 2, "speed": second},
+    ]
 
+
+def infer_train_type_and_speed_column(row: list[str | None]) -> tuple[str, int]:
+    for col, cell in enumerate(row):
+        normalized = normalize_line(cell or "").lower().replace(".", "")
+        if normalized in {"г", "гр", "груз"}:
+            return "cargo", col
+        if normalized in {"п", "пасс"}:
+            return "passenger", col
+    axis_km = parse_km_axis_cell(row[0] if row else None)
+    if axis_km is None:
+        return "", -1
+    # In the speed tables station/permanent-restriction rows sometimes omit the repeated
+    # train-type cell because the PDF visually merges it from the previous row.  For the
+    # route-base speed columns the first useful numeric cells still start around column 6-9.
+    return "cargo", 5
 
 def min_coordinate_from_rule_text(source: dict, text: str, bounds: dict[int, tuple[int, int]]) -> int | None:
     rules = parse_rules_from_line(source, 0, text, bounds)
@@ -158,43 +186,34 @@ def extract_base_speed_rows_from_tables(
         for index, row in enumerate(table):
             if not row:
                 continue
-            type_col = -1
-            train_type = ""
-            for col, cell in enumerate(row):
-                normalized = normalize_line(cell or "").lower().replace(".", "")
-                if normalized in {"г", "гр", "груз"}:
-                    type_col = col
-                    train_type = "cargo"
-                    break
-                if normalized in {"п", "пасс"}:
-                    type_col = col
-                    train_type = "passenger"
-                    break
+            train_type, type_col = infer_train_type_and_speed_column(row)
             if type_col < 0:
                 continue
-            speeds = extract_speed_values_from_table_row(row, type_col)
-            if not speeds:
+            speed_entries = extract_way_speed_entries_from_table_row(row, type_col)
+            if not speed_entries:
                 continue
             axis_km = parse_km_axis_cell(row[0] if len(row) else None)
             row_text = " ".join(normalize_line(cell or "") for cell in row if cell and normalize_line(cell))
             inferred_coordinate = axis_km * 1000 if axis_km is not None else min_coordinate_from_rule_text(source, row_text, bounds)
             if inferred_coordinate is None:
                 continue
-            rows.append(
-                {
-                    "sourceCode": source["code"],
-                    "sourceName": source["name"],
-                    "sourcePath": source["path"],
-                    "sourceUpdatedAt": source.get("updated_at", ""),
-                    "page": page,
-                    "row": index,
-                    "coordinate": inferred_coordinate,
-                    "speed": max(speeds),
-                    "appliesTo": train_type,
-                    "confidence": "speed-table-base",
-                    "raw": row_text[:260],
-                }
-            )
+            for speed_entry in speed_entries:
+                rows.append(
+                    {
+                        "sourceCode": source["code"],
+                        "sourceName": source["name"],
+                        "sourcePath": source["path"],
+                        "sourceUpdatedAt": source.get("updated_at", ""),
+                        "page": page,
+                        "row": index,
+                        "coordinate": inferred_coordinate,
+                        "speed": int(speed_entry["speed"]),
+                        "wayNumber": int(speed_entry.get("wayNumber") or 0),
+                        "appliesTo": train_type,
+                        "confidence": "speed-table-base",
+                        "raw": row_text[:260],
+                    }
+                )
     return rows
 
 
@@ -204,7 +223,7 @@ def build_base_speed_rules(base_rows: list[dict], bounds: dict[int, tuple[int, i
         grouped.setdefault(row["sourceCode"], []).append(row)
     result: list[dict] = []
     for source_code, rows in grouped.items():
-        rows = sorted(rows, key=lambda item: (item["coordinate"], item["page"], item["row"], item["appliesTo"]))
+        rows = sorted(rows, key=lambda item: (item["coordinate"], item.get("wayNumber", 0), item["page"], item["row"], item["appliesTo"]))
         anchors = sorted(set(int(item["coordinate"]) for item in rows))
         for row in rows:
             start = int(row["coordinate"])
@@ -233,7 +252,8 @@ def build_base_speed_rules(base_rows: list[dict], bounds: dict[int, tuple[int, i
                     "end": end,
                     "length": end - start,
                     "speed": int(row["speed"]),
-                    "name": f"Уст {int(row['speed'])}",
+                    "wayNumber": int(row.get("wayNumber") or 0),
+                    "name": f"Уст {int(row['speed'])}" + (f" П{int(row.get('wayNumber') or 0)}" if int(row.get("wayNumber") or 0) else ""),
                     "appliesTo": row["appliesTo"],
                     "targetSectors": target_sectors,
                     "confidence": row["confidence"],
