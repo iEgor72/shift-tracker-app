@@ -704,8 +704,8 @@
         totalMinutes += getShiftMinutesForDisplay(shifts[i], bounds);
       }
       noteEl.textContent = shifts.length > 1
-        ? ('Смен за день: ' + shifts.length + ' · всего ' + fmtMin(totalMinutes))
-        : ('Смена за день · ' + fmtMin(totalMinutes));
+        ? 'Ниже все смены за выбранный день.'
+        : 'Нажми на карточку смены, чтобы открыть детали.';
       var html = '';
       for (var si = 0; si < shifts.length; si++) {
         html += buildShiftItemHtml(shifts[si], true, null, shiftIncomeMap, bounds, durationLevelMap);
