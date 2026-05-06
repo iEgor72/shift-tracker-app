@@ -14782,7 +14782,8 @@
       var item = objects[i];
       var anchor = getObjectApproachAnchor(item, center);
       if (anchor === null || !isFinite(anchor)) continue;
-      var distance = getDirectionalDistance(anchor, center, tracker.even);
+      var navigationEven = type === '1' ? getEffectiveSignalDirectionEven() : tracker.even;
+      var distance = getDirectionalDistance(anchor, center, navigationEven);
       // Stations/signals must be true approach targets: after the head passes
       // the direction anchor they are behind us, so the distance must not grow.
       if (!isFinite(distance) || distance < -5) continue;
@@ -16225,7 +16226,7 @@
     ctx.restore();
   }
 
-  function drawApkSignals(ctx, layout, center, sector, objects, isPreview, labelLayout) {
+  function drawApkSignals(ctx, layout, center, sector, objects, isPreview, labelLayout, nextSignal) {
     var signals = objects.filter(function(item) { return item.type === '1'; }).sort(function(a, b) {
       return a.coordinate - b.coordinate;
     });
@@ -16238,9 +16239,13 @@
       var x = coordinateToApkX(signal.coordinate, center, layout);
       if (x < layout.viewportX - 8 || x > layout.viewportRight + 8) continue;
       var y = getProfileYAt(signal.coordinate, center, sector, layout);
+      var directionalDistance = getDirectionalDistance(signal.coordinate, center, getEffectiveSignalDirectionEven());
       var signalDistance = Math.abs(signal.coordinate - center);
-      var signalFocus = signalDistance <= APK_LABEL_CONTEXT_RADIUS_M;
-      ctx.globalAlpha = signalFocus ? 1 : 0.50;
+      var isNextSignal = nextSignal && Math.abs(Number(nextSignal.coordinate) - Number(signal.coordinate)) <= 2;
+      // Do not visually promote signals that are under/behind the train tail.
+      // Navigation signals are head-based: only the next signal ahead gets the bright aspect/label.
+      var signalFocus = isNextSignal || (directionalDistance >= -5 && signalDistance <= APK_LABEL_FOCUS_RADIUS_M);
+      ctx.globalAlpha = signalFocus ? 1 : 0.28;
       ctx.strokeStyle = 'rgba(129, 156, 169, 0.84)';
       var stemHeight = isPreview ? 28 : 34;
       ctx.beginPath();
@@ -16248,7 +16253,7 @@
       ctx.lineTo(x, y - stemHeight);
       ctx.stroke();
 
-      ctx.globalAlpha = signalFocus ? 0.66 : 0.38;
+      ctx.globalAlpha = signalFocus ? 0.66 : 0.18;
       ctx.fillStyle = '#f43f5e';
       ctx.beginPath();
       ctx.arc(x, y - 39, radius, 0, Math.PI * 2);
@@ -16264,7 +16269,7 @@
       ctx.globalAlpha = 1;
 
       var signalLabelY = y - (isPreview ? 78 : 86);
-      if (signalDistance <= APK_LABEL_FOCUS_RADIUS_M && x - lastLabelX > (isPreview ? 76 : 92) && reserveLabel(labelLayout, x, signalLabelY, 52, 16, isPreview ? 10 : 8)) {
+      if (signalFocus && directionalDistance >= -5 && x - lastLabelX > (isPreview ? 76 : 92) && reserveLabel(labelLayout, x, signalLabelY, 52, 16, isPreview ? 10 : 8)) {
         drawText(ctx, getDisplayTrackObjectName(signal), x, signalLabelY, {
           size: 8,
           weight: 850,
@@ -17589,7 +17594,7 @@
     drawApkProfile(ctx, layout, center, sector, bounds);
 
     drawApkStations(ctx, layout, center, sector, visibleObjects, isPreview, labelLayout);
-    drawApkSignals(ctx, layout, center, sector, visibleObjects, isPreview, labelLayout);
+    drawApkSignals(ctx, layout, center, sector, visibleObjects, isPreview, labelLayout, nextSignal);
     drawApkSpeedBands(ctx, layout, center, sector, speedRules, factualActiveSpeed, isPreview, labelLayout);
     drawRegimeControlMarks(ctx, layout, center, sector, visibleControlMarks, isPreview, labelLayout);
     drawApkWarningCue(ctx, layout, center, sector, nextWarning, isPreview, labelLayout);
