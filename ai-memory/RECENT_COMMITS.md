@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-06 00:47:42 +0000
+Generated: 2026-05-06 00:51:07 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `807fd2e` | 2026-05-06T00:51:05+00:00 | iEgor72 | fix(poekhali): silence idle target haptics |
+| `e55ffc3` | 2026-05-06T00:47:45+00:00 | iEgor72 | chore(memory): refresh project state |
 | `089ac16` | 2026-05-06T00:47:39+00:00 | iEgor72 | fix(poekhali): prevent track switch overlapping gps |
 | `5438231` | 2026-05-06T00:45:08+00:00 | iEgor72 | chore(memory): refresh project state |
 | `efd3d51` | 2026-05-06T00:45:02+00:00 | iEgor72 | fix(poekhali): polish track switch button |
@@ -42,5 +44,3 @@ Generated: 2026-05-06 00:47:42 +0000
 | `e0e55e2` | 2026-05-05T06:58:23+00:00 | iEgor72 | chore(memory): refresh project state |
 | `ba0de56` | 2026-05-05T06:58:10+00:00 | iEgor72 | fix(poekhali): simplify zero-distance target HUD |
 | `c551a78` | 2026-05-05T06:30:04+00:00 | iEgor72 | chore(memory): refresh project state |
-| `b606f21` | 2026-05-05T06:29:49+00:00 | iEgor72 | fix(poekhali): resolve KOMSOM station as Komsomolsk-2 |
-| `5dde77a` | 2026-05-05T06:11:18+00:00 | iEgor72 | chore(memory): refresh project state |
