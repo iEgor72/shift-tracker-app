@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-06 00:51:07 +0000
+Generated: 2026-05-06 14:42:43 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `ef67136` | 2026-05-06T14:42:21+00:00 | iEgor72 | fix(poekhali): correct live direction from gps movement |
+| `46a59cc` | 2026-05-06T00:51:10+00:00 | iEgor72 | chore(memory): refresh project state |
 | `807fd2e` | 2026-05-06T00:51:05+00:00 | iEgor72 | fix(poekhali): silence idle target haptics |
 | `e55ffc3` | 2026-05-06T00:47:45+00:00 | iEgor72 | chore(memory): refresh project state |
 | `089ac16` | 2026-05-06T00:47:39+00:00 | iEgor72 | fix(poekhali): prevent track switch overlapping gps |
@@ -42,5 +44,3 @@ Generated: 2026-05-06 00:51:07 +0000
 | `1d070d3` | 2026-05-05T07:05:08+00:00 | iEgor72 | chore(memory): refresh project state |
 | `7de8ac2` | 2026-05-05T07:04:25+00:00 | iEgor72 | fix(poekhali): avoid machine speed abbreviations |
 | `e0e55e2` | 2026-05-05T06:58:23+00:00 | iEgor72 | chore(memory): refresh project state |
-| `ba0de56` | 2026-05-05T06:58:10+00:00 | iEgor72 | fix(poekhali): simplify zero-distance target HUD |
-| `c551a78` | 2026-05-05T06:30:04+00:00 | iEgor72 | chore(memory): refresh project state |
