@@ -1,14 +1,14 @@
 # Project State
 
 <!-- AUTO_STATUS:START -->
-Generated: 2026-05-06 00:12:17 +0000
+Generated: 2026-05-06 00:14:46 +0000
 
 ## Repository Snapshot
 - Local repo path: `/opt/bloknot-mashinista`
 - Project memory path: `/opt/bloknot-mashinista/ai-memory`
 - Branch: `main`
-- HEAD: `87db842`
-- Last commit: `87db842 fix(shifts): remove duplicated detail hero metadata`
+- HEAD: `4a9c264`
+- Last commit: `4a9c264 fix(shifts): remove detail hero route duplicate`
 
 ## Git Remote
 ```text
@@ -29,12 +29,12 @@ origin	https://github.com/iEgor72/bloknot-mashinista.git (push)
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          87db842 [origin/main] fix(shifts): remove duplicated detail hero metadata
+* main                                          4a9c264 [origin/main] fix(shifts): remove detail hero route duplicate
 ```
 
 ## Worktree
 ```text
-?? ai-memory/sessions/2026-05-06.md
+clean
 ```
 <!-- AUTO_STATUS:END -->
 
