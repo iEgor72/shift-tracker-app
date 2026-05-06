@@ -14427,10 +14427,8 @@
   }
 
   function getSpeedRulePrefix(rule) {
-    if (!rule) return '';
-    if (rule.source === 'warning') return 'ПР';
-    // Manual/user rules are the factual layer for the app. Do not expose
-    // service-source labels like БАМ/GPS/РК/ОГР in the driver UI.
+    // Driver UI shows speed only: 60 км/ч, 40 км/ч, 25 км/ч.
+    // Source labels (ПР/БАМ/GPS/РК/ОГР) stay internal/management-only.
     return '';
   }
 
@@ -15534,7 +15532,7 @@
       var warningSpeed = Math.max(0, Math.round(Number(nextWarning.item.speed) || 0));
       candidates.push({
         kind: 'warning',
-        label: nextWarning.status === 'active' ? 'ПР действует ' + warningSpeed : 'ПР ' + warningSpeed,
+        label: String(warningSpeed),
         source: 'warning',
         speedKmh: warningSpeed,
         sector: projectionSector,
@@ -15665,7 +15663,7 @@
     var distanceEta = formatLiveHudDistanceEta(navTarget);
     if (navTarget.kind === 'restriction_end') {
       if (navTarget.source === 'warning') {
-        return speedText ? 'ПР ' + speedText + ': вытянем хвост через ' + distanceEta : 'Вытянем хвост через ' + distanceEta;
+        return speedText ? speedText + ': вытянем хвост через ' + distanceEta : 'Вытянем хвост через ' + distanceEta;
       }
       return speedText ? 'Ограничение ' + speedText + ' ещё ' + distanceEta : 'До конца ограничения ' + distanceEta;
     }
@@ -15673,7 +15671,7 @@
       return speedText ? 'Впереди ограничение ' + speedText + ' через ' + distanceEta : 'Впереди ограничение через ' + distanceEta;
     }
     if (navTarget.kind === 'warning') {
-      return speedText ? 'ПР ' + speedText + ' через ' + distanceEta : 'ПР через ' + distanceEta;
+      return speedText ? speedText + ' через ' + distanceEta : 'Скорость через ' + distanceEta;
     }
     return formatSharedPoekhaliNavigationTargetDisplay(navTarget) || fb || '—';
   }
