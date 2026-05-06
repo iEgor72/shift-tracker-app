@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-06 14:55:22 +0000
+Generated: 2026-05-06 15:58:30 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `751ff05` | 2026-05-06T15:58:15+00:00 | iEgor72 | feat(poekhali): add manual BAM speed layer |
+| `29aed3c` | 2026-05-06T14:55:27+00:00 | iEgor72 | chore(memory): refresh after direction-independent objects |
 | `7877eb2` | 2026-05-06T14:55:14+00:00 | iEgor72 | fix(poekhali): keep object data direction independent |
 | `71a4de5` | 2026-05-06T14:53:56+00:00 | iEgor72 | chore(memory): refresh after profile drawing fix |
 | `7692abe` | 2026-05-06T14:53:33+00:00 | iEgor72 | fix(poekhali): draw physical profile elevation |
@@ -42,5 +44,3 @@ Generated: 2026-05-06 14:55:22 +0000
 | `25299d0` | 2026-05-05T11:36:51+00:00 | iEgor72 | chore(memory): refresh project state |
 | `369fb91` | 2026-05-05T11:36:41+00:00 | iEgor72 | fix(poekhali): preserve warning form drafts |
 | `0782da8` | 2026-05-05T11:31:55+00:00 | iEgor72 | chore(memory): refresh project state |
-| `9a0af0f` | 2026-05-05T11:31:45+00:00 | iEgor72 | fix(poekhali): align signal direction with route movement |
-| `27f985d` | 2026-05-05T11:25:49+00:00 | iEgor72 | chore(memory): refresh project state |
