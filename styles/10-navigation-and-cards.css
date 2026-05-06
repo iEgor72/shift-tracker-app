@@ -700,6 +700,15 @@
       display: none;
     }
 
+    .poekhali-top-tray .poekhali-way-btn {
+      display: inline-flex;
+      width: 54px;
+      flex: 0 0 auto;
+      color: var(--accent-strong);
+      border-color: rgba(56, 189, 248, 0.26);
+      background: rgba(56, 189, 248, 0.12);
+    }
+
     .poekhali-map-btn {
       top: max(10px, var(--safe-top));
       left: calc(max(10px, var(--safe-left)) + 206px);
@@ -2057,6 +2066,10 @@
         width: 48px;
       }
 
+      .poekhali-top-tray .poekhali-way-btn {
+        width: 48px;
+      }
+
       .poekhali-map-btn {
         display: none;
       }
@@ -2158,6 +2171,10 @@
       .poekhali-way-btn {
         left: calc(max(8px, var(--safe-left)) + 104px);
         width: 42px;
+      }
+
+      .poekhali-top-tray .poekhali-way-btn {
+        width: 44px;
       }
 
       .poekhali-map-btn {
