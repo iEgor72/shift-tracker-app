@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-06 22:28:31 +0000
+Generated: 2026-05-06 22:32:33 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `bef206f` | 2026-05-06T22:32:25+00:00 | iEgor72 | fix(poekhali): add manual Apkan signals |
+| `19cd27d` | 2026-05-06T22:28:34+00:00 | iEgor72 | chore(memory): refresh after speed label cleanup |
 | `1b10f81` | 2026-05-06T22:28:23+00:00 | iEgor72 | fix(poekhali): show speed labels without source prefix |
 | `a469c9c` | 2026-05-06T22:23:54+00:00 | iEgor72 | chore(memory): refresh after hiding legacy speed UI |
 | `7ef0e22` | 2026-05-06T22:23:41+00:00 | iEgor72 | fix(poekhali): hide legacy speed sources in UI |
@@ -42,5 +44,3 @@ Generated: 2026-05-06 22:28:31 +0000
 | `93e6efa` | 2026-05-06T00:39:04+00:00 | iEgor72 | feat(poekhali): support manual track speed selection |
 | `fc2b80a` | 2026-05-06T00:26:22+00:00 | iEgor72 | chore(memory): refresh project state |
 | `e32307c` | 2026-05-06T00:26:15+00:00 | iEgor72 | fix(poekhali): disambiguate komsomolsk stations |
-| `9a226a5` | 2026-05-06T00:21:15+00:00 | iEgor72 | chore(memory): refresh project state |
-| `d5e4a4d` | 2026-05-06T00:21:08+00:00 | iEgor72 | fix(calendar): simplify empty day copy |
