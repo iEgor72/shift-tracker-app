@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-06 16:00:00 +0000
+Generated: 2026-05-06 16:01:47 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `b572a1e` | 2026-05-06T16:01:39+00:00 | iEgor72 | fix(pwa): sync displayed cache version |
+| `b1d44ca` | 2026-05-06T16:00:04+00:00 | iEgor72 | chore(memory): refresh after Khurmuli label fix |
 | `f069269` | 2026-05-06T15:59:49+00:00 | iEgor72 | fix(poekhali): expand Khurmuli station abbreviation |
 | `e157ebc` | 2026-05-06T15:58:35+00:00 | iEgor72 | chore(memory): refresh after manual BAM speeds |
 | `751ff05` | 2026-05-06T15:58:15+00:00 | iEgor72 | feat(poekhali): add manual BAM speed layer |
@@ -42,5 +44,3 @@ Generated: 2026-05-06 16:00:00 +0000
 | `de4f590` | 2026-05-05T12:16:40+00:00 | iEgor72 | chore(memory): refresh project state |
 | `b286f5f` | 2026-05-05T12:15:57+00:00 | iEgor72 | feat(poekhali): derive speeds from speed documents |
 | `7097eb3` | 2026-05-05T11:55:20+00:00 | iEgor72 | chore(memory): refresh project state |
-| `6670231` | 2026-05-05T11:55:07+00:00 | iEgor72 | feat(poekhali): improve regime control marks |
-| `25299d0` | 2026-05-05T11:36:51+00:00 | iEgor72 | chore(memory): refresh project state |

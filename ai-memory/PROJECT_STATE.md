@@ -1,14 +1,14 @@
 # Project State
 
 <!-- AUTO_STATUS:START -->
-Generated: 2026-05-06 16:00:00 +0000
+Generated: 2026-05-06 16:01:47 +0000
 
 ## Repository Snapshot
 - Local repo path: `/opt/bloknot-mashinista`
 - Project memory path: `/opt/bloknot-mashinista/ai-memory`
 - Branch: `main`
-- HEAD: `f069269`
-- Last commit: `f069269 fix(poekhali): expand Khurmuli station abbreviation`
+- HEAD: `b572a1e`
+- Last commit: `b572a1e fix(pwa): sync displayed cache version`
 
 ## Git Remote
 ```text
@@ -29,7 +29,7 @@ origin	https://github.com/iEgor72/bloknot-mashinista.git (push)
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          f069269 [origin/main] fix(poekhali): expand Khurmuli station abbreviation
+* main                                          b572a1e [origin/main] fix(pwa): sync displayed cache version
 ```
 
 ## Worktree
