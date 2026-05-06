@@ -14372,8 +14372,9 @@
     var start = Math.max(0, Math.round(Number(rule.coordinate) || 0));
     var end = Math.max(start, Math.round(Number(rule.end) || start + Math.max(0, Number(rule.length) || 0)));
     var coordinate = Math.max(0, Math.round(Number(projection.lineCoordinate) || 0));
-    var activeEnd = getDirectionEndCoordinate(start, end, tracker.even);
-    var distanceToEnd = Math.max(0, getDirectionalDistance(activeEnd, coordinate, tracker.even));
+    // Same distance as the speed band above the profile: the restriction remains
+    // active until the tail of the train clears the end of the restricted range.
+    var distanceToEnd = getTrainClearDistanceForSpeedRule(rule, coordinate);
     var prefix = getSpeedRulePrefix(rule);
     return {
       label: prefix + ' ' + formatSpeedLabel(rule),
@@ -14762,6 +14763,7 @@
         kind: 'restriction_end',
         label: 'Конец ' + activeLabel,
         source: run.activeRestrictionSource,
+        speedKmh: run.activeRestrictionSpeedKmh,
         sector: run.activeRestrictionSector,
         coordinate: getDirectionEndCoordinate(run.activeRestrictionStart, run.activeRestrictionEnd, tracker.even),
         distanceMeters: activeDistance,
@@ -14775,6 +14777,7 @@
         kind: run.nextRestrictionSource === 'warning' ? 'warning' : 'restriction',
         label: restrictionLabel,
         source: run.nextRestrictionSource,
+        speedKmh: run.nextRestrictionSpeedKmh,
         sector: run.nextRestrictionSector,
         coordinate: run.nextRestrictionCoordinate,
         distanceMeters: run.nextRestrictionDistanceMeters,
@@ -15345,6 +15348,7 @@
         kind: 'restriction_end',
         label: 'Конец ' + active.label,
         source: active.source,
+        speedKmh: active.speedKmh,
         sector: active.sector,
         coordinate: getDirectionEndCoordinate(active.start, active.end, tracker.even),
         distanceMeters: active.distanceToEnd,
@@ -15358,6 +15362,7 @@
         kind: 'warning',
         label: nextWarning.status === 'active' ? 'ПР действует ' + warningSpeed : 'ПР ' + warningSpeed,
         source: 'warning',
+        speedKmh: warningSpeed,
         sector: projectionSector,
         coordinate: nextWarning.anchor,
         distanceMeters: nextWarning.distance,
@@ -15369,6 +15374,7 @@
         kind: nextRestriction.source === 'warning' ? 'warning' : 'restriction',
         label: nextRestriction.label,
         source: nextRestriction.source,
+        speedKmh: nextRestriction.speedKmh,
         sector: nextRestriction.sector,
         coordinate: nextRestriction.coordinate,
         distanceMeters: nextRestriction.distance,
@@ -15443,29 +15449,55 @@
     return 'info';
   }
 
+  function getNavigationSpeedText(target) {
+    var direct = Math.max(0, Math.round(Number(target && target.speedKmh) || 0));
+    if (direct > 0) return direct + ' км/ч';
+    var label = String(target && target.label || '').trim();
+    var match = label.match(/(\d{2,3})(?=\D|$)/);
+    return match ? Math.round(Number(match[1])) + ' км/ч' : '';
+  }
+
+  function formatLiveHudDistanceEta(target) {
+    var distance = Math.max(0, Math.round(Number(target && target.distanceMeters) || 0));
+    var text = distance > 0 ? formatDistanceLabel(distance) : '0 м';
+    var eta = String(formatEtaSeconds(target && target.etaSeconds, true) || '').replace(/^~/, '').trim();
+    return eta && distance > 0 ? text + ' · ' + eta : text;
+  }
+
   /** Compact chip caption: what the distance number refers to (not "до Х"). */
   function getNavigationHudReachChipCaption(navTarget, nextRestriction, nextWarning, nextSignal, isPreview) {
     if (navTarget) {
       switch (navTarget.kind) {
+        case 'restriction_end':
+          return 'ЕЩЁ';
         case 'restriction':
-          return 'ОГР';
         case 'warning':
-          return 'ПРЕДУПР.';
+          return 'ЧЕРЕЗ';
         default:
           return 'ДО';
       }
     }
-    if (nextRestriction) return 'ОГР';
-    if (nextWarning) return 'ПРЕДУПР.';
+    if (nextRestriction || nextWarning) return 'ЧЕРЕЗ';
     if (nextSignal) return 'СВЕТОФОР';
     if (isPreview) return 'GPS';
     return 'ОБЪЕКТ';
   }
 
-  /** Single human headline: «ст Хальгасо через 697 м | 2 мин» without status labels/координаты/пояса. */
+  /** Single human headline: «Ограничение 60 км/ч ещё 697 м | 2 мин» without status labels/координаты/пояса. */
   function formatLiveHudHeadline(navTarget, fallbackTitle) {
     var fb = String(fallbackTitle || '').trim();
     if (!navTarget) return fb || '—';
+    var speedText = getNavigationSpeedText(navTarget);
+    var distanceEta = formatLiveHudDistanceEta(navTarget);
+    if (navTarget.kind === 'restriction_end') {
+      return speedText ? 'Ограничение ' + speedText + ' ещё ' + distanceEta : 'До конца ограничения ' + distanceEta;
+    }
+    if (navTarget.kind === 'restriction') {
+      return speedText ? 'Впереди ограничение ' + speedText + ' через ' + distanceEta : 'Впереди ограничение через ' + distanceEta;
+    }
+    if (navTarget.kind === 'warning') {
+      return speedText ? 'Предупреждение ' + speedText + ' через ' + distanceEta : 'Предупреждение через ' + distanceEta;
+    }
     return formatSharedPoekhaliNavigationTargetDisplay(navTarget) || fb || '—';
   }
 
