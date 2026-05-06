@@ -13563,18 +13563,17 @@
 
   function getCurrentObjectFileKey() {
     var way = normalizeWayNumber(tracker.wayNumber);
-    var even = !!tracker.even;
     var stores = tracker.trackObjectsByFile || {};
+    // Track geometry, station spans and speed objects are the same physical line for
+    // both travel directions. Direction only changes train movement / signal prefix,
+    // not which object XML we use for profile and speeds.
+    if (way === 1 && stores['1']) return '1';
+    if (way === 2 && stores['2']) return '2';
+    if (stores[String(way)]) return String(way);
     var keys = Object.keys(stores);
     for (var i = 0; i < keys.length; i++) {
-      if (getWayNumberFromObjectFileKey(keys[i]) !== way) continue;
-      var directionEven = stores[keys[i]] && stores[keys[i]].directionEven !== null && stores[keys[i]].directionEven !== undefined
-        ? !!stores[keys[i]].directionEven
-        : getEvenFromObjectFileName(keys[i]);
-      if (directionEven === even) return keys[i];
+      if (getWayNumberFromObjectFileKey(keys[i]) === way) return keys[i];
     }
-    if (way === 1) return even ? '1n' : '1';
-    if (way === 2) return even ? '2' : '2n';
     return String(way);
   }
 
