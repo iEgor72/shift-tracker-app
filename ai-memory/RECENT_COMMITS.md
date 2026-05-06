@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-06 00:26:22 +0000
+Generated: 2026-05-06 00:39:07 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `93e6efa` | 2026-05-06T00:39:04+00:00 | iEgor72 | feat(poekhali): support manual track speed selection |
+| `fc2b80a` | 2026-05-06T00:26:22+00:00 | iEgor72 | chore(memory): refresh project state |
 | `e32307c` | 2026-05-06T00:26:15+00:00 | iEgor72 | fix(poekhali): disambiguate komsomolsk stations |
 | `9a226a5` | 2026-05-06T00:21:15+00:00 | iEgor72 | chore(memory): refresh project state |
 | `d5e4a4d` | 2026-05-06T00:21:08+00:00 | iEgor72 | fix(calendar): simplify empty day copy |
@@ -42,5 +44,3 @@ Generated: 2026-05-06 00:26:22 +0000
 | `6816b25` | 2026-05-05T06:04:45+00:00 | iEgor72 | chore(memory): refresh project state |
 | `5e98c6f` | 2026-05-05T06:04:33+00:00 | iEgor72 | fix(poekhali): format fallback station titles |
 | `750cb3e` | 2026-05-05T06:01:03+00:00 | iEgor72 | chore(memory): refresh project state |
-| `f4619d1` | 2026-05-05T06:00:50+00:00 | iEgor72 | fix(poekhali): humanize object abbreviations |
-| `a9a8961` | 2026-05-05T05:50:04+00:00 | iEgor72 | chore(memory): refresh project state |
