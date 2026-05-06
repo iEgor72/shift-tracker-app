@@ -722,7 +722,7 @@
       var lowerText = text.toLowerCase();
       if (lowerText === 'комсом' || lowerText === 'комсомольск') text = resolvePoekhaliKomsomolskStationName(coordinate);
       else if (lowerText === 'хальгас') text = 'Хальгасо';
-      else if (lowerText === 'хурму') text = 'Хурмули';
+      else if (lowerText === 'хурму' || lowerText === 'хурмул') text = 'Хурмули';
       else if (lowerText === 'скоро') text = 'Огр.';
       text = text.replace(/\s+\(/g, '(').replace(/,\s*/g, ', ').replace(/\s+/g, ' ').trim();
       return text;
