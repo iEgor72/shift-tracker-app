@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-06 19:51:14 +0000
+Generated: 2026-05-06 22:23:50 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `7ef0e22` | 2026-05-06T22:23:41+00:00 | iEgor72 | fix(poekhali): hide legacy speed sources in UI |
+| `2492408` | 2026-05-06T19:51:21+00:00 | iEgor72 | chore(memory): refresh after station navigation fix |
 | `28537cf` | 2026-05-06T19:51:07+00:00 | iEgor72 | fix(poekhali): use station points for navigation |
 | `1a62570` | 2026-05-06T19:48:53+00:00 | iEgor72 | chore(memory): refresh after poekhali tracking fixes |
 | `3351e11` | 2026-05-06T19:48:43+00:00 | iEgor72 | fix(poekhali): stabilize station and warning tracking |
@@ -42,5 +44,3 @@ Generated: 2026-05-06 19:51:14 +0000
 | `d5e4a4d` | 2026-05-06T00:21:08+00:00 | iEgor72 | fix(calendar): simplify empty day copy |
 | `5e6c188` | 2026-05-06T00:19:08+00:00 | iEgor72 | chore(memory): log ui revert |
 | `93fc5a2` | 2026-05-06T00:18:48+00:00 | iEgor72 | Revert "fix(shifts): remove duplicated detail hero metadata" |
-| `4d9e71f` | 2026-05-06T00:18:48+00:00 | iEgor72 | Revert "fix(shifts): remove detail hero route duplicate" |
-| `f59293a` | 2026-05-06T00:18:48+00:00 | iEgor72 | Revert "fix(calendar): avoid duplicate day sheet summary" |
