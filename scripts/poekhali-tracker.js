@@ -14965,7 +14965,10 @@
       var point = source[i];
       if (coordinate <= point.start) break;
       var length = Math.min(coordinate, point.end) - point.start;
-      if (length > 0) total += getProfileDeltaForLength(getEffectiveProfileGrade(point, sector), length, 1);
+      // Visual profile is physical elevation by increasing map coordinate. The screen
+      // direction is already handled by coordinateToApkX(); only text labels should
+      // flip the grade sign for the driver's movement direction.
+      if (length > 0) total += getProfileDeltaForLength(Number(point.grade), length, 1);
       if (coordinate <= point.end) break;
     }
     return total;
