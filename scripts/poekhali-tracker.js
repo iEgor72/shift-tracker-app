@@ -3205,6 +3205,7 @@
     var movedMeters = 0;
     var deltaMs = 0;
     if (last && getSectorKey(last.sector) === getSectorKey(point.sector)) {
+      maybeApplyRunGpsDirectionFromDelta(last, point);
       var delta = Math.abs(point.coordinate - last.coordinate);
       if (delta >= 2 && delta <= 3000) {
         run.distanceMeters = Math.max(0, Math.round((run.distanceMeters || 0) + delta));
@@ -13410,6 +13411,16 @@
     return shouldInvertProfileForDirection(sector !== undefined && sector !== null ? sector : point.sector)
       ? -Number(point.grade)
       : Number(point.grade);
+  }
+
+  function maybeApplyRunGpsDirectionFromDelta(lastPoint, nextPoint) {
+    if (!lastPoint || !nextPoint) return false;
+    if (getSectorKey(lastPoint.sector) !== getSectorKey(nextPoint.sector)) return false;
+    var delta = Number(nextPoint.coordinate) - Number(lastPoint.coordinate);
+    if (!isFinite(delta) || Math.abs(delta) < GPS_DIRECTION_MIN_DELTA_M || Math.abs(delta) > 3000) return false;
+    var nextEven = getEvenFromCoordinateDelta(delta);
+    if (nextEven === tracker.even && tracker.directionSource === 'gps') return false;
+    return applyDetectedDirection(nextEven, 'gps', { force: true, updateRun: false });
   }
 
   function formatProfileGradeLabel(point) {
