@@ -724,23 +724,8 @@
       else if (lowerText === 'хальгас') text = 'Хальгасо';
       else if (lowerText === 'хурму') text = 'Хурмули';
       else if (lowerText === 'скоро') text = 'Огр.';
-      text = text.replace(/Комсомольск[\s-]*на[\s-]*Амуре/ig, 'К-на-А');
-      text = text.replace(/Партизанские\s+сопки/ig, 'Парт сопки');
-      text = text.replace(/\bсортировочн(?:ый|ая|ое|ые)?\b/ig, 'сорт');
-      text = text.replace(/\bгрузов(?:ой|ая|ое|ые)?\b/ig, 'груз');
-      text = text.replace(/\bпассажирск(?:ий|ая|ое|ие)?\b/ig, 'пасс');
-      text = text.replace(/\bразъезд\b/ig, 'рзд');
-      text = text.replace(/остановочн(?:ый|ая|ое)?\s+пункт/ig, 'о.п.');
       text = text.replace(/\s+\(/g, '(').replace(/,\s*/g, ', ').replace(/\s+/g, ' ').trim();
-      if (text.length <= 18) return text;
-      var words = text.split(' ');
-      if (words.length === 1) return text;
-      return words.map(function(word, index) {
-        if (word.indexOf('-') >= 0 || word.indexOf('.') >= 0 || /[()]/.test(word)) return word;
-        if (index === words.length - 1 && word.length <= 8) return word;
-        if (word.length <= 9) return word;
-        return word.slice(0, 4) + '.';
-      }).join(' ');
+      return text;
     }
 
     function formatPoekhaliTargetTitle(target) {

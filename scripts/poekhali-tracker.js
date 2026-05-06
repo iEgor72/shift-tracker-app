@@ -3508,23 +3508,8 @@
     else if (lowerText === 'хальгас') text = 'Хальгасо';
     else if (lowerText === 'хурму') text = 'Хурмули';
     else if (lowerText === 'скоро') text = 'Огр.';
-    text = text.replace(/Комсомольск[\s-]*на[\s-]*Амуре/ig, 'К-на-А');
-    text = text.replace(/Партизанские\s+сопки/ig, 'Парт сопки');
-    text = text.replace(/\bсортировочн(?:ый|ая|ое|ые)?\b/ig, 'сорт');
-    text = text.replace(/\bгрузов(?:ой|ая|ое|ые)?\b/ig, 'груз');
-    text = text.replace(/\bпассажирск(?:ий|ая|ое|ие)?\b/ig, 'пасс');
-    text = text.replace(/\bразъезд\b/ig, 'рзд');
-    text = text.replace(/остановочн(?:ый|ая|ое)?\s+пункт/ig, 'о.п.');
     text = text.replace(/\s+\(/g, '(').replace(/,\s*/g, ', ').replace(/\s+/g, ' ').trim();
-    if (text.length <= 18) return text;
-    var words = text.split(' ');
-    if (words.length === 1) return text;
-    return words.map(function(word, index) {
-      if (word.indexOf('-') >= 0 || word.indexOf('.') >= 0 || /[()]/.test(word)) return word;
-      if (index === words.length - 1 && word.length <= 8) return word;
-      if (word.length <= 9) return word;
-      return word.slice(0, 4) + '.';
-    }).join(' ');
+    return text;
   }
 
   function formatSharedPoekhaliNavigationTargetDisplay(target) {
@@ -11398,10 +11383,63 @@
     return best;
   }
 
+  function getRecentActiveRunSector() {
+    var run = getActiveRun();
+    var points = run && Array.isArray(run.points) ? run.points : [];
+    var counts = {};
+    var bestSector = null;
+    var bestCount = 0;
+    var start = Math.max(0, points.length - 24);
+    for (var i = start; i < points.length; i++) {
+      if (!points[i] || !isRealNumber(points[i].sector)) continue;
+      var sector = getSectorKey(points[i].sector);
+      counts[sector] = (counts[sector] || 0) + 1;
+      if (counts[sector] >= bestCount) {
+        bestCount = counts[sector];
+        bestSector = points[i].sector;
+      }
+    }
+    return bestSector;
+  }
+
+  function findProjectionInRouteSector(coords, routeSegments, routePoints, sector) {
+    if (!isRealNumber(sector)) return null;
+    var key = getSectorKey(sector);
+    var segments = (Array.isArray(routeSegments) ? routeSegments : []).filter(function(item) {
+      return item && getSectorKey(item.sector) === key;
+    });
+    var points = (Array.isArray(routePoints) ? routePoints : []).filter(function(item) {
+      return item && getSectorKey(item.sector) === key;
+    });
+    return findProjectionInRoute(coords, segments, points);
+  }
+
+  function preferProjectionContinuity(current, candidate) {
+    if (!candidate) return current;
+    if (!current) return candidate;
+    if (candidate.onTrack && !current.onTrack) return candidate;
+    if (!candidate.onTrack) return current;
+    var currentDistance = isFinite(current.distance) ? current.distance : Infinity;
+    var candidateDistance = isFinite(candidate.distance) ? candidate.distance : Infinity;
+    return candidateDistance <= currentDistance + 180 ? candidate : current;
+  }
+
   function findTrackProjection(coords) {
     var mapProjection = null;
     if (tracker.assetsLoaded && (tracker.routeSegments.length || tracker.routePoints.length)) {
       mapProjection = findProjectionInRoute(coords, tracker.routeSegments, tracker.routePoints);
+      var continuitySector = getRecentActiveRunSector();
+      mapProjection = preferProjectionContinuity(
+        mapProjection,
+        findProjectionInRouteSector(coords, tracker.routeSegments, tracker.routePoints, continuitySector)
+      );
+      var routeSuggestion = getShiftRouteSuggestion();
+      mapProjection = preferProjectionContinuity(
+        mapProjection,
+        routeSuggestion && routeSuggestion.status === 'ready'
+          ? findProjectionInRouteSector(coords, tracker.routeSegments, tracker.routePoints, routeSuggestion.sector)
+          : null
+      );
     }
     var userProjection = null;
     if ((tracker.userRouteSegments && tracker.userRouteSegments.length) ||
@@ -15759,13 +15797,13 @@
       var minGap = isPreview ? 88 : 112;
       if (shouldLabel && labelX - minGap > labelRight) {
         var stationLabel = formatHumanTrackObjectName(station.name, 'station', station.coordinate).toUpperCase();
-        var stationLabelWidth = Math.min(140, Math.max(54, stationLabel.length * 6.4));
+        var stationLabelWidth = Math.min(220, Math.max(64, stationLabel.length * 7.2));
         drawText(ctx, stationLabel, labelX, layout.profileTop + 7, {
           size: 10,
           weight: 850,
           color: isRegimeStation ? 'rgba(251, 146, 60, 0.36)' : 'rgba(238, 242, 248, 0.32)',
           align: 'center',
-          maxWidth: Math.min(visibleWidth + 12, stationLabelWidth)
+          maxWidth: Math.min(visibleWidth + 60, stationLabelWidth)
         });
         labelRight = labelX + stationLabelWidth / 2 + 14;
       }
