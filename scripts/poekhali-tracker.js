@@ -14421,19 +14421,24 @@
     return 1;
   }
 
+  function isFactualSpeedRuleSource(rule) {
+    var source = String(rule && rule.source || '');
+    return source === 'warning' || source === 'manual' || source === 'user';
+  }
+
   function getSpeedRulePrefix(rule) {
-    if (!rule) return 'ОГР';
-    if (rule.source === 'manual') return 'БАМ';
+    if (!rule) return '';
     if (rule.source === 'warning') return 'ПР';
-    if (rule.source === 'document') return 'ДОК';
-    if (rule.source === 'regime') return 'РК';
-    if (rule.source === 'user') return 'GPS';
-    return 'ОГР';
+    // Manual/user rules are the factual layer for the app. Do not expose
+    // service-source labels like БАМ/GPS/РК/ОГР in the driver UI.
+    return '';
   }
 
   function formatSpeedRuleDisplay(rule) {
     if (!rule) return '—';
-    return getSpeedRulePrefix(rule) + ' ' + formatSpeedLabel(rule);
+    var prefix = getSpeedRulePrefix(rule);
+    var speed = formatSpeedLabel(rule);
+    return prefix ? prefix + ' ' + speed : speed;
   }
 
   function xForCoordinate(value, center, centerX) {
@@ -14491,8 +14496,9 @@
     // active until the tail of the train clears the end of the restricted range.
     var distanceToEnd = getTrainClearDistanceForSpeedRule(rule, coordinate);
     var prefix = getSpeedRulePrefix(rule);
+    var label = prefix ? prefix + ' ' + formatSpeedLabel(rule) : formatSpeedLabel(rule);
     return {
-      label: prefix + ' ' + formatSpeedLabel(rule),
+      label: label,
       source: String(rule.source || ''),
       sourceLabel: prefix,
       speedKmh: Math.max(0, Math.round(speed)),
@@ -14513,7 +14519,8 @@
     var right = center + 250;
     var visibleObjects = getTrackObjectsInWindow(left, right, sector);
     var speedRules = getSpeedRulesInWindow(left, right, sector, visibleObjects);
-    return normalizeActiveRestriction(findTrainBindingSpeedRule(center, speedRules), projection);
+    var active = findTrainBindingSpeedRule(center, speedRules);
+    return isFactualSpeedRuleSource(active) ? normalizeActiveRestriction(active, projection) : null;
   }
 
   function findNextSpeedRule(center, speedRules) {
@@ -14582,7 +14589,8 @@
       var visibleObjects = getTrackObjectsInWindow(left, right, sector);
       rules = getSpeedRulesInWindow(left, right, sector, visibleObjects);
     }
-    return normalizeNextRestriction(findNextSpeedRule(center, rules), projection);
+    var next = findNextSpeedRule(center, (rules || []).filter(isFactualSpeedRuleSource));
+    return normalizeNextRestriction(next, projection);
   }
 
   function applyActiveRestrictionToRun(run, projection, activeRestriction) {
@@ -15507,7 +15515,7 @@
     var speed = getCurrentEtaSpeedKmh();
     var projectionSector = projection && isRealNumber(projection.sector) ? projection.sector : 0;
     var projectionCoordinate = projection && isRealNumber(projection.lineCoordinate) ? projection.lineCoordinate : 0;
-    var active = activeSpeed ? normalizeActiveRestriction(activeSpeed, projection) : null;
+    var active = activeSpeed && isFactualSpeedRuleSource(activeSpeed) ? normalizeActiveRestriction(activeSpeed, projection) : null;
     if (active && active.distanceToEnd > 0) {
       candidates.push({
         kind: 'restriction_end',
@@ -16419,7 +16427,9 @@
   }
 
   function filterSpeedRulesForDisplay(speedRules, activeSpeed, center) {
-    var prepared = (speedRules || []).filter(Boolean).slice().sort(function(a, b) {
+    var prepared = (speedRules || []).filter(function(rule) {
+      return isFactualSpeedRuleSource(rule);
+    }).slice().sort(function(a, b) {
       var aActive = isSameSpeedRule(a, activeSpeed) ? 1 : 0;
       var bActive = isSameSpeedRule(b, activeSpeed) ? 1 : 0;
       if (aActive !== bActive) return bActive - aActive;
@@ -17462,15 +17472,16 @@
     var nextNeutralMark = findNextRegimeControlMarkForDirection(center, sector, 'neutral');
     var nextWarning = findNextWarningForDirection(center, sector);
     var activeSpeed = findTrainBindingSpeedRule(center, speedRules);
+    var factualActiveSpeed = isFactualSpeedRuleSource(activeSpeed) ? activeSpeed : null;
     var nextRestriction = resolveNextRestrictionForProjection(projection);
     var routeProgress = resolveRouteProgressForProjection(projection);
-    tracker.activeRestriction = normalizeActiveRestriction(activeSpeed, projection);
+    tracker.activeRestriction = normalizeActiveRestriction(factualActiveSpeed, projection);
     tracker.nextRestriction = nextRestriction;
     var avgAngle = computeAvgProfileAngle(center, sector, layout);
     var labelLayout = makeLabelLayout();
 
     ctx.save();
-    drawApkLiveSummary(ctx, layout, center, sector, visibleObjects, activeSpeed, nextSignal, nextStation, nextWarning, nextRestriction, routeProgress, isPreview, projection);
+    drawApkLiveSummary(ctx, layout, center, sector, visibleObjects, factualActiveSpeed, nextSignal, nextStation, nextWarning, nextRestriction, routeProgress, isPreview, projection);
     drawApkSceneBackground(ctx, layout);
     drawApkProfileGrid(ctx, layout);
     drawApkTrackerHeader(ctx, layout, center, sector, visibleObjects);
@@ -17480,7 +17491,7 @@
 
     drawApkStations(ctx, layout, center, sector, visibleObjects, isPreview, labelLayout);
     drawApkSignals(ctx, layout, center, sector, visibleObjects, isPreview, labelLayout);
-    drawApkSpeedBands(ctx, layout, center, sector, speedRules, activeSpeed, isPreview, labelLayout);
+    drawApkSpeedBands(ctx, layout, center, sector, speedRules, factualActiveSpeed, isPreview, labelLayout);
     drawRegimeControlMarks(ctx, layout, center, sector, visibleControlMarks, isPreview, labelLayout);
     drawApkWarningCue(ctx, layout, center, sector, nextWarning, isPreview, labelLayout);
     drawApkNextRestrictionCue(ctx, layout, center, sector, nextRestriction, isPreview, labelLayout);
@@ -17493,9 +17504,9 @@
       drawApkTrain(ctx, layout, center, sector, avgAngle, false);
     }
 
-    if (!activeSpeed && !nextWarning && nextNeutralMark && !isPreview) {
+    if (!factualActiveSpeed && !nextWarning && nextNeutralMark && !isPreview) {
       var neutralDistance = Math.abs(nextNeutralMark.coordinate - center);
-      var neutralText = 'РК ОМ · ' + Math.round(neutralDistance) + ' м';
+      var neutralText = 'ОМ · ' + Math.round(neutralDistance) + ' м';
       var neutralWidth = Math.min(124, Math.max(74, neutralText.length * 6 + 18));
       var neutralX = layout.viewportRight - neutralWidth - 8;
       var neutralY = layout.trackY - 48;
@@ -17508,7 +17519,7 @@
         align: 'center',
         maxWidth: neutralWidth - 8
       });
-    } else if (!activeSpeed && !nextWarning && nextSignal && !isPreview) {
+    } else if (!factualActiveSpeed && !nextWarning && nextSignal && !isPreview) {
       var distance = Math.abs(nextSignal.coordinate - center);
       var signalText = formatSignalNameForDirection(nextSignal.name, tracker.even) + ' · ' + Math.round(distance) + ' м';
       var signalWidth = Math.min(132, Math.max(74, signalText.length * 6 + 18));
