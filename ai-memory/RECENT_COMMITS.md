@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-06 22:32:33 +0000
+Generated: 2026-05-06 22:37:42 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `974c916` | 2026-05-06T22:37:34+00:00 | iEgor72 | fix(poekhali): keep station name while inside station |
+| `1e19b9e` | 2026-05-06T22:32:37+00:00 | iEgor72 | chore(memory): refresh after Apkan signal fix |
 | `bef206f` | 2026-05-06T22:32:25+00:00 | iEgor72 | fix(poekhali): add manual Apkan signals |
 | `19cd27d` | 2026-05-06T22:28:34+00:00 | iEgor72 | chore(memory): refresh after speed label cleanup |
 | `1b10f81` | 2026-05-06T22:28:23+00:00 | iEgor72 | fix(poekhali): show speed labels without source prefix |
@@ -42,5 +44,3 @@ Generated: 2026-05-06 22:32:33 +0000
 | `a49f1cf` | 2026-05-06T00:42:23+00:00 | iEgor72 | fix(poekhali): show track switch near gps |
 | `999a495` | 2026-05-06T00:39:09+00:00 | iEgor72 | chore(memory): refresh project state |
 | `93e6efa` | 2026-05-06T00:39:04+00:00 | iEgor72 | feat(poekhali): support manual track speed selection |
-| `fc2b80a` | 2026-05-06T00:26:22+00:00 | iEgor72 | chore(memory): refresh project state |
-| `e32307c` | 2026-05-06T00:26:15+00:00 | iEgor72 | fix(poekhali): disambiguate komsomolsk stations |
