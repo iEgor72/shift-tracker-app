@@ -16615,13 +16615,14 @@
 
   function drawApkSpeedBands(ctx, layout, center, sector, speedRules, activeSpeed, isPreview, labelLayout) {
     var maxLanes = 4;
+    var laneStep = isPreview ? 17 : 18;
     var maxLabels = isPreview ? 3 : 3;
     var labelRightByLane = [];
     var drawnLabels = 0;
     ctx.save();
     var bounds = getApkVisibleBounds(center, layout);
-    var topY = Math.max(138, layout.profileTop - 54);
-    var railBottomY = topY + maxLanes * 14 + 4;
+    var topY = Math.max(126, layout.profileTop - maxLanes * laneStep - 8);
+    var railBottomY = topY + maxLanes * laneStep + 4;
     ctx.strokeStyle = 'rgba(238, 242, 248, 0.12)';
     ctx.lineWidth = 1.2;
     ctx.beginPath();
@@ -16666,7 +16667,7 @@
       var speedValue = getSpeedLaneValue(rule);
       var lane = laneValues.indexOf(speedValue);
       if (lane < 0) continue;
-      var y = topY + lane * 14;
+      var y = topY + lane * laneStep;
       var width = isActive ? 6.4 : (isDocConflict || isWarning ? 3 : 2.2);
       var stroke = getSpeedRowColor(rule, isDimmed);
       ctx.globalAlpha = isActive ? 1 : (isDocConflict || isWarning ? 0.62 : 0.34);
@@ -16702,9 +16703,9 @@
           ctx.save();
           ctx.font = '900 11px system-ui, -apple-system, Segoe UI, sans-serif';
           var measured = Math.min(labelMaxWidth, Math.ceil(ctx.measureText(label).width) + 18);
-          fillRoundRect(ctx, labelX - measured / 2, y - 19, measured, 17, 8, 'rgba(2, 6, 23, 0.84)');
+          fillRoundRect(ctx, labelX - measured / 2, y - 20, measured, 16, 8, 'rgba(2, 6, 23, 0.84)');
           ctx.lineWidth = 1;
-          strokeRoundRect(ctx, labelX - measured / 2, y - 19, measured, 17, 8, 'rgba(248, 250, 252, 0.18)');
+          strokeRoundRect(ctx, labelX - measured / 2, y - 20, measured, 16, 8, 'rgba(248, 250, 252, 0.18)');
           ctx.restore();
         }
         drawText(ctx, label, labelX, y - 6, {
