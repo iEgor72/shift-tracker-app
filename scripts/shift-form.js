@@ -407,56 +407,6 @@
         updateSelectPlaceholderState(e.currentTarget);
         renderDraftShiftSummary();
       });
-      inputLocoSeriesEl.addEventListener('focus', function() {
-        var trigger = document.getElementById('locoSeriesTrigger');
-        if (trigger) trigger.classList.add('is-open');
-      });
-      inputLocoSeriesEl.addEventListener('blur', function() {
-        var trigger = document.getElementById('locoSeriesTrigger');
-        if (trigger) trigger.classList.remove('is-open');
-      });
-    }
-    buildLocoSeriesMenu();
-    syncLocoSeriesTrigger();
-    var locoSeriesTriggerEl = document.getElementById('locoSeriesTrigger');
-    var locoSeriesMenuEl = document.getElementById('locoSeriesMenu');
-    if (locoSeriesTriggerEl) {
-      var locoSeriesPointerToggleAt = 0;
-      var handleLocoSeriesTriggerToggle = function(e) {
-        if (e) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-        toggleLocoSeriesMenu();
-      };
-      locoSeriesTriggerEl.addEventListener('pointerup', function(e) {
-        locoSeriesPointerToggleAt = Date.now ? Date.now() : new Date().getTime();
-        handleLocoSeriesTriggerToggle(e);
-      });
-      locoSeriesTriggerEl.addEventListener('touchend', function(e) {
-        // Telegram/iOS WebView can occasionally drop synthetic click after a fullscreen canvas mode.
-        // Keep a touch fallback, but do not double-toggle after pointerup.
-        var now = Date.now ? Date.now() : new Date().getTime();
-        if (now - locoSeriesPointerToggleAt < 500) return;
-        locoSeriesPointerToggleAt = now;
-        handleLocoSeriesTriggerToggle(e);
-      }, { passive: false });
-      locoSeriesTriggerEl.addEventListener('click', function(e) {
-        var now = Date.now ? Date.now() : new Date().getTime();
-        if (now - locoSeriesPointerToggleAt < 500) {
-          e.preventDefault();
-          e.stopPropagation();
-          return;
-        }
-        handleLocoSeriesTriggerToggle(e);
-      });
-    }
-    if (locoSeriesMenuEl) {
-      locoSeriesMenuEl.addEventListener('click', function(e) {
-        var option = e.target.closest('.glass-select-option');
-        if (!option) return;
-        setLocoSeriesValue(option.getAttribute('data-value'));
-      });
     }
     if (SHIFT_ACTIONS_MENU) {
       SHIFT_ACTIONS_MENU.addEventListener('pointerup', function(e) {
@@ -476,13 +426,6 @@
       }, { passive: false });
     }
     document.addEventListener('pointerdown', function(e) {
-      var els = getLocoSeriesMenuEls();
-      if (!els.menuEl || els.menuEl.classList.contains('hidden')) return;
-      var clickedTrigger = !!(els.triggerEl && els.triggerEl.contains(e.target));
-      var clickedMenu = !!els.menuEl.contains(e.target);
-      if (!clickedTrigger && !clickedMenu) closeLocoSeriesMenu();
-    });
-    document.addEventListener('pointerdown', function(e) {
       if (activeShiftMenuId === null) return;
       var clickedTrigger = !!e.target.closest('.shift-actions-trigger');
       var clickedMenu = !!(SHIFT_ACTIONS_MENU && SHIFT_ACTIONS_MENU.contains(e.target));
@@ -495,15 +438,12 @@
       if (!clickedTrigger && !clickedMenu) closeShiftActionsMenu(true);
     }, true);
     document.addEventListener('scroll', function() {
-      if (LOCO_SERIES_MENU_OPEN) updateLocoSeriesMenuPosition();
       if (activeShiftMenuId !== null) closeShiftActionsMenu(true);
     }, true);
     window.addEventListener('resize', function() {
-      if (LOCO_SERIES_MENU_OPEN) updateLocoSeriesMenuPosition();
       if (activeShiftMenuId !== null) closeShiftActionsMenu(true);
     });
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeLocoSeriesMenu();
       if (e.key === 'Escape') closeShiftActionsMenu(true);
       if (e.key === 'Escape') closeDocsViewerUI();
       if (e.key === 'Escape') closeShiftDetail();

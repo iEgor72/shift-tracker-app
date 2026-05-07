@@ -1389,144 +1389,40 @@
         el.value = String(value || '');
       }
       updateSelectPlaceholderState(el);
-      if (id === 'inputLocoSeries') syncLocoSeriesTrigger();
     }
 
     function updateSelectPlaceholderState(elOrId) {
       var el = typeof elOrId === 'string' ? document.getElementById(elOrId) : elOrId;
       if (!el || el.tagName !== 'SELECT') return;
       el.classList.toggle('is-placeholder', !el.value);
-      if (el.id === 'inputLocoSeries') syncLocoSeriesTrigger();
     }
 
-    var LOCO_SERIES_MENU_OPEN = false;
-
-    function getLocoSeriesMenuEls() {
-      return {
-        selectEl: document.getElementById('inputLocoSeries'),
-        valueEl: document.getElementById('locoSeriesValue'),
-        triggerEl: document.getElementById('locoSeriesTrigger'),
-        menuEl: document.getElementById('locoSeriesMenu')
-      };
-    }
-
-    function portalLocoSeriesMenu() {
-      var els = getLocoSeriesMenuEls();
-      if (!els.menuEl || !UI_OVERLAY_ROOT) return;
-      // Native select is more reliable in Telegram/iOS WebView; keep the custom
-      // menu available only as a desktop fallback and do not move it over mobile UI.
-      if (els.selectEl && els.selectEl.classList && els.selectEl.classList.contains('native-select-overlay')) return;
-      if (els.menuEl.parentNode !== UI_OVERLAY_ROOT) {
-        UI_OVERLAY_ROOT.appendChild(els.menuEl);
-      }
-    }
-
-    function updateLocoSeriesMenuPosition() {
-      if (!LOCO_SERIES_MENU_OPEN) return;
-      var els = getLocoSeriesMenuEls();
-      if (!els.triggerEl || !els.menuEl) return;
-
-      var rect = els.triggerEl.getBoundingClientRect();
-      var viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
-      var viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
-      var gap = 10;
-      var horizontalPadding = 12;
-      var verticalPadding = 12;
-      var availableWidth = Math.max(0, viewportWidth - horizontalPadding * 2);
-      var menuWidth = Math.max(rect.width, 180);
-      if (menuWidth > availableWidth) menuWidth = availableWidth;
-      var left = Math.min(Math.max(rect.left, horizontalPadding), Math.max(horizontalPadding, viewportWidth - menuWidth - horizontalPadding));
-
-      var spaceBelow = viewportHeight - rect.bottom - gap - verticalPadding;
-      var spaceAbove = rect.top - gap - verticalPadding;
-      var openDown = spaceBelow >= 160 || spaceBelow >= spaceAbove;
-      var maxHeight = Math.max(140, Math.min(256, openDown ? spaceBelow : spaceAbove));
-      var top = openDown ? rect.bottom + gap : Math.max(verticalPadding, rect.top - gap - maxHeight);
-
-      els.menuEl.style.setProperty('--select-left', left + 'px');
-      els.menuEl.style.setProperty('--select-top', top + 'px');
-      els.menuEl.style.setProperty('--select-width', menuWidth + 'px');
-      els.menuEl.style.setProperty('--select-max-height', maxHeight + 'px');
-      els.menuEl.dataset.placement = openDown ? 'bottom' : 'top';
+    function syncLocoSeriesSelect() {
+      updateSelectPlaceholderState(document.getElementById('inputLocoSeries'));
     }
 
     function syncLocoSeriesTrigger() {
-      var els = getLocoSeriesMenuEls();
-      var selectEl = els.selectEl;
-      var valueEl = els.valueEl;
-      var triggerEl = els.triggerEl;
-      var menuEl = els.menuEl;
-      if (!selectEl || !valueEl) return;
-      var selected = selectEl.options[selectEl.selectedIndex];
-      var hasValue = !!selectEl.value;
-      valueEl.textContent = hasValue && selected ? selected.textContent : 'Выберите серию';
-      valueEl.classList.toggle('is-placeholder', !hasValue);
-      if (triggerEl) triggerEl.classList.toggle('is-placeholder', !hasValue);
-      if (menuEl) {
-        var buttons = menuEl.querySelectorAll('.glass-select-option');
-        for (var i = 0; i < buttons.length; i++) {
-          var active = buttons[i].getAttribute('data-value') === selectEl.value;
-          buttons[i].classList.toggle('is-active', active);
-          buttons[i].setAttribute('aria-selected', active ? 'true' : 'false');
-        }
-      }
-    }
-
-    function buildLocoSeriesMenu() {
-      var els = getLocoSeriesMenuEls();
-      var selectEl = els.selectEl;
-      var menuEl = els.menuEl;
-      if (!selectEl || !menuEl) return;
-      var html = '';
-      for (var i = 0; i < selectEl.options.length; i++) {
-        var opt = selectEl.options[i];
-        if (!opt.value) continue;
-        html += '<button type="button" class="glass-select-option" role="option" aria-selected="false" data-value="' + escapeHtml(opt.value) + '">' + escapeHtml(opt.textContent) + '</button>';
-      }
-      menuEl.innerHTML = html;
-      portalLocoSeriesMenu();
-      syncLocoSeriesTrigger();
+      // Backward-compatible no-op: locomotive series is now a single native select.
+      syncLocoSeriesSelect();
     }
 
     function closeLocoSeriesMenu() {
-      var els = getLocoSeriesMenuEls();
-      LOCO_SERIES_MENU_OPEN = false;
-      if (els.menuEl) els.menuEl.classList.add('hidden');
-      if (els.triggerEl) {
-        els.triggerEl.classList.remove('is-open');
-        els.triggerEl.setAttribute('aria-expanded', 'false');
-      }
+      // Backward-compatible no-op for shared tab/menu cleanup.
     }
 
-    function openLocoSeriesMenu() {
-      var els = getLocoSeriesMenuEls();
-      if (!els.menuEl || !els.triggerEl) return;
-      portalLocoSeriesMenu();
-      LOCO_SERIES_MENU_OPEN = true;
-      els.menuEl.classList.remove('hidden');
-      els.triggerEl.classList.add('is-open');
-      els.triggerEl.setAttribute('aria-expanded', 'true');
-      updateLocoSeriesMenuPosition();
+    function updateLocoSeriesMenuPosition() {
+      // Backward-compatible no-op; there is no detached menu to position.
     }
 
-    function toggleLocoSeriesMenu() {
-      var menuEl = document.getElementById('locoSeriesMenu');
-      if (!menuEl) return;
-      if (menuEl.classList.contains('hidden')) openLocoSeriesMenu();
-      else closeLocoSeriesMenu();
+    function buildLocoSeriesMenu() {
+      syncLocoSeriesSelect();
     }
 
     function setLocoSeriesValue(value) {
       var selectEl = document.getElementById('inputLocoSeries');
       if (!selectEl) return;
-      if (selectEl.value === String(value || '')) {
-        closeLocoSeriesMenu();
-        return;
-      }
       selectEl.value = String(value || '');
       selectEl.dispatchEvent(new Event('change', { bubbles: true }));
-      syncLocoSeriesTrigger();
-      closeLocoSeriesMenu();
       renderDraftShiftSummary();
     }
 
