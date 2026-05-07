@@ -1,14 +1,14 @@
 # Project State
 
 <!-- AUTO_STATUS:START -->
-Generated: 2026-05-07 01:17:06 +0000
+Generated: 2026-05-07 05:58:32 +0000
 
 ## Repository Snapshot
 - Local repo path: `/opt/bloknot-mashinista`
 - Project memory path: `/opt/bloknot-mashinista/ai-memory`
 - Branch: `main`
-- HEAD: `24bffb8`
-- Last commit: `24bffb8 fix(ui): remove locomotive dropdown sync recursion`
+- HEAD: `3fedb4b`
+- Last commit: `3fedb4b fix(tracker): separate speed lanes on map`
 
 ## Git Remote
 ```text
@@ -29,7 +29,7 @@ origin	https://github.com/iEgor72/bloknot-mashinista.git (push)
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          24bffb8 [origin/main] fix(ui): remove locomotive dropdown sync recursion
+* main                                          3fedb4b [origin/main] fix(tracker): separate speed lanes on map
 ```
 
 ## Worktree

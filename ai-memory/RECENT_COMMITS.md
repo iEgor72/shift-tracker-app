@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-07 01:17:07 +0000
+Generated: 2026-05-07 05:58:33 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `3fedb4b` | 2026-05-07T05:58:23+00:00 | iEgor72 | fix(tracker): separate speed lanes on map |
+| `3986476` | 2026-05-07T01:18:30+00:00 | iEgor72 | chore(memory): refresh after dropdown recursion fix |
 | `24bffb8` | 2026-05-07T01:16:52+00:00 | iEgor72 | fix(ui): remove locomotive dropdown sync recursion |
 | `b2b0fff` | 2026-05-07T01:13:53+00:00 | iEgor72 | chore(memory): refresh after styled dropdown restore |
 | `fa0fedd` | 2026-05-07T01:13:32+00:00 | iEgor72 | fix(ui): restore styled locomotive series dropdown |
@@ -42,5 +44,3 @@ Generated: 2026-05-07 01:17:07 +0000
 | `f069269` | 2026-05-06T15:59:49+00:00 | iEgor72 | fix(poekhali): expand Khurmuli station abbreviation |
 | `e157ebc` | 2026-05-06T15:58:35+00:00 | iEgor72 | chore(memory): refresh after manual BAM speeds |
 | `751ff05` | 2026-05-06T15:58:15+00:00 | iEgor72 | feat(poekhali): add manual BAM speed layer |
-| `29aed3c` | 2026-05-06T14:55:27+00:00 | iEgor72 | chore(memory): refresh after direction-independent objects |
-| `7877eb2` | 2026-05-06T14:55:14+00:00 | iEgor72 | fix(poekhali): keep object data direction independent |
