@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-07 01:06:09 +0000
+Generated: 2026-05-07 01:08:56 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `2169e63` | 2026-05-07T01:08:38+00:00 | iEgor72 | refactor(ui): use single native locomotive series select |
+| `aee4c07` | 2026-05-07T01:06:14+00:00 | iEgor72 | chore(memory): refresh after native select fix |
 | `fcd5d04` | 2026-05-07T01:05:55+00:00 | iEgor72 | fix(ui): use native locomotive series select |
 | `b21c70e` | 2026-05-07T00:58:58+00:00 | iEgor72 | chore(memory): refresh after loco menu fix |
 | `e58cff8` | 2026-05-07T00:58:39+00:00 | iEgor72 | fix(ui): make locomotive series menu touch-safe |
@@ -42,5 +44,3 @@ Generated: 2026-05-07 01:06:09 +0000
 | `7692abe` | 2026-05-06T14:53:33+00:00 | iEgor72 | fix(poekhali): draw physical profile elevation |
 | `39ed233` | 2026-05-06T14:52:27+00:00 | iEgor72 | chore(memory): refresh after poekhali profile fix |
 | `a15a3d3` | 2026-05-06T14:52:07+00:00 | iEgor72 | fix(poekhali): keep full station names and route profile |
-| `92a66df` | 2026-05-06T14:42:49+00:00 | iEgor72 | chore(memory): refresh after poekhali direction fix |
-| `ef67136` | 2026-05-06T14:42:21+00:00 | iEgor72 | fix(poekhali): correct live direction from gps movement |
