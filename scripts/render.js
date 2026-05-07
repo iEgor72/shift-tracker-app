@@ -1396,15 +1396,6 @@
       var el = typeof elOrId === 'string' ? document.getElementById(elOrId) : elOrId;
       if (!el || el.tagName !== 'SELECT') return;
       el.classList.toggle('is-placeholder', !el.value);
-      if (el.id === 'inputLocoSeries' && typeof syncLocoSeriesTrigger === 'function') {
-        var valueEl = document.getElementById('locoSeriesValue');
-        var selected = el.options[el.selectedIndex];
-        var hasValue = !!el.value;
-        if (valueEl) {
-          valueEl.textContent = hasValue && selected ? selected.textContent : 'Выберите серию';
-          valueEl.classList.toggle('is-placeholder', !hasValue);
-        }
-      }
     }
 
     var LOCO_SERIES_MENU_OPEN = false;
