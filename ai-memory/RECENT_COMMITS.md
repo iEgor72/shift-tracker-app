@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-07 01:08:56 +0000
+Generated: 2026-05-07 01:13:48 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `fa0fedd` | 2026-05-07T01:13:32+00:00 | iEgor72 | fix(ui): restore styled locomotive series dropdown |
+| `c14d64e` | 2026-05-07T01:09:02+00:00 | iEgor72 | chore(memory): refresh after native select refactor |
 | `2169e63` | 2026-05-07T01:08:38+00:00 | iEgor72 | refactor(ui): use single native locomotive series select |
 | `aee4c07` | 2026-05-07T01:06:14+00:00 | iEgor72 | chore(memory): refresh after native select fix |
 | `fcd5d04` | 2026-05-07T01:05:55+00:00 | iEgor72 | fix(ui): use native locomotive series select |
@@ -42,5 +44,3 @@ Generated: 2026-05-07 01:08:56 +0000
 | `7877eb2` | 2026-05-06T14:55:14+00:00 | iEgor72 | fix(poekhali): keep object data direction independent |
 | `71a4de5` | 2026-05-06T14:53:56+00:00 | iEgor72 | chore(memory): refresh after profile drawing fix |
 | `7692abe` | 2026-05-06T14:53:33+00:00 | iEgor72 | fix(poekhali): draw physical profile elevation |
-| `39ed233` | 2026-05-06T14:52:27+00:00 | iEgor72 | chore(memory): refresh after poekhali profile fix |
-| `a15a3d3` | 2026-05-06T14:52:07+00:00 | iEgor72 | fix(poekhali): keep full station names and route profile |
