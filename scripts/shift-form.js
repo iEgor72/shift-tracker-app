@@ -413,10 +413,34 @@
     var locoSeriesTriggerEl = document.getElementById('locoSeriesTrigger');
     var locoSeriesMenuEl = document.getElementById('locoSeriesMenu');
     if (locoSeriesTriggerEl) {
-      locoSeriesTriggerEl.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
+      var locoSeriesPointerToggleAt = 0;
+      var handleLocoSeriesTriggerToggle = function(e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
         toggleLocoSeriesMenu();
+      };
+      locoSeriesTriggerEl.addEventListener('pointerup', function(e) {
+        locoSeriesPointerToggleAt = Date.now ? Date.now() : new Date().getTime();
+        handleLocoSeriesTriggerToggle(e);
+      });
+      locoSeriesTriggerEl.addEventListener('touchend', function(e) {
+        // Telegram/iOS WebView can occasionally drop synthetic click after a fullscreen canvas mode.
+        // Keep a touch fallback, but do not double-toggle after pointerup.
+        var now = Date.now ? Date.now() : new Date().getTime();
+        if (now - locoSeriesPointerToggleAt < 500) return;
+        locoSeriesPointerToggleAt = now;
+        handleLocoSeriesTriggerToggle(e);
+      }, { passive: false });
+      locoSeriesTriggerEl.addEventListener('click', function(e) {
+        var now = Date.now ? Date.now() : new Date().getTime();
+        if (now - locoSeriesPointerToggleAt < 500) {
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+        handleLocoSeriesTriggerToggle(e);
       });
     }
     if (locoSeriesMenuEl) {
