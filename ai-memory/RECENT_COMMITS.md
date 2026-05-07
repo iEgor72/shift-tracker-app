@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-06 23:53:22 +0000
+Generated: 2026-05-07 00:58:55 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `e58cff8` | 2026-05-07T00:58:39+00:00 | iEgor72 | fix(ui): make locomotive series menu touch-safe |
+| `0a8760d` | 2026-05-06T23:53:28+00:00 | iEgor72 | chore(memory): refresh after poekhali hang fix |
 | `1ba44a2` | 2026-05-06T23:53:11+00:00 | iEgor72 | fix(poekhali): cache signal direction during drawing |
 | `5257931` | 2026-05-06T22:46:12+00:00 | iEgor72 | chore(memory): refresh after station hud fix |
 | `c99b6dc` | 2026-05-06T22:46:03+00:00 | iEgor72 | fix(poekhali): show current station separately from next target |
@@ -42,5 +44,3 @@ Generated: 2026-05-06 23:53:22 +0000
 | `ef67136` | 2026-05-06T14:42:21+00:00 | iEgor72 | fix(poekhali): correct live direction from gps movement |
 | `46a59cc` | 2026-05-06T00:51:10+00:00 | iEgor72 | chore(memory): refresh project state |
 | `807fd2e` | 2026-05-06T00:51:05+00:00 | iEgor72 | fix(poekhali): silence idle target haptics |
-| `e55ffc3` | 2026-05-06T00:47:45+00:00 | iEgor72 | chore(memory): refresh project state |
-| `089ac16` | 2026-05-06T00:47:39+00:00 | iEgor72 | fix(poekhali): prevent track switch overlapping gps |

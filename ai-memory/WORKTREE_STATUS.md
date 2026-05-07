@@ -1,6 +1,6 @@
 # Worktree Status
 
-Generated: 2026-05-06 23:53:22 +0000
+Generated: 2026-05-07 00:58:55 +0000
 
 ## git status -sb
 ```text
@@ -21,16 +21,16 @@ Generated: 2026-05-06 23:53:22 +0000
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          1ba44a2 [origin/main] fix(poekhali): cache signal direction during drawing
+* main                                          e58cff8 [origin/main] fix(ui): make locomotive series menu touch-safe
 ```
 
 ## HEAD
 ```text
-1ba44a2 fix(poekhali): cache signal direction during drawing
- ai-memory/CHANGELOG.md           |  8 ++++++
- ai-memory/sessions/2026-05-06.md |  1 +
+e58cff8 fix(ui): make locomotive series menu touch-safe
+ ai-memory/CHANGELOG.md           |  8 ++++++++
+ ai-memory/sessions/2026-05-07.md |  2 ++
  scripts/app-constants.js         |  2 +-
- scripts/poekhali-tracker.js      | 55 +++++++++++++++++++++++++++++++---------
+ scripts/shift-form.js            | 30 +++++++++++++++++++++++++++---
  sw.js                            |  2 +-
- 5 files changed, 54 insertions(+), 14 deletions(-)
+ 5 files changed, 39 insertions(+), 5 deletions(-)
 ```

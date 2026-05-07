@@ -1,14 +1,14 @@
 # Project State
 
 <!-- AUTO_STATUS:START -->
-Generated: 2026-05-06 23:53:22 +0000
+Generated: 2026-05-07 00:58:55 +0000
 
 ## Repository Snapshot
 - Local repo path: `/opt/bloknot-mashinista`
 - Project memory path: `/opt/bloknot-mashinista/ai-memory`
 - Branch: `main`
-- HEAD: `1ba44a2`
-- Last commit: `1ba44a2 fix(poekhali): cache signal direction during drawing`
+- HEAD: `e58cff8`
+- Last commit: `e58cff8 fix(ui): make locomotive series menu touch-safe`
 
 ## Git Remote
 ```text
@@ -29,7 +29,7 @@ origin	https://github.com/iEgor72/bloknot-mashinista.git (push)
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          1ba44a2 [origin/main] fix(poekhali): cache signal direction during drawing
+* main                                          e58cff8 [origin/main] fix(ui): make locomotive series menu touch-safe
 ```
 
 ## Worktree
