@@ -383,6 +383,7 @@
     runStartMessage: '',
     autoRunTimer: null,
     autoRunSuppressedShiftId: '',
+    manualRunPause: false,
     backupMessage: '',
     backupMessageTone: '',
     timerStartedAt: 0,
@@ -12266,6 +12267,7 @@
     if (tracker.timerRunning || tracker.runStartPreparing) return;
     clearAutoRunTimer();
     if (!options.auto) tracker.autoRunSuppressedShiftId = '';
+    tracker.manualRunPause = false;
     var token = Date.now() + Math.random();
     tracker.runStartPreparing = true;
     tracker.runStartToken = token;
@@ -12340,11 +12342,25 @@
       clearAutoRunTimer();
       tracker.timerElapsedMs = getTimerElapsed();
       tracker.timerRunning = false;
+      tracker.manualRunPause = true;
       pauseActiveRun();
       restartWatchingGps();
     }
     updateModeButtons();
     requestDraw();
+  }
+
+  function shouldAutoResumePausedRun() {
+    var run = getActiveRun();
+    return !!(tracker.active && run && run.status === 'paused' && !tracker.manualRunPause && !tracker.timerRunning && !tracker.runStartPreparing);
+  }
+
+  function maybeAutoResumePausedRun(reason) {
+    if (!shouldAutoResumePausedRun()) return;
+    beginPoekhaliRun({
+      auto: true,
+      reason: reason || 'gps-reconnect'
+    });
   }
 
   function handlePosition(position) {
@@ -12369,6 +12385,7 @@
       var projection = applyTrackProjection(position.coords);
       if (shouldCaptureTrackData) recordLearningSample(position, projection);
       updateActiveRunFromProjection(projection, position);
+      if (projection && projection.onTrack) maybeAutoResumePausedRun('gps-reconnect');
     }
     requestDraw();
   }
@@ -12402,8 +12419,8 @@
 
   function shouldKeepGpsWatching() {
     if (!tracker.active) return false;
-    if (!(tracker.timerRunning || tracker.runStartPreparing)) return false;
-    return true;
+    if (tracker.timerRunning || tracker.runStartPreparing) return true;
+    return shouldAutoResumePausedRun();
   }
 
   function getGpsPollOptions() {
@@ -17792,12 +17809,12 @@
 
   function getDrawLoopIntervalMs() {
     if (isPageHidden()) return DRAW_HIDDEN_INTERVAL_MS;
-    return (tracker.timerRunning || tracker.runStartPreparing) ? DRAW_LIVE_INTERVAL_MS : DRAW_IDLE_INTERVAL_MS;
+    return (tracker.timerRunning || tracker.runStartPreparing || getActiveRun()) ? DRAW_LIVE_INTERVAL_MS : DRAW_IDLE_INTERVAL_MS;
   }
 
   function shouldKeepDrawLoop() {
     if (!tracker.active || isPageHidden()) return false;
-    return !!(tracker.timerRunning || tracker.runStartPreparing || tracker.previewDragActive);
+    return !!(tracker.timerRunning || tracker.runStartPreparing || getActiveRun() || tracker.previewDragActive);
   }
 
   function requestDraw() {
@@ -18026,6 +18043,7 @@
     if (tracker.timerRunning) {
       tracker.timerElapsedMs = getTimerElapsed();
       tracker.timerRunning = false;
+      tracker.manualRunPause = false;
       pauseActiveRun();
     }
     tracker.runStartPreparing = false;
