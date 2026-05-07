@@ -1,6 +1,6 @@
 # Worktree Status
 
-Generated: 2026-05-07 01:13:48 +0000
+Generated: 2026-05-07 01:17:07 +0000
 
 ## git status -sb
 ```text
@@ -21,19 +21,16 @@ Generated: 2026-05-07 01:13:48 +0000
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          fa0fedd [origin/main] fix(ui): restore styled locomotive series dropdown
+* main                                          24bffb8 [origin/main] fix(ui): remove locomotive dropdown sync recursion
 ```
 
 ## HEAD
 ```text
-fa0fedd fix(ui): restore styled locomotive series dropdown
- ai-memory/CHANGELOG.md           |  8 ++++
- ai-memory/sessions/2026-05-07.md |  1 +
- index.html                       | 11 ++++-
- scripts/app-constants.js         |  2 +-
- scripts/render.js                | 99 ++++++++++++++++++++++++++++++++++++----
- scripts/shift-form.js            | 37 +++++++++++++++
- styles/20-form-and-stats.css     | 29 ++++++++++--
- sw.js                            |  2 +-
- 8 files changed, 171 insertions(+), 18 deletions(-)
+24bffb8 fix(ui): remove locomotive dropdown sync recursion
+ ai-memory/CHANGELOG.md           | 8 ++++++++
+ ai-memory/sessions/2026-05-07.md | 1 +
+ scripts/app-constants.js         | 2 +-
+ scripts/render.js                | 9 ---------
+ sw.js                            | 2 +-
+ 5 files changed, 11 insertions(+), 11 deletions(-)
 ```
