@@ -407,6 +407,14 @@
         updateSelectPlaceholderState(e.currentTarget);
         renderDraftShiftSummary();
       });
+      inputLocoSeriesEl.addEventListener('focus', function() {
+        var trigger = document.getElementById('locoSeriesTrigger');
+        if (trigger) trigger.classList.add('is-open');
+      });
+      inputLocoSeriesEl.addEventListener('blur', function() {
+        var trigger = document.getElementById('locoSeriesTrigger');
+        if (trigger) trigger.classList.remove('is-open');
+      });
     }
     buildLocoSeriesMenu();
     syncLocoSeriesTrigger();

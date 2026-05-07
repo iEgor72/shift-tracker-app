@@ -1413,6 +1413,9 @@
     function portalLocoSeriesMenu() {
       var els = getLocoSeriesMenuEls();
       if (!els.menuEl || !UI_OVERLAY_ROOT) return;
+      // Native select is more reliable in Telegram/iOS WebView; keep the custom
+      // menu available only as a desktop fallback and do not move it over mobile UI.
+      if (els.selectEl && els.selectEl.classList && els.selectEl.classList.contains('native-select-overlay')) return;
       if (els.menuEl.parentNode !== UI_OVERLAY_ROOT) {
         UI_OVERLAY_ROOT.appendChild(els.menuEl);
       }
