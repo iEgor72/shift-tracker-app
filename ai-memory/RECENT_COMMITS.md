@@ -1,9 +1,11 @@
 # Recent Commits
 
-Generated: 2026-05-07 05:58:33 +0000
+Generated: 2026-05-07 06:23:38 +0000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `241d11c` | 2026-05-07T06:23:33+00:00 | iEgor72 | fix(tracker): auto resume gps after pause |
+| `9275743` | 2026-05-07T05:58:39+00:00 | iEgor72 | chore(memory): refresh project snapshot |
 | `3fedb4b` | 2026-05-07T05:58:23+00:00 | iEgor72 | fix(tracker): separate speed lanes on map |
 | `3986476` | 2026-05-07T01:18:30+00:00 | iEgor72 | chore(memory): refresh after dropdown recursion fix |
 | `24bffb8` | 2026-05-07T01:16:52+00:00 | iEgor72 | fix(ui): remove locomotive dropdown sync recursion |
@@ -42,5 +44,3 @@ Generated: 2026-05-07 05:58:33 +0000
 | `b572a1e` | 2026-05-06T16:01:39+00:00 | iEgor72 | fix(pwa): sync displayed cache version |
 | `b1d44ca` | 2026-05-06T16:00:04+00:00 | iEgor72 | chore(memory): refresh after Khurmuli label fix |
 | `f069269` | 2026-05-06T15:59:49+00:00 | iEgor72 | fix(poekhali): expand Khurmuli station abbreviation |
-| `e157ebc` | 2026-05-06T15:58:35+00:00 | iEgor72 | chore(memory): refresh after manual BAM speeds |
-| `751ff05` | 2026-05-06T15:58:15+00:00 | iEgor72 | feat(poekhali): add manual BAM speed layer |

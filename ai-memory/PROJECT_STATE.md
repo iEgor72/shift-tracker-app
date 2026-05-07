@@ -1,14 +1,14 @@
 # Project State
 
 <!-- AUTO_STATUS:START -->
-Generated: 2026-05-07 05:58:32 +0000
+Generated: 2026-05-07 06:23:38 +0000
 
 ## Repository Snapshot
 - Local repo path: `/opt/bloknot-mashinista`
 - Project memory path: `/opt/bloknot-mashinista/ai-memory`
 - Branch: `main`
-- HEAD: `3fedb4b`
-- Last commit: `3fedb4b fix(tracker): separate speed lanes on map`
+- HEAD: `241d11c`
+- Last commit: `241d11c fix(tracker): auto resume gps after pause`
 
 ## Git Remote
 ```text
@@ -29,7 +29,7 @@ origin	https://github.com/iEgor72/bloknot-mashinista.git (push)
 + cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
 + cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
 + feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          3fedb4b [origin/main] fix(tracker): separate speed lanes on map
+* main                                          241d11c [origin/main] fix(tracker): auto resume gps after pause
 ```
 
 ## Worktree
