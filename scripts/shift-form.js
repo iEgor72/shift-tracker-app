@@ -405,9 +405,44 @@
     if (inputLocoSeriesEl) {
       inputLocoSeriesEl.addEventListener('change', function(e) {
         updateSelectPlaceholderState(e.currentTarget);
+        syncLocoSeriesTrigger();
         renderDraftShiftSummary();
       });
     }
+    buildLocoSeriesMenu();
+    syncLocoSeriesTrigger();
+    var locoSeriesTriggerEl = document.getElementById('locoSeriesTrigger');
+    var locoSeriesMenuEl = document.getElementById('locoSeriesMenu');
+    if (locoSeriesTriggerEl) {
+      var locoSeriesPointerToggleAt = 0;
+      locoSeriesTriggerEl.addEventListener('pointerup', function(e) {
+        // Some Telegram WebViews deliver pointerup more reliably than click after canvas mode.
+        locoSeriesPointerToggleAt = Date.now ? Date.now() : new Date().getTime();
+        e.preventDefault();
+        e.stopPropagation();
+        toggleLocoSeriesMenu();
+      });
+      locoSeriesTriggerEl.addEventListener('click', function(e) {
+        var now = Date.now ? Date.now() : new Date().getTime();
+        e.preventDefault();
+        e.stopPropagation();
+        if (now - locoSeriesPointerToggleAt < 500) return;
+        toggleLocoSeriesMenu();
+      });
+    }
+    if (locoSeriesMenuEl) {
+      locoSeriesMenuEl.addEventListener('click', function(e) {
+        var option = e.target.closest('.glass-select-option');
+        if (!option) return;
+        setLocoSeriesValue(option.getAttribute('data-value'));
+      });
+    }
+    document.addEventListener('pointerdown', function(e) {
+      if (!LOCO_SERIES_MENU_OPEN) return;
+      var root = document.getElementById('locoSeriesSelect');
+      if (root && root.contains(e.target)) return;
+      closeLocoSeriesMenu();
+    });
     if (SHIFT_ACTIONS_MENU) {
       SHIFT_ACTIONS_MENU.addEventListener('pointerup', function(e) {
         var item = e.target.closest('.shift-actions-item');
@@ -441,9 +476,11 @@
       if (activeShiftMenuId !== null) closeShiftActionsMenu(true);
     }, true);
     window.addEventListener('resize', function() {
+      if (LOCO_SERIES_MENU_OPEN) closeLocoSeriesMenu();
       if (activeShiftMenuId !== null) closeShiftActionsMenu(true);
     });
     document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeLocoSeriesMenu();
       if (e.key === 'Escape') closeShiftActionsMenu(true);
       if (e.key === 'Escape') closeDocsViewerUI();
       if (e.key === 'Escape') closeShiftDetail();

@@ -630,11 +630,28 @@
       color: var(--accent);
     }
 
+    .optional-card.has-open-select {
+      position: relative;
+      z-index: var(--layer-overlay);
+      overflow: visible;
+    }
+
+    .optional-card.has-open-select .optional-card-body,
+    .optional-card.has-open-select .optional-grid,
+    .optional-card.has-open-select .field {
+      overflow: visible;
+    }
+
+    .glass-select.is-open {
+      z-index: var(--layer-overlay);
+    }
+
     .glass-select-menu {
-      position: fixed;
-      left: var(--select-left, 0);
-      top: var(--select-top, 0);
-      width: var(--select-width, 100%);
+      position: absolute;
+      left: 0;
+      top: calc(100% + 8px);
+      width: 100%;
+      min-width: 180px;
       z-index: var(--layer-overlay);
       display: grid;
       gap: 2px;
@@ -643,10 +660,12 @@
       background: var(--card);
       border: 1px solid var(--border-hi);
       box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
-      max-height: var(--select-max-height, 256px);
+      max-height: min(256px, 52vh);
       overflow: auto;
+      overscroll-behavior: contain;
       transform: translateZ(0);
       pointer-events: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .glass-select-option {

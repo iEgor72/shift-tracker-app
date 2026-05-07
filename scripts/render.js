@@ -1389,33 +1389,112 @@
         el.value = String(value || '');
       }
       updateSelectPlaceholderState(el);
+      if (id === 'inputLocoSeries') syncLocoSeriesTrigger();
     }
 
     function updateSelectPlaceholderState(elOrId) {
       var el = typeof elOrId === 'string' ? document.getElementById(elOrId) : elOrId;
       if (!el || el.tagName !== 'SELECT') return;
       el.classList.toggle('is-placeholder', !el.value);
+      if (el.id === 'inputLocoSeries' && typeof syncLocoSeriesTrigger === 'function') {
+        var valueEl = document.getElementById('locoSeriesValue');
+        var selected = el.options[el.selectedIndex];
+        var hasValue = !!el.value;
+        if (valueEl) {
+          valueEl.textContent = hasValue && selected ? selected.textContent : 'Выберите серию';
+          valueEl.classList.toggle('is-placeholder', !hasValue);
+        }
+      }
     }
 
-    function syncLocoSeriesSelect() {
-      updateSelectPlaceholderState(document.getElementById('inputLocoSeries'));
+    var LOCO_SERIES_MENU_OPEN = false;
+
+    function getLocoSeriesMenuEls() {
+      return {
+        selectEl: document.getElementById('inputLocoSeries'),
+        valueEl: document.getElementById('locoSeriesValue'),
+        triggerEl: document.getElementById('locoSeriesTrigger'),
+        menuEl: document.getElementById('locoSeriesMenu'),
+        rootEl: document.getElementById('locoSeriesSelect')
+      };
     }
 
     function syncLocoSeriesTrigger() {
-      // Backward-compatible no-op: locomotive series is now a single native select.
-      syncLocoSeriesSelect();
-    }
-
-    function closeLocoSeriesMenu() {
-      // Backward-compatible no-op for shared tab/menu cleanup.
-    }
-
-    function updateLocoSeriesMenuPosition() {
-      // Backward-compatible no-op; there is no detached menu to position.
+      var els = getLocoSeriesMenuEls();
+      var selectEl = els.selectEl;
+      var valueEl = els.valueEl;
+      var triggerEl = els.triggerEl;
+      var menuEl = els.menuEl;
+      if (!selectEl) return;
+      updateSelectPlaceholderState(selectEl);
+      var selected = selectEl.options[selectEl.selectedIndex];
+      var hasValue = !!selectEl.value;
+      if (valueEl) {
+        valueEl.textContent = hasValue && selected ? selected.textContent : 'Выберите серию';
+        valueEl.classList.toggle('is-placeholder', !hasValue);
+      }
+      if (triggerEl) triggerEl.classList.toggle('is-placeholder', !hasValue);
+      if (menuEl) {
+        var buttons = menuEl.querySelectorAll('.glass-select-option');
+        for (var i = 0; i < buttons.length; i++) {
+          var active = buttons[i].getAttribute('data-value') === selectEl.value;
+          buttons[i].classList.toggle('is-active', active);
+          buttons[i].setAttribute('aria-selected', active ? 'true' : 'false');
+        }
+      }
     }
 
     function buildLocoSeriesMenu() {
-      syncLocoSeriesSelect();
+      var els = getLocoSeriesMenuEls();
+      var selectEl = els.selectEl;
+      var menuEl = els.menuEl;
+      if (!selectEl || !menuEl) return;
+      var html = '';
+      for (var i = 0; i < selectEl.options.length; i++) {
+        var opt = selectEl.options[i];
+        if (!opt.value) continue;
+        html += '<button type="button" class="glass-select-option" role="option" aria-selected="false" data-value="' + escapeHtml(opt.value) + '">' + escapeHtml(opt.textContent) + '</button>';
+      }
+      menuEl.innerHTML = html;
+      syncLocoSeriesTrigger();
+    }
+
+    function openLocoSeriesMenu() {
+      var els = getLocoSeriesMenuEls();
+      if (!els.menuEl || !els.triggerEl) return;
+      LOCO_SERIES_MENU_OPEN = true;
+      els.menuEl.classList.remove('hidden');
+      els.triggerEl.classList.add('is-open');
+      els.triggerEl.setAttribute('aria-expanded', 'true');
+      if (els.rootEl) {
+        els.rootEl.classList.add('is-open');
+        var card = els.rootEl.closest ? els.rootEl.closest('.optional-card') : null;
+        if (card) card.classList.add('has-open-select');
+      }
+    }
+
+    function closeLocoSeriesMenu() {
+      var els = getLocoSeriesMenuEls();
+      LOCO_SERIES_MENU_OPEN = false;
+      if (els.menuEl) els.menuEl.classList.add('hidden');
+      if (els.triggerEl) {
+        els.triggerEl.classList.remove('is-open');
+        els.triggerEl.setAttribute('aria-expanded', 'false');
+      }
+      if (els.rootEl) {
+        els.rootEl.classList.remove('is-open');
+        var card = els.rootEl.closest ? els.rootEl.closest('.optional-card') : null;
+        if (card) card.classList.remove('has-open-select');
+      }
+    }
+
+    function toggleLocoSeriesMenu() {
+      if (LOCO_SERIES_MENU_OPEN) closeLocoSeriesMenu();
+      else openLocoSeriesMenu();
+    }
+
+    function updateLocoSeriesMenuPosition() {
+      // Inline dropdown: CSS positions it under the trigger; no JS geometry needed.
     }
 
     function setLocoSeriesValue(value) {
@@ -1423,6 +1502,8 @@
       if (!selectEl) return;
       selectEl.value = String(value || '');
       selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+      syncLocoSeriesTrigger();
+      closeLocoSeriesMenu();
       renderDraftShiftSummary();
     }
 

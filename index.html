@@ -431,7 +431,13 @@
               <div class="optional-grid optional-grid-two">
                 <div class="field">
                   <label>Серия локомотива</label>
-                  <select class="optional-control native-loco-series-select is-placeholder" id="inputLocoSeries" aria-label="Серия локомотива">
+                  <div class="glass-select loco-series-select" id="locoSeriesSelect">
+                    <button class="glass-select-trigger" id="locoSeriesTrigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                      <span class="glass-select-value is-placeholder" id="locoSeriesValue">Выберите серию</span>
+                      <span class="glass-select-chevron">⌄</span>
+                    </button>
+                    <div class="glass-select-menu hidden" id="locoSeriesMenu" role="listbox" aria-label="Серия локомотива"></div>
+                    <select class="hidden" id="inputLocoSeries" tabindex="-1" aria-hidden="true">
                     <option value="" selected disabled hidden>Выберите серию</option>
                     <option value="2ТЭ10М">2ТЭ10М</option>
                     <option value="2ТЭ10У">2ТЭ10У</option>
@@ -453,7 +459,8 @@
                     <option value="ВЛ85">ВЛ85</option>
                     <option value="ЭП1">ЭП1</option>
                     <option value="ЭП1М">ЭП1М</option>
-                  </select>
+                    </select>
+                  </div>
                 </div>
                 <div class="field">
                   <label>Номер локомотива</label>
