@@ -15,11 +15,19 @@
   };
 
   var panelTitles = {
-    overview: ['Обзор', 'Сводка данных и состояния приложения'],
-    users: ['Пользователи', 'Смены, параметры расчёта и поездочные данные по каждому пользователю'],
-    documents: ['Документы', 'Редактор manifest.json для раздела документов'],
-    functions: ['Функции', 'Черновики новых функций и вариантов расчёта без подключения к основному приложению'],
-    raw: ['JSON', 'Точный режим редактирования административных данных'],
+    overview: ['Главная', 'Самое важное простым языком'],
+    users: ['Люди и смены', 'Открой человека, посмотри его смены и поправь данные, если нужно'],
+    documents: ['Документы', 'Файлы, которые видны в разделе документов приложения'],
+    functions: ['Идеи и настройки', 'Место для будущих функций и вариантов расчёта, без влияния на приложение'],
+    raw: ['Тех. режим', 'Опасная зона для точной правки данных. Лучше заходить сюда только когда понятно, что меняешь'],
+  };
+
+  var docCategoryLabels = {
+    speeds: 'Скорости',
+    folders: 'Папки',
+    instructions: 'Инструкции',
+    memos: 'Режимки',
+    reminders: 'Памятки',
   };
 
   var els = {};
@@ -74,6 +82,18 @@
   function parseJsonTextarea(id) {
     var raw = $('#' + id).value;
     return raw.trim() ? JSON.parse(raw) : {};
+  }
+
+  function getPercent(value, total) {
+    var current = Math.max(0, Number(value) || 0);
+    var max = Math.max(1, Number(total) || 0);
+    return Math.max(0, Math.min(100, Math.round((current / max) * 100)));
+  }
+
+  function sumStorageBytes(storage) {
+    return ['shifts', 'salaryParams', 'poekhaliLearning', 'poekhaliWarnings', 'poekhaliRuns'].reduce(function(sum, key) {
+      return sum + Number(storage && storage[key] && storage[key].bytes || 0);
+    }, 0);
   }
 
   function getStoredSessionToken() {
@@ -197,52 +217,88 @@
       return;
     }
     var storage = data.storage || {};
+    var stats = data.stats || {};
+    var onlinePercent = getPercent(stats.onlineUsers, stats.totalUsers);
+    var totalBytes = sumStorageBytes(storage);
     panel.innerHTML =
+      '<div class="welcome-card">' +
+        '<div>' +
+          '<div class="welcome-kicker">Что здесь делать</div>' +
+          '<div class="welcome-title">Это пульт управления приложением</div>' +
+          '<div class="welcome-text">Сначала смотри цветные карточки. Если нужно поправить конкретного человека, открой раздел "Люди и смены". Тех. режим лучше не трогать без причины.</div>' +
+        '</div>' +
+        '<div class="welcome-actions">' +
+          '<button class="btn-primary" type="button" data-jump-panel="users">Открыть людей</button>' +
+          '<button class="btn" type="button" data-jump-panel="documents">Открыть документы</button>' +
+        '</div>' +
+      '</div>' +
       '<div class="grid grid-3">' +
-        metricCard('Всего пользователей', data.stats && data.stats.totalUsers, 'По данным presence и файлов смен') +
-        metricCard('Онлайн сейчас', data.stats && data.stats.onlineUsers, 'Окно ' + ((data.stats && data.stats.onlineWindowSeconds) || 0) + ' сек') +
-        metricCard('Документов', data.docs && data.docs.totalFiles, 'Категорий: ' + ((data.docs && data.docs.categories || []).length)) +
+        metricCard('Людей в приложении', stats.totalUsers, 'Все, кто хотя бы раз заходил или имеет смены', 'users') +
+        metricCard('Сейчас онлайн', stats.onlineUsers, 'Зелёная полоска показывает долю онлайн', 'online', onlinePercent) +
+        metricCard('Документов в базе', data.docs && data.docs.totalFiles, 'Файлы из раздела "Документы"', 'docs') +
       '</div>' +
       '<div class="grid grid-2" style="margin-top:12px">' +
-        '<div class="card"><div class="card-title">Хранилище</div>' +
-          storageLine('Смены', storage.shifts) +
-          storageLine('Параметры зарплаты', storage.salaryParams) +
-          storageLine('Обучение Поехали', storage.poekhaliLearning) +
-          storageLine('Предупреждения', storage.poekhaliWarnings) +
-          storageLine('Поездки', storage.poekhaliRuns) +
-          '<div class="muted">Presence: ' + formatBytes(storage.presence || 0) + '</div>' +
+        '<div class="card"><div class="card-title">Где лежат данные</div>' +
+          '<div class="muted card-help">Чем длиннее полоска, тем больше места занимает этот тип данных.</div>' +
+          storageLine('Смены людей', storage.shifts, totalBytes) +
+          storageLine('Настройки зарплаты', storage.salaryParams, totalBytes) +
+          storageLine('Данные режима Поехали', storage.poekhaliLearning, totalBytes) +
+          storageLine('Предупреждения на маршруте', storage.poekhaliWarnings, totalBytes) +
+          storageLine('Записанные поездки', storage.poekhaliRuns, totalBytes) +
         '</div>' +
-        '<div class="card"><div class="card-title">Админ-доступ</div>' +
-          '<div class="muted">ADMIN_TELEGRAM_IDS настроен: ' + (data.app && data.app.adminIdsConfigured ? 'да' : 'нет') + '</div>' +
-          '<div class="muted">NODE_ENV: ' + escapeHtml(data.app && data.app.nodeEnv || '—') + '</div>' +
-          '<div class="muted">Порт: ' + escapeHtml(data.app && data.app.port || '—') + '</div>' +
-          '<div class="muted">Кэш приложения: ' + escapeHtml(data.app && data.app.cacheVersion || '—') + '</div>' +
+        '<div class="card"><div class="card-title">Быстрые подсказки</div>' +
+          guideItem('Люди и смены', 'Здесь можно открыть человека и поправить его смены, расчёт зарплаты или данные поездок.', 'users') +
+          guideItem('Документы', 'Здесь меняется список файлов, который видят пользователи в приложении.', 'documents') +
+          guideItem('Идеи и настройки', 'Здесь можно записывать будущие функции. Они не включаются в приложении сами по себе.', 'functions') +
+          '<div class="health-strip"><span>Доступ администратора</span><strong>' + (data.app && data.app.adminIdsConfigured ? 'настроен' : 'не настроен') + '</strong></div>' +
+          '<div class="health-strip"><span>Версия кэша</span><strong>' + escapeHtml(data.app && data.app.cacheVersion || '—') + '</strong></div>' +
         '</div>' +
       '</div>';
+    $all('[data-jump-panel], [data-guide-panel]', panel).forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        switchPanel(btn.dataset.jumpPanel || btn.dataset.guidePanel);
+      });
+    });
   }
 
-  function metricCard(label, value, note) {
-    return '<div class="card metric"><div class="metric-value">' + escapeHtml(value === undefined ? '—' : value) +
-      '</div><div class="metric-label">' + escapeHtml(label) + '</div><div class="muted">' + escapeHtml(note || '') + '</div></div>';
+  function metricCard(label, value, note, tone, percent) {
+    var safePercent = typeof percent === 'number' ? percent : Math.min(100, Math.max(8, Number(value) ? 70 : 8));
+    return '<div class="card metric metric--' + escapeHtml(tone || 'default') + '">' +
+      '<div class="metric-top"><div class="metric-label">' + escapeHtml(label) + '</div><div class="metric-dot"></div></div>' +
+      '<div class="metric-value">' + escapeHtml(value === undefined ? '—' : value) + '</div>' +
+      '<div class="meter"><span style="width:' + safePercent + '%"></span></div>' +
+      '<div class="muted">' + escapeHtml(note || '') + '</div></div>';
   }
 
-  function storageLine(label, row) {
+  function storageLine(label, row, totalBytes) {
     row = row || {};
-    return '<div class="toolbar"><span>' + escapeHtml(label) + '</span><span class="muted">' +
-      escapeHtml(row.files || 0) + ' файлов · ' + formatBytes(row.bytes || 0) + '</span></div>';
+    var percent = getPercent(row.bytes || 0, totalBytes || row.bytes || 1);
+    return '<div class="storage-line">' +
+      '<div class="storage-line-top"><span>' + escapeHtml(label) + '</span><strong>' +
+      escapeHtml(row.files || 0) + ' файлов · ' + formatBytes(row.bytes || 0) + '</strong></div>' +
+      '<div class="meter meter--thin"><span style="width:' + Math.max(3, percent) + '%"></span></div>' +
+    '</div>';
+  }
+
+  function guideItem(title, text, panel) {
+    return '<button class="guide-item" type="button" data-guide-panel="' + escapeHtml(panel) + '">' +
+      '<span class="guide-title">' + escapeHtml(title) + '</span>' +
+      '<span class="guide-text">' + escapeHtml(text) + '</span>' +
+    '</button>';
   }
 
   function renderUsers() {
     var panel = els.users;
     var selected = state.selectedUserData;
     panel.innerHTML =
+      '<div class="friendly-note"><strong>Как пользоваться:</strong> нажми на строку человека слева. Справа откроются его смены, расчёт и поездки. Пока не нажал "Сохранить", изменения не применятся.</div>' +
       '<div class="toolbar">' +
-        '<div class="toolbar-left"><input class="input" id="userSearch" placeholder="Поиск по ID" style="width:260px" /></div>' +
-        '<div class="toolbar-right"><button class="btn-primary" id="btnCreateUser" type="button">Новый пользователь</button></div>' +
+        '<div class="toolbar-left"><input class="input" id="userSearch" placeholder="Найти человека по Telegram ID" style="width:300px" /></div>' +
+        '<div class="toolbar-right"><button class="btn-primary" id="btnCreateUser" type="button">Добавить человека</button></div>' +
       '</div>' +
       '<div class="grid grid-2">' +
-        '<div class="card"><div class="card-title">Пользователи</div><div id="usersTableSlot"></div></div>' +
-        '<div class="card"><div id="userEditorSlot">' + (selected ? '' : '<div class="empty">Выберите пользователя слева.</div>') + '</div></div>' +
+        '<div class="card"><div class="card-title">Список людей</div><div id="usersTableSlot"></div></div>' +
+        '<div class="card"><div id="userEditorSlot">' + (selected ? '' : '<div class="empty">Выберите человека слева. Здесь появится его карточка.</div>') + '</div></div>' +
       '</div>';
     renderUsersTable(state.users);
     if (selected) renderUserEditor();
@@ -253,7 +309,7 @@
       }));
     });
     $('#btnCreateUser').addEventListener('click', function() {
-      var sid = prompt('Telegram ID нового пользователя');
+      var sid = prompt('Введите Telegram ID человека');
       if (!sid) return;
       loadUser(sid.trim()).then(function() {
         renderUsers();
@@ -269,16 +325,16 @@
     }
     slot.innerHTML =
       '<div class="table-wrap"><table><thead><tr>' +
-      '<th>ID</th><th>Статус</th><th>Смены</th><th>Последний вход</th><th>Поехали</th>' +
+      '<th>Человек</th><th>Сейчас</th><th>Смены</th><th>Последний вход</th><th>Поездки и карта</th>' +
       '</tr></thead><tbody>' +
       users.map(function(user) {
         var learning = user.learning || {};
         return '<tr data-sid="' + escapeHtml(user.id) + '">' +
-          '<td>' + escapeHtml(user.id) + '</td>' +
+          '<td><strong>ID ' + escapeHtml(user.id) + '</strong><div class="muted">нажми, чтобы открыть</div></td>' +
           '<td><span class="pill ' + (user.online ? 'is-online' : '') + '">' + (user.online ? 'онлайн' : 'офлайн') + '</span></td>' +
           '<td>' + escapeHtml(user.shifts || 0) + '</td>' +
           '<td>' + escapeHtml(formatDate(user.lastSeenAt)) + '</td>' +
-          '<td>' + escapeHtml((user.warnings || 0) + ' пред. · ' + (user.runs || 0) + ' поезд. · ' + (learning.maps || 0) + ' карт') + '</td>' +
+          '<td>' + escapeHtml((user.warnings || 0) + ' предупреждений · ' + (user.runs || 0) + ' поездок · ' + (learning.maps || 0) + ' карт') + '</td>' +
         '</tr>';
       }).join('') +
       '</tbody></table></div>';
@@ -297,11 +353,11 @@
     var data = state.selectedUserData;
     var slot = $('#userEditorSlot');
     slot.innerHTML =
-      '<div class="toolbar"><div><div class="card-title">Пользователь ' + escapeHtml(data.sid) + '</div>' +
-      '<div class="muted">Изменения сохраняются только после нажатия кнопки.</div></div>' +
-      '<button class="btn-primary" id="btnSaveUser" type="button">Сохранить пользователя</button></div>' +
+      '<div class="toolbar"><div><div class="card-title">Карточка человека: ID ' + escapeHtml(data.sid) + '</div>' +
+      '<div class="muted">Правь спокойно: пока не нажмёшь кнопку, на сервер ничего не уйдёт.</div></div>' +
+      '<button class="btn-primary" id="btnSaveUser" type="button">Сохранить изменения</button></div>' +
       '<div class="tabs">' + ['shifts','salary','warnings','runs','learning'].map(function(tab) {
-        var labels = { shifts:'Смены', salary:'Расчёт', warnings:'Предупреждения', runs:'Поездки', learning:'Обучение' };
+        var labels = { shifts:'Смены', salary:'Зарплата', warnings:'Ограничения', runs:'Поездки', learning:'Карта' };
         return '<button class="tab ' + (state.userTab === tab ? 'is-active' : '') + '" data-user-tab="' + tab + '" type="button">' + labels[tab] + '</button>';
       }).join('') + '</div>' +
       '<div id="userTabSlot"></div>';
@@ -320,14 +376,16 @@
     if (state.userTab === 'shifts') return renderShiftEditor(slot);
     if (state.userTab === 'salary') return renderSalaryEditor(slot);
     if (state.userTab === 'warnings') return renderWarningsEditor(slot);
-    if (state.userTab === 'runs') return renderJsonEditor(slot, 'poekhaliRuns', 'Поездки');
-    renderJsonEditor(slot, 'poekhaliLearning', 'Обучение Поехали');
+    if (state.userTab === 'runs') return renderJsonEditor(slot, 'poekhaliRuns', 'Поездки', 'Здесь технические записи поездок. Лучше менять только если точно понятно, что нужно исправить.');
+    renderJsonEditor(slot, 'poekhaliLearning', 'Карта и обучение Поехали', 'Это технические данные карты. Обычно их лучше не трогать вручную.');
   }
 
   function renderShiftEditor(slot) {
     var shifts = state.selectedUserData.shifts || [];
     slot.innerHTML = '<div class="toolbar"><div class="muted">Всего смен: ' + shifts.length +
-      '</div><button class="btn" id="btnAddShift" type="button">Добавить смену</button></div><div class="editor-list" id="shiftList"></div>';
+      '</div><button class="btn" id="btnAddShift" type="button">Добавить смену</button></div><div class="mini-chart">' +
+      '<div class="mini-chart-bar"><span style="width:' + Math.min(100, shifts.length * 4) + '%"></span></div>' +
+      '<div class="muted">Визуально: чем длиннее полоска, тем больше записей у человека.</div></div><div class="editor-list" id="shiftList"></div>';
     $('#btnAddShift').addEventListener('click', function() {
       var now = new Date().toISOString();
       shifts.unshift({ id: 'admin-' + Date.now(), start_msk: now, end_msk: now, created_at: now, route: '', notes: '' });
@@ -454,15 +512,16 @@
     });
   }
 
-  function renderJsonEditor(slot, key, title) {
-    slot.innerHTML = '<div class="field"><label>' + escapeHtml(title) + '</label><textarea class="textarea" id="json_' + key + '">' +
+  function renderJsonEditor(slot, key, title, helpText) {
+    slot.innerHTML = '<div class="danger-note"><strong>Осторожно:</strong> ' + escapeHtml(helpText || 'Это технический формат данных. Ошибка в скобке или запятой может сломать сохранение.') + '</div>' +
+      '<div class="field"><label>' + escapeHtml(title) + '</label><textarea class="textarea" id="json_' + key + '">' +
       escapeHtml(getJsonText(state.selectedUserData[key])) + '</textarea></div>';
     $('#json_' + key).addEventListener('input', function() {
       try {
         state.selectedUserData[key] = parseJsonTextarea('json_' + key);
         setStatus('');
       } catch (error) {
-        setStatus('JSON пока невалидный: ' + error.message, 'error');
+        setStatus('Технический текст пока с ошибкой: ' + error.message, 'error');
       }
     });
   }
@@ -485,12 +544,14 @@
     var categories = Object.keys(manifest);
     if (!categories.includes(state.docsCategory)) state.docsCategory = categories[0] || 'speeds';
     panel.innerHTML =
+      '<div class="friendly-note"><strong>Проще говоря:</strong> это список файлов, который видят пользователи. Если файл уже лежит на сервере, здесь можно поменять его название, раздел и путь.</div>' +
       '<div class="toolbar"><div class="toolbar-left"><div class="tabs">' + categories.map(function(category) {
-        return '<button class="tab ' + (category === state.docsCategory ? 'is-active' : '') + '" data-doc-category="' + category + '" type="button">' + category + '</button>';
+        return '<button class="tab ' + (category === state.docsCategory ? 'is-active' : '') + '" data-doc-category="' + category + '" type="button">' + escapeHtml(docCategoryLabels[category] || category) + '</button>';
       }).join('') + '</div></div>' +
-      '<div class="toolbar-right"><button class="btn" id="btnAddDocCategory" type="button">Категория</button><button class="btn-primary" id="btnSaveDocs" type="button">Сохранить документы</button></div></div>' +
-      '<div class="card"><div class="toolbar"><div class="card-title">' + escapeHtml(state.docsCategory || 'Документы') +
-      '</div><button class="btn" id="btnAddDoc" type="button">Добавить файл</button></div><div class="editor-list" id="docsList"></div></div>';
+      '<div class="toolbar-right"><button class="btn" id="btnAddDocCategory" type="button">Новый раздел</button><button class="btn-primary" id="btnSaveDocs" type="button">Сохранить документы</button></div></div>' +
+      '<div class="card"><div class="toolbar"><div><div class="card-title">' + escapeHtml(docCategoryLabels[state.docsCategory] || state.docsCategory || 'Документы') +
+      '</div><div class="muted">' + (((manifest[state.docsCategory] || []).length) || 0) + ' файлов в этом разделе</div></div>' +
+      '<button class="btn" id="btnAddDoc" type="button">Добавить файл</button></div><div class="editor-list" id="docsList"></div></div>';
     $all('[data-doc-category]').forEach(function(btn) {
       btn.addEventListener('click', function() {
         state.docsCategory = btn.dataset.docCategory;
@@ -498,7 +559,7 @@
       });
     });
     $('#btnAddDocCategory').addEventListener('click', function() {
-      var name = prompt('Ключ категории латиницей, например memos');
+      var name = prompt('Техническое имя нового раздела латиницей, например memos');
       if (!name) return;
       var safe = name.trim().replace(/[^\w-]+/g, '');
       if (!safe) return;
@@ -567,11 +628,12 @@
     var panel = els.functions;
     var config = state.adminConfig || { features: [], calculationVariants: [], notes: '' };
     panel.innerHTML =
-      '<div class="toolbar"><div class="muted">Эти записи не меняют поведение приложения, пока их явно не подключить в коде.</div>' +
-      '<button class="btn-primary" id="btnSaveConfig" type="button">Сохранить</button></div>' +
+      '<div class="friendly-note"><strong>Это блокнот для развития:</strong> записывай сюда идеи, варианты расчёта и планы. Пользователи этого не увидят, пока мы отдельно не подключим это в коде.</div>' +
+      '<div class="toolbar"><div class="muted">Здесь можно хранить черновики без риска для основного приложения.</div>' +
+      '<button class="btn-primary" id="btnSaveConfig" type="button">Сохранить идеи</button></div>' +
       '<div class="grid grid-2">' +
-        '<div class="card"><div class="toolbar"><div class="card-title">Функции</div><button class="btn" id="btnAddFeature" type="button">Добавить</button></div><div id="featureList" class="editor-list"></div></div>' +
-        '<div class="card"><div class="toolbar"><div class="card-title">Варианты расчёта</div><button class="btn" id="btnAddCalc" type="button">Добавить</button></div><div id="calcList" class="editor-list"></div></div>' +
+        '<div class="card"><div class="toolbar"><div><div class="card-title">Будущие функции</div><div class="muted">Что хочется добавить в приложение</div></div><button class="btn" id="btnAddFeature" type="button">Добавить</button></div><div id="featureList" class="editor-list"></div></div>' +
+        '<div class="card"><div class="toolbar"><div><div class="card-title">Варианты расчёта</div><div class="muted">Идеи по зарплате, нормам и формулам</div></div><button class="btn" id="btnAddCalc" type="button">Добавить</button></div><div id="calcList" class="editor-list"></div></div>' +
       '</div>' +
       '<div class="card" style="margin-top:12px"><div class="field"><label>Заметки администратора</label><textarea class="textarea" id="configNotes">' + escapeHtml(config.notes || '') + '</textarea></div></div>';
     $('#btnAddFeature').addEventListener('click', function() {
@@ -649,13 +711,13 @@
     var panel = els.raw;
     panel.innerHTML =
       '<div class="grid grid-2">' +
-        '<div class="card"><div class="card-title">Пользователь</div>' +
+        '<div class="card"><div class="card-title">Технические данные человека</div><div class="danger-note"><strong>Осторожно:</strong> этот режим нужен для точечной правки. Если сомневаешься, лучше не сохранять.</div>' +
           '<div class="field"><label>ID пользователя</label><input class="input" id="rawSid" value="' + escapeHtml(state.selectedSid || '') + '" /></div>' +
           '<div style="height:10px"></div><button class="btn" id="btnLoadRawUser" type="button">Загрузить</button>' +
           '<div style="height:10px"></div><textarea class="textarea" id="rawUserJson">' + escapeHtml(getJsonText(state.selectedUserData)) + '</textarea>' +
           '<div style="height:10px"></div><button class="btn-primary" id="btnSaveRawUser" type="button">Сохранить пользователя</button>' +
         '</div>' +
-        '<div class="card"><div class="card-title">Документы и функции</div>' +
+        '<div class="card"><div class="card-title">Технические данные документов и идей</div>' +
           '<div class="field"><label>docs manifest</label><textarea class="textarea" id="rawDocsJson">' + escapeHtml(getJsonText(state.docsManifest)) + '</textarea></div>' +
           '<div style="height:10px"></div><button class="btn" id="btnSaveRawDocs" type="button">Сохранить docs</button>' +
           '<div style="height:14px"></div><div class="field"><label>admin config</label><textarea class="textarea" id="rawConfigJson">' + escapeHtml(getJsonText(state.adminConfig)) + '</textarea></div>' +
