@@ -15,8 +15,11 @@ const POEKHALI_WARNINGS_DIR = path.join(DATA_DIR, 'poekhali-warnings');
 const POEKHALI_RUNS_DIR = path.join(DATA_DIR, 'poekhali-runs');
 const USER_STATS_FILE = path.join(DATA_DIR, 'user-presence.json');
 const LOGIN_REQUESTS_FILE = path.join(DATA_DIR, 'auth-login-requests.json');
+const ADMIN_CONFIG_FILE = path.join(DATA_DIR, 'admin-config.json');
+const DOCS_MANIFEST_FILE = path.join(ROOT, 'assets', 'docs', 'manifest.json');
 const PUBLIC_TOP_LEVEL_FILES = new Set([
   'index.html',
+  'admin.html',
   'manifest.webmanifest',
   'sw.js',
   'apple-touch-icon.png',
@@ -72,6 +75,10 @@ const DEFAULT_SALARY_PARAMS = {
 };
 const SALARY_PARAM_KEYS = Object.keys(DEFAULT_SALARY_PARAMS);
 const PUBLIC_SITE_URL = process.env.PUBLIC_SITE_URL || 'https://bloknot-mashinista-bot.ru';
+const ADMIN_USER_IDS = new Set(String(process.env.ADMIN_TELEGRAM_IDS || process.env.ADMIN_USER_IDS || '')
+  .split(/[\s,;]+/)
+  .map(value => value.trim())
+  .filter(Boolean));
 const LOCAL_DEV_USER = {
   id: 'dev-local',
   first_name: 'Dev',
@@ -1797,6 +1804,340 @@ function readUserPresenceStats() {
   return buildUserPresenceStats(readUserPresenceStore());
 }
 
+function isAdminUser(user, req) {
+  if (!user || !user.id) return false;
+  if (isLocalAuthBypassEnabled(req)) return true;
+  if (user.is_admin === true) return true;
+  return ADMIN_USER_IDS.has(String(user.id));
+}
+
+function getAdminUserFromRequest(req) {
+  const user = getUserFromRequest(req);
+  return isAdminUser(user, req) ? user : null;
+}
+
+function readJsonFileForAdmin(filePath, fallback) {
+  try {
+    if (!fs.existsSync(filePath)) return fallback;
+    const raw = fs.readFileSync(filePath, 'utf8');
+    if (!raw.trim()) return fallback;
+    return JSON.parse(raw);
+  } catch (err) {
+    logStructuredRateLimited('warn', 'admin.read_json_failed', filePath, {
+      file: filePath,
+      error: toErrorMeta(err),
+    });
+    return fallback;
+  }
+}
+
+function getDirectoryJsonStats(dirPath) {
+  try {
+    if (!fs.existsSync(dirPath)) return { files: 0, bytes: 0 };
+    return fs.readdirSync(dirPath).reduce((acc, fileName) => {
+      if (!fileName.endsWith('.json')) return acc;
+      const fullPath = path.join(dirPath, fileName);
+      try {
+        const stat = fs.statSync(fullPath);
+        if (stat.isFile()) {
+          acc.files += 1;
+          acc.bytes += stat.size;
+        }
+      } catch (_) {}
+      return acc;
+    }, { files: 0, bytes: 0 });
+  } catch (err) {
+    logStructuredRateLimited('warn', 'admin.dir_stats_failed', dirPath, {
+      dir: dirPath,
+      error: toErrorMeta(err),
+    });
+    return { files: 0, bytes: 0 };
+  }
+}
+
+function collectJsonFileIds(dirPath) {
+  const ids = new Set();
+  try {
+    if (!fs.existsSync(dirPath)) return ids;
+    fs.readdirSync(dirPath).forEach(fileName => {
+      if (!fileName.endsWith('.json')) return;
+      const id = normalizeStatsUserId(fileName.slice(0, -5));
+      if (id && id !== 'default') ids.add(id);
+    });
+  } catch (err) {
+    logStructuredRateLimited('warn', 'admin.collect_ids_failed', dirPath, {
+      dir: dirPath,
+      error: toErrorMeta(err),
+    });
+  }
+  return ids;
+}
+
+function getArrayFileCount(readFn, sid) {
+  try {
+    const value = readFn(sid);
+    return Array.isArray(value) ? value.length : 0;
+  } catch (_) {
+    return 0;
+  }
+}
+
+function getObjectMapCount(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return 0;
+  return Object.keys(value).length;
+}
+
+function getPoekhaliLearningSummary(sid) {
+  const learning = readPoekhaliLearning(sid);
+  const maps = learning && learning.maps ? learning.maps : {};
+  return Object.keys(maps).reduce((acc, mapId) => {
+    const map = maps[mapId] || {};
+    acc.maps += 1;
+    acc.sectors += getObjectMapCount(map.sectors);
+    acc.rawTracks += getObjectMapCount(map.rawTracks);
+    acc.userSections += getObjectMapCount(map.userSections);
+    return acc;
+  }, { maps: 0, sectors: 0, rawTracks: 0, userSections: 0 });
+}
+
+function listAdminUsers() {
+  const presence = readUserPresenceStore();
+  const ids = new Set(Object.keys((presence && presence.users) || {}));
+  [
+    USERS_DIR,
+    SALARY_PARAMS_DIR,
+    POEKHALI_LEARNING_DIR,
+    POEKHALI_WARNINGS_DIR,
+    POEKHALI_RUNS_DIR,
+  ].forEach(dir => collectJsonFileIds(dir).forEach(id => ids.add(id)));
+  listShiftUserIds().forEach(id => ids.add(id));
+
+  const nowMs = Date.now();
+  return Array.from(ids)
+    .filter(id => id && id !== 'guest' && id !== 'default')
+    .sort((a, b) => {
+      const aSeen = Date.parse(((presence.users || {})[a] || {}).lastSeenAt || '') || 0;
+      const bSeen = Date.parse(((presence.users || {})[b] || {}).lastSeenAt || '') || 0;
+      return bSeen - aSeen || String(a).localeCompare(String(b));
+    })
+    .map(id => {
+      const row = ((presence && presence.users) || {})[id] || {};
+      const lastSeenMs = Date.parse(row.lastSeenAt || '');
+      const sessions = Object.keys((presence && presence.sessions) || {}).filter(sessionId => {
+        const session = presence.sessions[sessionId] || {};
+        return normalizeStatsUserId(session.userId) === id;
+      });
+      return {
+        id,
+        firstSeenAt: row.firstSeenAt || '',
+        lastSeenAt: row.lastSeenAt || '',
+        online: Number.isFinite(lastSeenMs) && nowMs - lastSeenMs <= ONLINE_WINDOW_MS,
+        sessions: sessions.length,
+        shifts: getArrayFileCount(readShifts, id),
+        warnings: getArrayFileCount(readPoekhaliWarnings, id),
+        runs: getArrayFileCount(readPoekhaliRuns, id),
+        learning: getPoekhaliLearningSummary(id),
+        hasSalaryParams: fs.existsSync(getUserSalaryParamsFile(id)),
+      };
+    });
+}
+
+function getAdminOverview() {
+  const docsManifest = readJsonFileForAdmin(DOCS_MANIFEST_FILE, {});
+  const docCategories = Object.keys(docsManifest || {});
+  const docCount = docCategories.reduce((sum, key) => sum + (Array.isArray(docsManifest[key]) ? docsManifest[key].length : 0), 0);
+  return {
+    generatedAt: new Date().toISOString(),
+    app: {
+      cacheVersion: 'v324',
+      nodeEnv: process.env.NODE_ENV || '',
+      port: String(PORT),
+      adminIdsConfigured: ADMIN_USER_IDS.size > 0,
+    },
+    stats: readUserPresenceStats(),
+    users: {
+      total: listAdminUsers().length,
+    },
+    storage: {
+      shifts: getDirectoryJsonStats(USERS_DIR),
+      salaryParams: getDirectoryJsonStats(SALARY_PARAMS_DIR),
+      poekhaliLearning: getDirectoryJsonStats(POEKHALI_LEARNING_DIR),
+      poekhaliWarnings: getDirectoryJsonStats(POEKHALI_WARNINGS_DIR),
+      poekhaliRuns: getDirectoryJsonStats(POEKHALI_RUNS_DIR),
+      presence: fs.existsSync(USER_STATS_FILE) ? fs.statSync(USER_STATS_FILE).size : 0,
+    },
+    docs: {
+      categories: docCategories,
+      totalFiles: docCount,
+    },
+    config: readJsonFileForAdmin(ADMIN_CONFIG_FILE, getDefaultAdminConfig()),
+  };
+}
+
+function getDefaultAdminConfig() {
+  return {
+    version: 1,
+    features: [],
+    calculationVariants: [],
+    notes: '',
+    updatedAt: '',
+  };
+}
+
+function sanitizeAdminConfig(payload) {
+  const source = payload && typeof payload === 'object' && !Array.isArray(payload) ? payload : {};
+  const normalizeList = (items, maxItems) => (Array.isArray(items) ? items : []).slice(0, maxItems).map((item, index) => {
+    const row = item && typeof item === 'object' && !Array.isArray(item) ? item : {};
+    return {
+      id: String(row.id || `item-${index + 1}`).trim().replace(/[^\w.-]+/g, '-').slice(0, 80) || `item-${index + 1}`,
+      title: String(row.title || '').trim().slice(0, 120),
+      status: String(row.status || 'draft').trim().slice(0, 40),
+      enabled: row.enabled === true,
+      description: String(row.description || '').trim().slice(0, 1000),
+    };
+  }).filter(item => item.title);
+  return {
+    version: 1,
+    features: normalizeList(source.features, 120),
+    calculationVariants: normalizeList(source.calculationVariants, 80),
+    notes: String(source.notes || '').slice(0, 10000),
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+function sanitizeDocsManifest(payload) {
+  const source = payload && typeof payload === 'object' && !Array.isArray(payload) ? payload : {};
+  const result = {};
+  Object.keys(source).forEach(category => {
+    const safeCategory = String(category || '').trim().replace(/[^\w-]+/g, '').slice(0, 40);
+    if (!safeCategory || !Array.isArray(source[category])) return;
+    result[safeCategory] = source[category].slice(0, 300).map(item => {
+      const row = item && typeof item === 'object' && !Array.isArray(item) ? item : {};
+      return {
+        name: String(row.name || '').trim().slice(0, 180),
+        path: String(row.path || '').trim().slice(0, 500),
+        mime_type: String(row.mime_type || '').trim().slice(0, 120),
+        size: Math.max(0, Math.round(Number(row.size) || 0)),
+        updated_at: String(row.updated_at || '').trim().slice(0, 40),
+      };
+    }).filter(item => item.name && item.path.startsWith('/assets/docs/'));
+  });
+  return result;
+}
+
+function getAdminUserPayload(sid) {
+  const safeSid = normalizeSid(sid);
+  return {
+    sid: safeSid,
+    shifts: readShifts(safeSid),
+    salaryParams: readSalaryParams(safeSid),
+    poekhaliWarnings: readPoekhaliWarnings(safeSid),
+    poekhaliRuns: readPoekhaliRuns(safeSid),
+    poekhaliLearning: readPoekhaliLearning(safeSid),
+  };
+}
+
+function sendAdminResource(res, resource, sid) {
+  if (resource === 'overview') {
+    sendJson(res, 200, getAdminOverview());
+    return true;
+  }
+  if (resource === 'users') {
+    sendJson(res, 200, { users: listAdminUsers() });
+    return true;
+  }
+  if (resource === 'user') {
+    if (!sid) {
+      sendJson(res, 400, { error: 'Missing sid' });
+      return true;
+    }
+    sendJson(res, 200, getAdminUserPayload(sid));
+    return true;
+  }
+  if (resource === 'docsManifest') {
+    sendJson(res, 200, { manifest: readJsonFileForAdmin(DOCS_MANIFEST_FILE, {}) });
+    return true;
+  }
+  if (resource === 'adminConfig') {
+    sendJson(res, 200, { config: readJsonFileForAdmin(ADMIN_CONFIG_FILE, getDefaultAdminConfig()) });
+    return true;
+  }
+  sendJson(res, 404, { error: 'Unknown admin resource' });
+  return true;
+}
+
+function writeAdminUserPayload(sid, payload) {
+  const safeSid = normalizeSid(sid);
+  const source = payload && typeof payload === 'object' && !Array.isArray(payload) ? payload : {};
+  if (Array.isArray(source.shifts)) writeShifts(safeSid, sanitizeAndValidateShiftsPayload({ shifts: source.shifts }));
+  if (source.salaryParams && typeof source.salaryParams === 'object') writeSalaryParams(safeSid, source.salaryParams);
+  if (Array.isArray(source.poekhaliWarnings)) writePoekhaliWarnings(safeSid, source.poekhaliWarnings);
+  if (Array.isArray(source.poekhaliRuns)) writePoekhaliRuns(safeSid, source.poekhaliRuns);
+  if (source.poekhaliLearning && typeof source.poekhaliLearning === 'object') writePoekhaliLearning(safeSid, source.poekhaliLearning);
+  return getAdminUserPayload(safeSid);
+}
+
+async function handleAdminApi(req, res, pathname, parsedUrl) {
+  const adminUser = getAdminUserFromRequest(req);
+  if (!adminUser) {
+    sendJson(res, 403, { error: 'Admin access is not configured for this account' });
+    return;
+  }
+
+  const resource = String(parsedUrl.query.resource || '').trim();
+  const sid = String(parsedUrl.query.sid || '').trim();
+
+  if (pathname === '/api/admin/me') {
+    sendJson(res, 200, { user: adminUser, admin: true });
+    return;
+  }
+
+  if (pathname === '/api/admin' && req.method === 'GET') {
+    sendAdminResource(res, resource || 'overview', sid);
+    return;
+  }
+
+  if (pathname === '/api/admin' && req.method === 'PUT') {
+    try {
+      const body = await readBody(req);
+      const payload = body ? JSON.parse(body) : {};
+      if (resource === 'user') {
+        if (!sid) {
+          sendJson(res, 400, { error: 'Missing sid' });
+          return;
+        }
+        sendJson(res, 200, { ok: true, userData: writeAdminUserPayload(sid, payload) });
+        return;
+      }
+      if (resource === 'docsManifest') {
+        const manifest = sanitizeDocsManifest(payload.manifest || payload);
+        atomicWriteFileSync(DOCS_MANIFEST_FILE, JSON.stringify(manifest, null, 2));
+        sendJson(res, 200, { ok: true, manifest });
+        return;
+      }
+      if (resource === 'adminConfig') {
+        const config = sanitizeAdminConfig(payload.config || payload);
+        atomicWriteFileSync(ADMIN_CONFIG_FILE, JSON.stringify(config, null, 2));
+        sendJson(res, 200, { ok: true, config });
+        return;
+      }
+      sendJson(res, 404, { error: 'Unknown admin resource' });
+    } catch (err) {
+      const message = err && err.message ? err.message : 'Invalid payload';
+      const status = /^(Expected|Too many|Invalid|Missing|Payload too large)/.test(message) ? 400 : 500;
+      logStructuredRateLimited(status === 400 ? 'warn' : 'error', 'admin.write_failed', `${resource}:${sid}:${message}`, {
+        resource,
+        sid: sid ? normalizeSid(sid) : '',
+        error: toErrorMeta(err),
+      });
+      sendJson(res, status, { error: message });
+    }
+    return;
+  }
+
+  sendJson(res, 405, { error: 'Method not allowed' });
+}
+
 function touchUserPresence(userId, sessionId) {
   const store = readUserPresenceStore();
   const nowIso = new Date().toISOString();
@@ -2043,6 +2384,11 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') {
     res.writeHead(204);
     res.end();
+    return;
+  }
+
+  if (pathname === '/api/admin' || pathname === '/api/admin/me') {
+    await handleAdminApi(req, res, pathname, parsedUrl);
     return;
   }
 
@@ -2520,6 +2866,11 @@ const server = http.createServer(async (req, res) => {
 
   if (SEO_PAGE_ROUTES[pathname]) {
     serveFile(res, path.join(ROOT, SEO_PAGE_ROUTES[pathname]));
+    return;
+  }
+
+  if (pathname === '/admin') {
+    serveFile(res, path.join(ROOT, 'admin.html'));
     return;
   }
 
