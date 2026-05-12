@@ -12,6 +12,8 @@
     docsManifest: null,
     docsCategory: '',
     adminConfig: null,
+    selectedLearningMapId: '',
+    selectedLearningSectionId: '',
   };
 
   var panelTitles = {
@@ -73,6 +75,52 @@
     if (value < 1024) return value + ' Б';
     if (value < 1024 * 1024) return Math.round(value / 1024) + ' КБ';
     return (value / 1024 / 1024).toFixed(1) + ' МБ';
+  }
+
+  function formatDuration(ms) {
+    var totalMinutes = Math.max(0, Math.round((Number(ms) || 0) / 60000));
+    var hours = Math.floor(totalMinutes / 60);
+    var minutes = totalMinutes % 60;
+    if (hours && minutes) return hours + ' ч ' + minutes + ' мин';
+    if (hours) return hours + ' ч';
+    return minutes + ' мин';
+  }
+
+  function formatDistance(meters) {
+    var value = Math.max(0, Math.round(Number(meters) || 0));
+    if (value >= 1000) return (value / 1000).toFixed(value >= 10000 ? 0 : 1) + ' км';
+    return value + ' м';
+  }
+
+  function formatCoordinate(value) {
+    var coordinate = Math.max(0, Math.round(Number(value) || 0));
+    var km = Math.floor(coordinate / 1000);
+    var meter = coordinate % 1000;
+    var pk = Math.floor(meter / 100) + 1;
+    return km + ' км ' + pk + ' пк +' + String(meter % 100).padStart(2, '0') + ' м';
+  }
+
+  function getCoordinateBounds(items, keys) {
+    var values = [];
+    (items || []).forEach(function(item) {
+      (keys || ['coordinate', 'start', 'end']).forEach(function(key) {
+        var value = Number(item && item[key]);
+        if (isFinite(value)) values.push(value);
+      });
+    });
+    if (!values.length) return { min: 0, max: 1000 };
+    var min = Math.max(0, Math.min.apply(Math, values));
+    var max = Math.max.apply(Math, values);
+    if (max <= min) max = min + 1000;
+    var padding = Math.max(100, Math.round((max - min) * 0.08));
+    return { min: Math.max(0, min - padding), max: max + padding };
+  }
+
+  function coordinatePercent(value, bounds) {
+    var min = Number(bounds && bounds.min) || 0;
+    var max = Number(bounds && bounds.max) || (min + 1);
+    var current = Math.max(min, Math.min(max, Number(value) || 0));
+    return Math.max(0, Math.min(100, ((current - min) / Math.max(1, max - min)) * 100));
   }
 
   function getJsonText(value) {
@@ -168,6 +216,8 @@
 
   function loadUser(sid) {
     state.selectedSid = sid;
+    state.selectedLearningMapId = '';
+    state.selectedLearningSectionId = '';
     return request('user', { sid: sid }).then(function(data) {
       state.selectedUserData = data;
     });
@@ -287,6 +337,39 @@
     '</button>';
   }
 
+  function moveArrayItem(items, from, to) {
+    if (!Array.isArray(items)) return;
+    var start = Number(from);
+    var end = Number(to);
+    if (!isFinite(start) || !isFinite(end) || start === end || start < 0 || end < 0 || start >= items.length || end >= items.length) return;
+    var row = items.splice(start, 1)[0];
+    items.splice(end, 0, row);
+  }
+
+  function bindReorderCards(root, selector, onMove) {
+    var draggedIndex = null;
+    $all(selector, root).forEach(function(card) {
+      card.addEventListener('dragstart', function(event) {
+        draggedIndex = Number(card.dataset.warningCard || card.dataset.docCard);
+        card.classList.add('is-dragging');
+        if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
+      });
+      card.addEventListener('dragend', function() {
+        card.classList.remove('is-dragging');
+        draggedIndex = null;
+      });
+      card.addEventListener('dragover', function(event) {
+        event.preventDefault();
+        if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+      });
+      card.addEventListener('drop', function(event) {
+        event.preventDefault();
+        var targetIndex = Number(card.dataset.warningCard || card.dataset.docCard);
+        if (draggedIndex !== null && isFinite(targetIndex)) onMove(draggedIndex, targetIndex);
+      });
+    });
+  }
+
   function renderUsers() {
     var panel = els.users;
     var selected = state.selectedUserData;
@@ -376,8 +459,8 @@
     if (state.userTab === 'shifts') return renderShiftEditor(slot);
     if (state.userTab === 'salary') return renderSalaryEditor(slot);
     if (state.userTab === 'warnings') return renderWarningsEditor(slot);
-    if (state.userTab === 'runs') return renderJsonEditor(slot, 'poekhaliRuns', 'Поездки', 'Здесь технические записи поездок. Лучше менять только если точно понятно, что нужно исправить.');
-    renderJsonEditor(slot, 'poekhaliLearning', 'Карта и обучение Поехали', 'Это технические данные карты. Обычно их лучше не трогать вручную.');
+    if (state.userTab === 'runs') return renderRunsCards(slot);
+    renderLearningConstructor(slot);
   }
 
   function renderShiftEditor(slot) {
@@ -461,33 +544,66 @@
 
   function renderWarningsEditor(slot) {
     var warnings = state.selectedUserData.poekhaliWarnings || [];
-    slot.innerHTML = '<div class="toolbar"><div class="muted">Предупреждений: ' + warnings.length +
-      '</div><button class="btn" id="btnAddWarning" type="button">Добавить</button></div><div class="editor-list" id="warningsList"></div>';
+    var bounds = getCoordinateBounds(warnings, ['start', 'end', 'coordinate']);
+    slot.innerHTML =
+      '<div class="constructor-head">' +
+        '<div><div class="card-title">Конструктор ограничений скорости</div>' +
+        '<div class="muted">Перетаскивай карточки для порядка. Координаты и скорость меняются ползунками и цифрами.</div></div>' +
+        '<button class="btn-primary" id="btnAddWarning" type="button">Добавить ограничение</button>' +
+      '</div>' +
+      '<div class="route-scale">' +
+        '<span>' + escapeHtml(formatCoordinate(bounds.min)) + '</span>' +
+        '<div class="route-scale-line"></div>' +
+        '<span>' + escapeHtml(formatCoordinate(bounds.max)) + '</span>' +
+      '</div>' +
+      '<div class="editor-list visual-list" id="warningsList"></div>';
     $('#btnAddWarning').addEventListener('click', function() {
-      warnings.unshift({ id: 'warning-' + Date.now(), mapId: '', shiftId: '', sector: 0, start: 0, end: 100, speed: 25, name: '', note: '', enabled: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+      var start = Math.round(bounds.min + (bounds.max - bounds.min) * 0.35);
+      warnings.unshift({ id: 'warning-' + Date.now(), mapId: 'komsomol-sk-tche-9', shiftId: '', sector: 0, start: start, end: start + 1000, speed: 25, name: 'Ограничение 25', note: '', enabled: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
       renderWarningsEditor(slot);
     });
     var list = $('#warningsList');
     if (!warnings.length) {
-      list.innerHTML = '<div class="empty">Предупреждений нет.</div>';
+      list.innerHTML = '<div class="empty">Ограничений пока нет. Нажми "Добавить ограничение" и выставь место на линии.</div>';
       return;
     }
     list.innerHTML = warnings.map(function(warning, index) {
-      return '<div class="row-card"><div class="row-card-head"><strong>' + escapeHtml(warning.name || warning.id) +
-        '</strong><button class="icon-btn" data-delete-warning="' + index + '" type="button">×</button></div>' +
-        '<div class="form-grid">' +
-          warningField('ID', 'id', warning.id, index) +
-          warningField('Карта', 'mapId', warning.mapId, index) +
-          warningField('Сектор', 'sector', warning.sector, index, 'number') +
-          warningField('Начало', 'start', warning.start, index, 'number') +
-          warningField('Конец', 'end', warning.end, index, 'number') +
-          warningField('Скорость', 'speed', warning.speed, index, 'number') +
-          warningField('Название', 'name', warning.name, index) +
-          warningField('До даты', 'validUntil', warning.validUntil, index) +
-          '<div class="field wide"><label>Заметка</label><textarea class="input" data-warning-field="note" data-index="' + index + '">' + escapeHtml(warning.note || '') + '</textarea></div>' +
+      var left = coordinatePercent(warning.start, bounds);
+      var right = coordinatePercent(warning.end, bounds);
+      var width = Math.max(1, right - left);
+      var speed = Math.max(1, Math.round(Number(warning.speed) || 25));
+      var tone = speed <= 40 ? 'danger' : speed <= 60 ? 'warning' : 'success';
+      return '<div class="row-card warning-builder-card" draggable="true" data-warning-card="' + index + '">' +
+        '<div class="row-card-head">' +
+          '<div><strong>' + escapeHtml(warning.name || ('Ограничение ' + speed)) + '</strong>' +
+          '<div class="muted">' + escapeHtml(formatCoordinate(warning.start)) + ' — ' + escapeHtml(formatCoordinate(warning.end)) + '</div></div>' +
+          '<div class="row-actions"><span class="speed-badge speed-badge--' + tone + '">' + speed + ' км/ч</span><button class="icon-btn" data-delete-warning="' + index + '" type="button">×</button></div>' +
+        '</div>' +
+        '<div class="track-preview">' +
+          '<div class="track-preview-line"></div>' +
+          '<div class="track-segment track-segment--' + tone + '" style="left:' + left + '%;width:' + width + '%"></div>' +
+          '<span class="track-pin" style="left:' + left + '%"></span><span class="track-pin" style="left:' + right + '%"></span>' +
+        '</div>' +
+        '<div class="builder-grid">' +
+          warningField('Название на карточке', 'name', warning.name, index) +
+          warningField('Карта', 'mapId', warning.mapId || 'komsomol-sk-tche-9', index) +
+          warningField('Участок', 'sector', warning.sector, index, 'number') +
+          warningField('Действует до', 'validUntil', warning.validUntil, index, 'date') +
+          rangeField('Начало', 'start', warning.start, index, bounds) +
+          rangeField('Конец', 'end', warning.end, index, bounds) +
+          rangeField('Скорость', 'speed', speed, index, { min: 1, max: 120 }) +
+          '<div class="field"><label>Включено</label><select class="select" data-warning-field="enabled" data-index="' + index + '">' +
+            '<option value="true"' + (warning.enabled === false ? '' : ' selected') + '>да, показывать</option>' +
+            '<option value="false"' + (warning.enabled === false ? ' selected' : '') + '>нет, скрыть</option>' +
+          '</select></div>' +
+          '<div class="field wide"><label>Подпись для себя</label><textarea class="input" data-warning-field="note" data-index="' + index + '">' + escapeHtml(warning.note || '') + '</textarea></div>' +
         '</div></div>';
     }).join('');
-    bindWarningInputs();
+    bindWarningInputs(slot);
+    bindReorderCards(list, '[data-warning-card]', function(from, to) {
+      moveArrayItem(state.selectedUserData.poekhaliWarnings, from, to);
+      renderWarningsEditor(slot);
+    });
   }
 
   function warningField(label, key, value, index, type) {
@@ -495,19 +611,277 @@
       '" data-warning-field="' + key + '" data-index="' + index + '" value="' + escapeHtml(value === undefined ? '' : value) + '" /></div>';
   }
 
-  function bindWarningInputs() {
+  function rangeField(label, key, value, index, bounds) {
+    var min = Math.round(Number(bounds && bounds.min) || 0);
+    var max = Math.round(Number(bounds && bounds.max) || 100);
+    return '<div class="field range-field"><label>' + escapeHtml(label) + ': <strong>' + escapeHtml(key === 'speed' ? (Math.round(Number(value) || 0) + ' км/ч') : formatCoordinate(value)) + '</strong></label>' +
+      '<input type="range" min="' + min + '" max="' + max + '" step="1" data-warning-field="' + key + '" data-index="' + index + '" value="' + escapeHtml(value === undefined ? min : value) + '" />' +
+      '<input class="input" type="number" min="' + min + '" max="' + max + '" step="1" data-warning-field="' + key + '" data-index="' + index + '" value="' + escapeHtml(value === undefined ? min : value) + '" />' +
+    '</div>';
+  }
+
+  function bindWarningInputs(slot) {
     $all('[data-warning-field]').forEach(function(input) {
-      input.addEventListener('input', function() {
+      var update = function() {
         var warning = state.selectedUserData.poekhaliWarnings[Number(input.dataset.index)];
         var key = input.dataset.warningField;
-        warning[key] = input.type === 'number' ? Number(input.value || 0) : input.value;
+        if (key === 'enabled') {
+          warning.enabled = input.value === 'true';
+        } else if (input.type === 'number' || input.type === 'range') {
+          warning[key] = Number(input.value || 0);
+        } else {
+          warning[key] = input.value;
+        }
+        if (key === 'start' && Number(warning.start) > Number(warning.end)) warning.end = warning.start;
+        if (key === 'end' && Number(warning.end) < Number(warning.start)) warning.start = warning.end;
+        warning.coordinate = Math.min(Number(warning.start) || 0, Number(warning.end) || 0);
+        warning.length = Math.max(0, Math.round((Number(warning.end) || 0) - (Number(warning.start) || 0)));
         warning.updatedAt = new Date().toISOString();
+      };
+      input.addEventListener('input', update);
+      input.addEventListener('change', function() {
+        update();
+        renderWarningsEditor(slot);
       });
     });
     $all('[data-delete-warning]').forEach(function(btn) {
       btn.addEventListener('click', function() {
         state.selectedUserData.poekhaliWarnings.splice(Number(btn.dataset.deleteWarning), 1);
         renderUserEditor();
+      });
+    });
+  }
+
+  function renderRunsCards(slot) {
+    var runs = state.selectedUserData.poekhaliRuns || [];
+    var activeCount = runs.filter(function(run) { return run && run.status === 'active'; }).length;
+    var totalDistance = runs.reduce(function(sum, run) { return sum + Number(run && run.distanceMeters || 0); }, 0);
+    slot.innerHTML =
+      '<div class="constructor-head">' +
+        '<div><div class="card-title">Поездки карточками</div>' +
+        '<div class="muted">Здесь просмотр поездок как в приложении: маршрут, скорость, события и прогресс без JSON.</div></div>' +
+      '</div>' +
+      '<div class="grid grid-3 trip-summary">' +
+        metricCard('Всего поездок', runs.length, 'Записи режима Поехали', 'users') +
+        metricCard('Активные', activeCount, 'Ещё не завершены', 'online', activeCount ? 70 : 8) +
+        metricCard('Пройдено', formatDistance(totalDistance), 'Сумма записанных поездок', 'docs') +
+      '</div>' +
+      '<div class="trip-card-list">' + (runs.length ? runs.map(renderRunCard).join('') : '<div class="empty">Поездок пока нет.</div>') + '</div>';
+  }
+
+  function renderRunCard(run) {
+    var title = run.route || [run.routeFromName, run.routeToName].filter(Boolean).join(' — ') || run.mapTitle || 'Поездка';
+    var progress = Math.max(0, Math.min(100, Number(run.routeProgressPct) || 0));
+    var status = run.status === 'active' ? 'идёт' : run.status === 'paused' ? 'пауза' : 'завершена';
+    return '<div class="trip-card">' +
+      '<div class="trip-card-top">' +
+        '<div><strong>' + escapeHtml(title) + '</strong><div class="muted">' + escapeHtml(formatDate(run.startedAt || run.createdAt)) + '</div></div>' +
+        '<span class="pill ' + (run.status === 'active' ? 'is-online' : '') + '">' + escapeHtml(status) + '</span>' +
+      '</div>' +
+      '<div class="trip-route">' +
+        '<span>' + escapeHtml(run.routeFromName || 'Старт') + '</span>' +
+        '<div class="trip-route-line"><i style="width:' + progress + '%"></i></div>' +
+        '<span>' + escapeHtml(run.routeToName || 'Финиш') + '</span>' +
+      '</div>' +
+      '<div class="trip-stats">' +
+        '<div><b>' + escapeHtml(formatDuration(run.durationMs)) + '</b><span>время</span></div>' +
+        '<div><b>' + escapeHtml(formatDistance(run.distanceMeters)) + '</b><span>путь</span></div>' +
+        '<div><b>' + escapeHtml(Math.round(Number(run.maxSpeedKmh) || 0)) + '</b><span>макс км/ч</span></div>' +
+        '<div><b>' + escapeHtml(run.warningsCount || 0) + '</b><span>огр.</span></div>' +
+      '</div>' +
+      '<div class="trip-foot">' +
+        '<span>Следующий светофор: <b>' + escapeHtml(run.nextSignalName || '—') + '</b></span>' +
+        '<span>Следующая цель: <b>' + escapeHtml(run.nextTargetLabel || run.nextStationName || '—') + '</b></span>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function getLearningStore() {
+    var data = state.selectedUserData;
+    if (!data.poekhaliLearning || typeof data.poekhaliLearning !== 'object' || Array.isArray(data.poekhaliLearning)) {
+      data.poekhaliLearning = { version: 1, maps: {} };
+    }
+    if (!data.poekhaliLearning.maps || typeof data.poekhaliLearning.maps !== 'object' || Array.isArray(data.poekhaliLearning.maps)) {
+      data.poekhaliLearning.maps = {};
+    }
+    return data.poekhaliLearning;
+  }
+
+  function getLearningSections() {
+    var store = getLearningStore();
+    var rows = [];
+    Object.keys(store.maps || {}).forEach(function(mapId) {
+      var map = store.maps[mapId] || {};
+      Object.keys(map.userSections || {}).forEach(function(sectionId) {
+        var section = map.userSections[sectionId];
+        if (!section) return;
+        rows.push({ mapId: mapId, sectionId: sectionId, section: section });
+      });
+    });
+    return rows;
+  }
+
+  function renderLearningConstructor(slot) {
+    var sections = getLearningSections();
+    var selected = getSelectedLearningSection(sections);
+    slot.innerHTML =
+      '<div class="constructor-head">' +
+        '<div><div class="card-title">Конструктор карты Поехали</div>' +
+        '<div class="muted">Светофоры, станции и скорости редактируются карточками на линии координат. Это реальные пользовательские GPS-участки.</div></div>' +
+      '</div>' +
+      '<div class="learning-layout">' +
+        '<div class="learning-sidebar" id="learningSectionList">' + renderLearningSectionList(sections, selected) + '</div>' +
+        '<div class="learning-editor" id="learningEditor">' + (selected ? renderLearningSectionEditor(selected) : '<div class="empty">GPS-участков пока нет. Когда в приложении появится пользовательский участок Поехали, здесь будет конструктор светофоров, станций и скоростей.</div>') + '</div>' +
+      '</div>';
+    $all('[data-learning-section]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        state.selectedLearningMapId = btn.dataset.mapId;
+        state.selectedLearningSectionId = btn.dataset.sectionId;
+        renderLearningConstructor(slot);
+      });
+    });
+    if (selected) bindLearningEditor(slot, selected);
+  }
+
+  function getSelectedLearningSection(sections) {
+    if (!sections.length) return null;
+    var selected = sections.find(function(row) {
+      return row.mapId === state.selectedLearningMapId && row.sectionId === state.selectedLearningSectionId;
+    }) || sections[0];
+    state.selectedLearningMapId = selected.mapId;
+    state.selectedLearningSectionId = selected.sectionId;
+    return selected;
+  }
+
+  function renderLearningSectionList(sections, selected) {
+    if (!sections.length) return '<div class="empty">Нет участков</div>';
+    return sections.map(function(row) {
+      var section = row.section || {};
+      var active = selected && selected.mapId === row.mapId && selected.sectionId === row.sectionId;
+      var signals = (section.objects || []).filter(function(item) { return String(item.type) === '1'; }).length;
+      return '<button class="learning-section-card ' + (active ? 'is-active' : '') + '" type="button" data-learning-section="1" data-map-id="' + escapeHtml(row.mapId) + '" data-section-id="' + escapeHtml(row.sectionId) + '">' +
+        '<strong>' + escapeHtml(section.title || row.sectionId) + '</strong>' +
+        '<span>' + escapeHtml('уч. ' + (section.sector || '—') + ' · ' + signals + ' светофоров · ' + ((section.speeds || []).length) + ' скоростей') + '</span>' +
+      '</button>';
+    }).join('');
+  }
+
+  function renderLearningSectionEditor(row) {
+    var section = row.section;
+    var points = section.routePoints || [];
+    var bounds = getCoordinateBounds(points.map(function(point) { return { coordinate: point.ordinate || point.coordinate }; }), ['coordinate']);
+    var entities = getLearningEntities(section);
+    return '<div class="learning-workbench">' +
+      '<div class="builder-grid">' +
+        '<div class="field wide"><label>Название участка</label><input class="input" data-section-meta="title" value="' + escapeHtml(section.title || '') + '" /></div>' +
+        '<div class="field"><label>Участок</label><input class="input" type="number" data-section-meta="sector" value="' + escapeHtml(section.sector || 0) + '" /></div>' +
+        '<div class="field"><label>Опорный участок</label><input class="input" type="number" data-section-meta="referenceSector" value="' + escapeHtml(section.referenceSector === null || section.referenceSector === undefined ? '' : section.referenceSector) + '" /></div>' +
+      '</div>' +
+      '<div class="route-scale route-scale--large"><span>' + escapeHtml(formatCoordinate(bounds.min)) + '</span><div class="route-scale-line"></div><span>' + escapeHtml(formatCoordinate(bounds.max)) + '</span></div>' +
+      '<div class="map-canvas">' +
+        '<div class="map-canvas-rail"></div>' +
+        entities.map(function(entity) { return renderLearningMarker(entity, bounds); }).join('') +
+      '</div>' +
+      '<div class="add-entity-card">' +
+        '<div class="card-title">Добавить на линию</div>' +
+        '<div class="builder-grid">' +
+          '<div class="field"><label>Что</label><select class="select" id="learningNewKind"><option value="signal">Светофор</option><option value="station">Станция</option><option value="speed">Скорость</option></select></div>' +
+          '<div class="field"><label>Название</label><input class="input" id="learningNewName" placeholder="Напр. НМ1 или ОГР 60" /></div>' +
+          '<div class="field"><label>Координата</label><input class="input" type="number" id="learningNewCoordinate" value="' + escapeHtml(Math.round((bounds.min + bounds.max) / 2)) + '" /></div>' +
+          '<div class="field"><label>Длина, м</label><input class="input" type="number" id="learningNewLength" value="0" /></div>' +
+          '<div class="field"><label>Скорость</label><input class="input" type="number" id="learningNewSpeed" value="60" /></div>' +
+        '</div>' +
+        '<button class="btn-primary" id="btnAddLearningEntity" type="button">Добавить карточку</button>' +
+      '</div>' +
+      '<div class="editor-list visual-list">' + (entities.length ? entities.map(function(entity) { return renderLearningEntityCard(entity, bounds); }).join('') : '<div class="empty">На участке ещё нет светофоров, станций и скоростей.</div>') + '</div>' +
+    '</div>';
+  }
+
+  function getLearningEntities(section) {
+    var result = [];
+    (section.objects || []).forEach(function(item, index) {
+      result.push({ kind: String(item.type) === '1' ? 'signal' : 'station', list: 'objects', index: index, item: item, coordinate: Number(item.coordinate) || 0 });
+    });
+    (section.speeds || []).forEach(function(item, index) {
+      result.push({ kind: 'speed', list: 'speeds', index: index, item: item, coordinate: Number(item.coordinate) || 0 });
+    });
+    return result.sort(function(a, b) { return a.coordinate - b.coordinate || a.kind.localeCompare(b.kind); });
+  }
+
+  function renderLearningMarker(entity, bounds) {
+    var left = coordinatePercent(entity.coordinate, bounds);
+    var label = entity.kind === 'signal' ? 'СВ' : entity.kind === 'station' ? 'СТ' : Math.round(Number(entity.item.speed) || 0);
+    return '<span class="map-marker map-marker--' + entity.kind + '" style="left:' + left + '%" title="' + escapeHtml(entity.item.name || '') + '">' + escapeHtml(label) + '</span>';
+  }
+
+  function renderLearningEntityCard(entity, bounds) {
+    var item = entity.item || {};
+    var label = entity.kind === 'signal' ? 'Светофор' : entity.kind === 'station' ? 'Станция' : 'Скорость';
+    return '<div class="row-card learning-entity-card">' +
+      '<div class="row-card-head"><div><strong>' + escapeHtml(label + ': ' + (item.name || 'без названия')) + '</strong><div class="muted">' + escapeHtml(formatCoordinate(item.coordinate)) + '</div></div>' +
+      '<button class="icon-btn" data-delete-entity="' + entity.list + ':' + entity.index + '" type="button">×</button></div>' +
+      '<div class="track-preview"><div class="track-preview-line"></div><span class="track-pin" style="left:' + coordinatePercent(item.coordinate, bounds) + '%"></span></div>' +
+      '<div class="builder-grid">' +
+        '<div class="field"><label>Название</label><input class="input" data-learning-list="' + entity.list + '" data-learning-index="' + entity.index + '" data-learning-field="name" value="' + escapeHtml(item.name || '') + '" /></div>' +
+        '<div class="field"><label>Координата</label><input class="input" type="number" data-learning-list="' + entity.list + '" data-learning-index="' + entity.index + '" data-learning-field="coordinate" value="' + escapeHtml(item.coordinate || 0) + '" /></div>' +
+        '<div class="field range-field"><label>Перетащить по линии</label><input type="range" min="' + Math.round(bounds.min) + '" max="' + Math.round(bounds.max) + '" step="1" data-learning-list="' + entity.list + '" data-learning-index="' + entity.index + '" data-learning-field="coordinate" value="' + escapeHtml(item.coordinate || 0) + '" /></div>' +
+        '<div class="field"><label>' + (entity.kind === 'speed' ? 'Длина, м' : 'Длина/зона, м') + '</label><input class="input" type="number" data-learning-list="' + entity.list + '" data-learning-index="' + entity.index + '" data-learning-field="length" value="' + escapeHtml(item.length || 0) + '" /></div>' +
+        (entity.kind === 'speed' ? '<div class="field"><label>Скорость</label><input class="input" type="number" data-learning-list="' + entity.list + '" data-learning-index="' + entity.index + '" data-learning-field="speed" value="' + escapeHtml(item.speed || 60) + '" /></div>' : '') +
+      '</div></div>';
+  }
+
+  function bindLearningEditor(slot, row) {
+    var section = row.section;
+    $all('[data-section-meta]').forEach(function(input) {
+      input.addEventListener('input', function() {
+        var key = input.dataset.sectionMeta;
+        if (input.type === 'number') {
+          section[key] = key === 'referenceSector' && input.value === '' ? null : Number(input.value || 0);
+        } else {
+          section[key] = input.value;
+        }
+        section.updatedAt = Date.now();
+      });
+    });
+    $all('[data-learning-field]').forEach(function(input) {
+      var update = function() {
+        var list = section[input.dataset.learningList] || [];
+        var item = list[Number(input.dataset.learningIndex)];
+        if (!item) return;
+        var key = input.dataset.learningField;
+        item[key] = (input.type === 'number' || input.type === 'range') ? Number(input.value || 0) : input.value;
+        if (key === 'coordinate' || key === 'length') item.end = Math.max(Number(item.coordinate) || 0, (Number(item.coordinate) || 0) + (Number(item.length) || 0));
+        section.updatedAt = Date.now();
+      };
+      input.addEventListener('input', update);
+      input.addEventListener('change', function() {
+        update();
+        renderLearningConstructor(slot);
+      });
+    });
+    $('#btnAddLearningEntity').addEventListener('click', function() {
+      var kind = $('#learningNewKind').value;
+      var coordinate = Math.max(0, Math.round(Number($('#learningNewCoordinate').value) || 0));
+      var length = Math.max(0, Math.round(Number($('#learningNewLength').value) || 0));
+      var speed = Math.max(1, Math.round(Number($('#learningNewSpeed').value) || 60));
+      var name = ($('#learningNewName').value || '').trim() || (kind === 'signal' ? 'Новый светофор' : kind === 'station' ? 'Новая станция' : 'ОГР ' + speed);
+      if (kind === 'speed') {
+        if (!Array.isArray(section.speeds)) section.speeds = [];
+        section.speeds.push({ id: 'admin-speed-' + Date.now(), sector: Number(section.sector) || 0, coordinate: coordinate, length: length || 1000, end: coordinate + (length || 1000), speed: speed, name: name, source: 'user' });
+      } else {
+        if (!Array.isArray(section.objects)) section.objects = [];
+        section.objects.push({ id: 'admin-object-' + Date.now(), fileKey: 'user', sector: Number(section.sector) || 0, type: kind === 'signal' ? '1' : '2', name: name, coordinate: coordinate, length: length, end: coordinate + length, source: 'user' });
+      }
+      section.updatedAt = Date.now();
+      renderLearningConstructor(slot);
+    });
+    $all('[data-delete-entity]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var parts = btn.dataset.deleteEntity.split(':');
+        var list = section[parts[0]];
+        if (Array.isArray(list)) list.splice(Number(parts[1]), 1);
+        section.updatedAt = Date.now();
+        renderLearningConstructor(slot);
       });
     });
   }
@@ -541,17 +915,24 @@
   function renderDocuments() {
     var panel = els.documents;
     var manifest = state.docsManifest || {};
-    var categories = Object.keys(manifest);
+    var categories = getDocCategories(manifest);
     if (!categories.includes(state.docsCategory)) state.docsCategory = categories[0] || 'speeds';
     panel.innerHTML =
-      '<div class="friendly-note"><strong>Проще говоря:</strong> это список файлов, который видят пользователи. Если файл уже лежит на сервере, здесь можно поменять его название, раздел и путь.</div>' +
+      '<div class="friendly-note"><strong>Конструктор документов:</strong> перетащи PDF, DOCX или картинку в зону загрузки. Потом дай файлу нормальное название и подпись, как это увидит человек в приложении.</div>' +
       '<div class="toolbar"><div class="toolbar-left"><div class="tabs">' + categories.map(function(category) {
         return '<button class="tab ' + (category === state.docsCategory ? 'is-active' : '') + '" data-doc-category="' + category + '" type="button">' + escapeHtml(docCategoryLabels[category] || category) + '</button>';
       }).join('') + '</div></div>' +
-      '<div class="toolbar-right"><button class="btn" id="btnAddDocCategory" type="button">Новый раздел</button><button class="btn-primary" id="btnSaveDocs" type="button">Сохранить документы</button></div></div>' +
-      '<div class="card"><div class="toolbar"><div><div class="card-title">' + escapeHtml(docCategoryLabels[state.docsCategory] || state.docsCategory || 'Документы') +
-      '</div><div class="muted">' + (((manifest[state.docsCategory] || []).length) || 0) + ' файлов в этом разделе</div></div>' +
-      '<button class="btn" id="btnAddDoc" type="button">Добавить файл</button></div><div class="editor-list" id="docsList"></div></div>';
+      '<div class="toolbar-right"><button class="btn" id="btnAddDocCategory" type="button">Новый раздел</button><button class="btn-primary" id="btnSaveDocs" type="button">Сохранить порядок и подписи</button></div></div>' +
+      '<div class="docs-workbench">' +
+        '<div class="doc-dropzone" id="docDropZone">' +
+          '<input id="docFileInput" type="file" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt" hidden />' +
+          '<div class="doc-drop-icon">+</div>' +
+          '<div><strong>Перетащи файлы сюда</strong><span>или нажми, чтобы выбрать на компьютере</span></div>' +
+        '</div>' +
+        '<div class="card"><div class="toolbar"><div><div class="card-title">' + escapeHtml(docCategoryLabels[state.docsCategory] || state.docsCategory || 'Документы') +
+        '</div><div class="muted">' + (((manifest[state.docsCategory] || []).length) || 0) + ' файлов в этом разделе. Карточки можно перетаскивать.</div></div>' +
+        '<button class="btn" id="btnAddDoc" type="button">Карточка без загрузки</button></div><div class="editor-list doc-card-list" id="docsList"></div></div>' +
+      '</div>';
     $all('[data-doc-category]').forEach(function(btn) {
       btn.addEventListener('click', function() {
         state.docsCategory = btn.dataset.docCategory;
@@ -569,29 +950,45 @@
     });
     $('#btnAddDoc').addEventListener('click', function() {
       if (!state.docsManifest[state.docsCategory]) state.docsManifest[state.docsCategory] = [];
-      state.docsManifest[state.docsCategory].push({ name: '', path: '/assets/docs/', mime_type: 'application/pdf', size: 0, updated_at: new Date().toISOString().slice(0, 10) });
+      state.docsManifest[state.docsCategory].push({ name: 'Новый документ', caption: '', path: '/assets/docs/', mime_type: 'application/pdf', size: 0, updated_at: new Date().toISOString().slice(0, 10) });
       renderDocuments();
     });
     $('#btnSaveDocs').addEventListener('click', saveDocs);
+    bindDocDropzone();
     renderDocRows();
+  }
+
+  function getDocCategories(manifest) {
+    var known = ['speeds', 'folders', 'instructions', 'memos', 'reminders'];
+    var result = known.filter(function(category) { return Object.prototype.hasOwnProperty.call(manifest || {}, category); });
+    Object.keys(manifest || {}).forEach(function(category) {
+      if (!result.includes(category)) result.push(category);
+    });
+    return result.length ? result : known;
   }
 
   function renderDocRows() {
     var list = $('#docsList');
     var rows = (state.docsManifest && state.docsManifest[state.docsCategory]) || [];
     if (!rows.length) {
-      list.innerHTML = '<div class="empty">В категории нет документов.</div>';
+      list.innerHTML = '<div class="empty">В категории нет документов. Перетащи файл в зону сверху.</div>';
       return;
     }
     list.innerHTML = rows.map(function(doc, index) {
-      return '<div class="row-card"><div class="row-card-head"><strong>' + escapeHtml(doc.name || 'Новый документ') +
-        '</strong><button class="icon-btn" data-delete-doc="' + index + '" type="button">×</button></div>' +
-        '<div class="form-grid">' +
-          docField('Название', 'name', doc.name, index) +
-          docField('Путь', 'path', doc.path, index) +
-          docField('MIME', 'mime_type', doc.mime_type, index) +
+      return '<div class="row-card doc-builder-card" draggable="true" data-doc-card="' + index + '">' +
+        '<div class="doc-card-head">' +
+          '<div class="doc-type-mark">' + escapeHtml(getDocTypeLabel(doc)) + '</div>' +
+          '<div><strong>' + escapeHtml(doc.name || 'Новый документ') + '</strong>' +
+          '<div class="muted">' + escapeHtml(doc.caption || doc.path || 'Файл ещё не выбран') + '</div></div>' +
+          '<button class="icon-btn" data-delete-doc="' + index + '" type="button">×</button>' +
+        '</div>' +
+        '<div class="builder-grid">' +
+          docField('Название в приложении', 'name', doc.name, index) +
+          docField('Подпись под карточкой', 'caption', doc.caption, index) +
+          docField('Файл на сервере', 'path', doc.path, index) +
+          docField('Тип файла', 'mime_type', doc.mime_type, index) +
           docField('Размер', 'size', doc.size, index, 'number') +
-          docField('Дата', 'updated_at', doc.updated_at, index) +
+          docField('Дата', 'updated_at', doc.updated_at, index, 'date') +
         '</div></div>';
     }).join('');
     $all('[data-doc-field]').forEach(function(input) {
@@ -606,6 +1003,10 @@
         renderDocuments();
       });
     });
+    bindReorderCards(list, '[data-doc-card]', function(from, to) {
+      moveArrayItem(state.docsManifest[state.docsCategory], from, to);
+      renderDocuments();
+    });
   }
 
   function docField(label, key, value, index, type) {
@@ -613,8 +1014,89 @@
       (type || 'text') + '" data-doc-field="' + key + '" data-index="' + index + '" value="' + escapeHtml(value === undefined ? '' : value) + '" /></div>';
   }
 
+  function getDocTypeLabel(doc) {
+    var mime = String(doc && doc.mime_type || '').toLowerCase();
+    var path = String(doc && doc.path || '').toLowerCase();
+    if (mime.indexOf('pdf') !== -1 || path.endsWith('.pdf')) return 'PDF';
+    if (mime.indexOf('image') !== -1 || /\.(jpg|jpeg|png)$/.test(path)) return 'IMG';
+    if (mime.indexOf('word') !== -1 || /\.(doc|docx)$/.test(path)) return 'DOC';
+    if (mime.indexOf('text') !== -1 || path.endsWith('.txt')) return 'TXT';
+    return 'FILE';
+  }
+
+  function bindDocDropzone() {
+    var dropzone = $('#docDropZone');
+    var input = $('#docFileInput');
+    if (!dropzone || !input) return;
+    dropzone.addEventListener('click', function() { input.click(); });
+    input.addEventListener('change', function() {
+      uploadDocFiles(input.files);
+      input.value = '';
+    });
+    ['dragenter', 'dragover'].forEach(function(type) {
+      dropzone.addEventListener(type, function(event) {
+        event.preventDefault();
+        dropzone.classList.add('is-dragover');
+      });
+    });
+    ['dragleave', 'drop'].forEach(function(type) {
+      dropzone.addEventListener(type, function(event) {
+        event.preventDefault();
+        dropzone.classList.remove('is-dragover');
+      });
+    });
+    dropzone.addEventListener('drop', function(event) {
+      uploadDocFiles(event.dataTransfer && event.dataTransfer.files);
+    });
+  }
+
+  function uploadDocFiles(fileList) {
+    var files = Array.prototype.slice.call(fileList || []);
+    if (!files.length) return;
+    if (!state.docsManifest[state.docsCategory]) state.docsManifest[state.docsCategory] = [];
+    setStatus('Загружаю файлов: ' + files.length + '...');
+    files.reduce(function(chain, file, index) {
+      return chain.then(function() {
+        setStatus('Загружаю ' + (index + 1) + ' из ' + files.length + ': ' + file.name);
+        return uploadDocFile(file);
+      });
+    }, Promise.resolve()).then(function() {
+      setStatus('Файлы загружены. Проверь названия и подписи.', 'ok');
+      renderDocuments();
+    }).catch(showError);
+  }
+
+  function uploadDocFile(file) {
+    return readFileAsDataUrl(file).then(function(dataUrl) {
+      var name = String(file.name || 'Документ').replace(/\.[^.]+$/, '').trim();
+      return request('uploadDoc', {
+        method: 'POST',
+        body: {
+          category: state.docsCategory,
+          name: name,
+          caption: '',
+          fileName: file.name,
+          mimeType: file.type || '',
+          base64: dataUrl,
+        },
+      }).then(function(body) {
+        state.docsManifest = body.manifest || state.docsManifest;
+        state.docsCategory = body.category || state.docsCategory;
+      });
+    });
+  }
+
+  function readFileAsDataUrl(file) {
+    return new Promise(function(resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function() { resolve(String(reader.result || '')); };
+      reader.onerror = function() { reject(new Error('Не удалось прочитать файл')); };
+      reader.readAsDataURL(file);
+    });
+  }
+
   function saveDocs() {
-    setStatus('Сохраняю manifest документов...');
+    setStatus('Сохраняю документы...');
     request('docsManifest', { method: 'PUT', body: { manifest: state.docsManifest } })
       .then(function(body) {
         state.docsManifest = body.manifest;

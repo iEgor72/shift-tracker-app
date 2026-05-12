@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v326';
+const CACHE_VERSION = 'v327';
 const CACHE_NAME = `shift-tracker-shell-${CACHE_VERSION}`;
 const NAVIGATION_FALLBACK_URL = '/index.html';
 const NETWORK_TIMEOUT_MS = 4500;
@@ -6,6 +6,7 @@ const ASSET_NETWORK_TIMEOUT_MS = 8000;
 const DOCS_ASSET_NETWORK_TIMEOUT_MS = 8000;
 const APP_SHELL_PATHS = new Set(['/', '/index.html']);
 const ADMIN_PAGE_PATHS = new Set(['/admin', '/admin.html']);
+const ADMIN_ASSET_PATHS = new Set(['/scripts/admin.js', '/styles/admin.css']);
 const SEO_PAGE_PATHS = new Set([
   '/uchet-marshrutov',
   '/zarplata-mashinista',
@@ -163,6 +164,16 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
   if (url.origin !== self.location.origin) return;
   if (url.pathname.startsWith('/api/')) return;
+
+  if (isAdminRuntimeRequest(url.pathname)) {
+    event.respondWith(networkOnlyNoStore(request));
+    return;
+  }
+
+  if (url.pathname === '/assets/docs/manifest.json') {
+    event.respondWith(networkOnlyNoStore(request));
+    return;
+  }
 
   if (request.mode === 'navigate' || request.destination === 'document') {
     event.respondWith(networkFirstDocument(request, event));
@@ -359,6 +370,27 @@ function isAppShellPath(pathname) {
 
 function shouldBypassNavigationFallback(pathname) {
   return SEO_PAGE_PATHS.has(pathname) || ADMIN_PAGE_PATHS.has(pathname);
+}
+
+function isAdminRuntimeRequest(pathname) {
+  return ADMIN_PAGE_PATHS.has(pathname) || ADMIN_ASSET_PATHS.has(pathname);
+}
+
+async function networkOnlyNoStore(request) {
+  try {
+    const response = await fetch(request, { cache: 'no-store' });
+    if (response) return response;
+  } catch (error) {
+    // Admin must not fall back to a stale app shell or stale admin bundle.
+  }
+
+  return new Response('Админка сейчас недоступна. Проверьте интернет и обновите страницу.', {
+    status: 503,
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'no-store',
+    },
+  });
 }
 
 function withTimeout(promise, timeoutMs) {

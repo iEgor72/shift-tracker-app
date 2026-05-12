@@ -314,33 +314,34 @@
 
       var baseName = extractDocBaseName(file);
       var safeName = normalizeDocDisplayText(file && file.name);
+      var caption = normalizeDocDisplayText(file && file.caption);
       if (folder === 'folders') {
         return {
           title: safeName || baseName || 'Папка',
-          subtitle: ''
+          subtitle: caption || ''
         };
       }
       if (folder === 'speeds') {
         return {
           title: 'Скорости ' + (safeName || baseName || ''),
-          subtitle: baseName || ''
+          subtitle: caption || baseName || ''
         };
       }
       if (folder === 'memos') {
         return {
           title: 'Режимка ' + (safeName || baseName || ''),
-          subtitle: ''
+          subtitle: caption || ''
         };
       }
       if (folder === 'reminders') {
         return {
           title: safeName || baseName || 'Памятка',
-          subtitle: baseName && baseName !== safeName ? baseName : ''
+          subtitle: caption || (baseName && baseName !== safeName ? baseName : '')
         };
       }
       return {
         title: safeName || baseName || 'Файл',
-        subtitle: baseName && baseName !== safeName ? baseName : ''
+        subtitle: caption || (baseName && baseName !== safeName ? baseName : '')
       };
     }
 

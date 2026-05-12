@@ -16,7 +16,22 @@ const POEKHALI_RUNS_DIR = path.join(DATA_DIR, 'poekhali-runs');
 const USER_STATS_FILE = path.join(DATA_DIR, 'user-presence.json');
 const LOGIN_REQUESTS_FILE = path.join(DATA_DIR, 'auth-login-requests.json');
 const ADMIN_CONFIG_FILE = path.join(DATA_DIR, 'admin-config.json');
-const DOCS_MANIFEST_FILE = path.join(ROOT, 'assets', 'docs', 'manifest.json');
+const DOCS_ROOT_DIR = path.join(ROOT, 'assets', 'docs');
+const DOCS_STATIC_MANIFEST_FILE = path.join(DOCS_ROOT_DIR, 'manifest.json');
+const DOCS_MANIFEST_FILE = path.join(DATA_DIR, 'docs-manifest.json');
+const ADMIN_DOC_FILES_DIR = path.join(DATA_DIR, 'admin-docs');
+const ADMIN_DOC_UPLOAD_MAX_BYTES = 25 * 1024 * 1024;
+const ADMIN_DOC_UPLOAD_BODY_MAX_BYTES = 35 * 1024 * 1024;
+const ADMIN_DOC_UPLOAD_EXTENSIONS = new Set(['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png', '.txt']);
+const DOC_MIME_BY_EXTENSION = {
+  '.pdf': 'application/pdf',
+  '.doc': 'application/msword',
+  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.png': 'image/png',
+  '.txt': 'text/plain; charset=utf-8',
+};
 const PUBLIC_TOP_LEVEL_FILES = new Set([
   'index.html',
   'admin.html',
@@ -1851,6 +1866,18 @@ function readJsonFileForAdmin(filePath, fallback) {
   }
 }
 
+function readDocsManifestForAdmin() {
+  const dynamicManifest = readJsonFileForAdmin(DOCS_MANIFEST_FILE, null);
+  if (dynamicManifest && typeof dynamicManifest === 'object' && !Array.isArray(dynamicManifest)) {
+    return sanitizeDocsManifest(dynamicManifest);
+  }
+  return sanitizeDocsManifest(readJsonFileForAdmin(DOCS_STATIC_MANIFEST_FILE, {}));
+}
+
+function sendDocsManifest(res) {
+  sendJson(res, 200, readDocsManifestForAdmin());
+}
+
 function getDirectoryJsonStats(dirPath) {
   try {
     if (!fs.existsSync(dirPath)) return { files: 0, bytes: 0 };
@@ -1963,13 +1990,13 @@ function listAdminUsers() {
 }
 
 function getAdminOverview() {
-  const docsManifest = readJsonFileForAdmin(DOCS_MANIFEST_FILE, {});
+  const docsManifest = readDocsManifestForAdmin();
   const docCategories = Object.keys(docsManifest || {});
   const docCount = docCategories.reduce((sum, key) => sum + (Array.isArray(docsManifest[key]) ? docsManifest[key].length : 0), 0);
   return {
     generatedAt: new Date().toISOString(),
     app: {
-      cacheVersion: 'v326',
+      cacheVersion: 'v327',
       nodeEnv: process.env.NODE_ENV || '',
       port: String(PORT),
       adminIdsConfigured: ADMIN_USER_IDS.size > 0,
@@ -2029,20 +2056,113 @@ function sanitizeDocsManifest(payload) {
   const source = payload && typeof payload === 'object' && !Array.isArray(payload) ? payload : {};
   const result = {};
   Object.keys(source).forEach(category => {
-    const safeCategory = String(category || '').trim().replace(/[^\w-]+/g, '').slice(0, 40);
+    const safeCategory = sanitizeDocsCategory(category);
     if (!safeCategory || !Array.isArray(source[category])) return;
     result[safeCategory] = source[category].slice(0, 300).map(item => {
       const row = item && typeof item === 'object' && !Array.isArray(item) ? item : {};
       return {
         name: String(row.name || '').trim().slice(0, 180),
+        caption: String(row.caption || '').trim().slice(0, 280),
         path: String(row.path || '').trim().slice(0, 500),
         mime_type: String(row.mime_type || '').trim().slice(0, 120),
         size: Math.max(0, Math.round(Number(row.size) || 0)),
         updated_at: String(row.updated_at || '').trim().slice(0, 40),
       };
-    }).filter(item => item.name && item.path.startsWith('/assets/docs/'));
+    }).filter(item => item.name && (item.path.startsWith('/assets/docs/') || item.path.startsWith('/admin-docs/')));
   });
   return result;
+}
+
+function sanitizeDocsCategory(category) {
+  return String(category || '').trim().replace(/[^\w-]+/g, '').slice(0, 40);
+}
+
+function sanitizeAdminUploadBaseName(value) {
+  return String(value || '')
+    .trim()
+    .replace(/[<>:"/\\|?*\x00-\x1f]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .slice(0, 140)
+    .trim();
+}
+
+function sanitizeAdminUploadFileName(fileName, displayName, mimeType) {
+  const rawFileName = path.basename(String(fileName || displayName || 'document').replace(/[/\\]+/g, ' '));
+  let ext = path.extname(rawFileName).toLowerCase();
+  if (!ext && mimeType) {
+    const mime = String(mimeType || '').toLowerCase();
+    ext = Object.keys(DOC_MIME_BY_EXTENSION).find(key => DOC_MIME_BY_EXTENSION[key].split(';')[0] === mime.split(';')[0]) || '';
+  }
+  if (!ADMIN_DOC_UPLOAD_EXTENSIONS.has(ext)) {
+    throw new Error('Unsupported document file type');
+  }
+  const base = sanitizeAdminUploadBaseName(path.basename(rawFileName, path.extname(rawFileName))) ||
+    sanitizeAdminUploadBaseName(displayName) ||
+    'document';
+  return `${base}${ext}`;
+}
+
+function getUniqueAdminDocPath(dir, fileName) {
+  const ext = path.extname(fileName);
+  const base = path.basename(fileName, ext);
+  let candidate = path.join(dir, fileName);
+  let index = 2;
+  while (fs.existsSync(candidate) && index < 1000) {
+    candidate = path.join(dir, `${base}-${index}${ext}`);
+    index += 1;
+  }
+  return candidate;
+}
+
+function getAdminUploadBuffer(payload) {
+  const raw = String(payload && payload.base64 || '').trim();
+  const clean = raw.includes(',') ? raw.slice(raw.indexOf(',') + 1) : raw;
+  let buffer;
+  try {
+    buffer = Buffer.from(clean.replace(/\s+/g, ''), 'base64');
+  } catch (_) {
+    throw new Error('Invalid file payload');
+  }
+  if (!buffer || !buffer.length) throw new Error('Empty file payload');
+  if (buffer.length > ADMIN_DOC_UPLOAD_MAX_BYTES) throw new Error('Payload too large');
+  return buffer;
+}
+
+function handleAdminDocUpload(payload) {
+  const source = payload && typeof payload === 'object' && !Array.isArray(payload) ? payload : {};
+  const category = sanitizeDocsCategory(source.category || 'uploads');
+  if (!category) throw new Error('Missing document category');
+  const buffer = getAdminUploadBuffer(source);
+  const fileName = sanitizeAdminUploadFileName(source.fileName, source.name, source.mimeType);
+  const ext = path.extname(fileName).toLowerCase();
+  const displayName = String(source.name || path.basename(fileName, ext)).trim().slice(0, 180) || path.basename(fileName, ext);
+  const caption = String(source.caption || '').trim().slice(0, 280);
+  const categoryDir = path.join(ADMIN_DOC_FILES_DIR, category);
+  fs.mkdirSync(categoryDir, { recursive: true });
+  const filePath = getUniqueAdminDocPath(categoryDir, fileName);
+  const resolvedDocsRoot = path.resolve(ADMIN_DOC_FILES_DIR);
+  const resolvedFilePath = path.resolve(filePath);
+  if (!resolvedFilePath.startsWith(resolvedDocsRoot + path.sep)) {
+    throw new Error('Invalid document path');
+  }
+  atomicWriteFileSync(resolvedFilePath, buffer);
+
+  const relativePath = `/admin-docs/${category}/${encodeURIComponent(path.basename(resolvedFilePath))}`;
+  const documentRow = {
+    name: displayName,
+    caption,
+    path: relativePath,
+    mime_type: DOC_MIME_BY_EXTENSION[ext] || String(source.mimeType || '').trim().slice(0, 120) || 'application/octet-stream',
+    size: buffer.length,
+    updated_at: new Date().toISOString().slice(0, 10),
+  };
+  const manifest = readDocsManifestForAdmin();
+  if (!Array.isArray(manifest[category])) manifest[category] = [];
+  manifest[category] = [documentRow]
+    .concat(manifest[category].filter(item => item && item.path !== documentRow.path))
+    .slice(0, 300);
+  atomicWriteFileSync(DOCS_MANIFEST_FILE, JSON.stringify(manifest, null, 2));
+  return { category, document: documentRow, manifest };
 }
 
 function getAdminUserPayload(sid) {
@@ -2075,7 +2195,7 @@ function sendAdminResource(res, resource, sid) {
     return true;
   }
   if (resource === 'docsManifest') {
-    sendJson(res, 200, { manifest: readJsonFileForAdmin(DOCS_MANIFEST_FILE, {}) });
+    sendJson(res, 200, { manifest: readDocsManifestForAdmin() });
     return true;
   }
   if (resource === 'adminConfig') {
@@ -2148,6 +2268,27 @@ async function handleAdminApi(req, res, pathname, parsedUrl) {
       logStructuredRateLimited(status === 400 ? 'warn' : 'error', 'admin.write_failed', `${resource}:${sid}:${message}`, {
         resource,
         sid: sid ? normalizeSid(sid) : '',
+        error: toErrorMeta(err),
+      });
+      sendJson(res, status, { error: message });
+    }
+    return;
+  }
+
+  if (pathname === '/api/admin' && req.method === 'POST') {
+    try {
+      const body = await readBodyWithLimit(req, ADMIN_DOC_UPLOAD_BODY_MAX_BYTES);
+      const payload = body ? JSON.parse(body) : {};
+      if (resource === 'uploadDoc') {
+        sendJson(res, 200, { ok: true, ...handleAdminDocUpload(payload) });
+        return;
+      }
+      sendJson(res, 404, { error: 'Unknown admin resource' });
+    } catch (err) {
+      const message = err && err.message ? err.message : 'Invalid payload';
+      const status = /^(Unsupported|Expected|Too many|Invalid|Missing|Payload too large|Empty)/.test(message) ? 400 : 500;
+      logStructuredRateLimited(status === 400 ? 'warn' : 'error', 'admin.post_failed', `${resource}:${message}`, {
+        resource,
         error: toErrorMeta(err),
       });
       sendJson(res, status, { error: message });
@@ -2289,12 +2430,45 @@ function serveFile(res, filePath) {
   fs.createReadStream(filePath).pipe(res);
 }
 
+function serveAdminDocFile(res, pathname) {
+  let relativePath;
+  try {
+    relativePath = decodeURIComponent(String(pathname || '').replace(/^\/admin-docs\/?/, ''));
+  } catch (_) {
+    sendText(res, 400, 'Bad request');
+    return;
+  }
+  const filePath = path.resolve(path.join(ADMIN_DOC_FILES_DIR, relativePath));
+  const rootPath = path.resolve(ADMIN_DOC_FILES_DIR);
+  if (!filePath.startsWith(rootPath + path.sep)) {
+    sendText(res, 403, 'Forbidden');
+    return;
+  }
+  if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+    sendText(res, 404, 'Not found');
+    return;
+  }
+  const ext = path.extname(filePath).toLowerCase();
+  res.writeHead(200, {
+    'Content-Type': DOC_MIME_BY_EXTENSION[ext] || 'application/octet-stream',
+    'Cache-Control': 'no-store',
+    'X-Content-Type-Options': 'nosniff',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+  });
+  fs.createReadStream(filePath).pipe(res);
+}
+
 function readBody(req) {
+  return readBodyWithLimit(req, 2 * 1024 * 1024);
+}
+
+function readBodyWithLimit(req, maxBytes) {
+  const limit = Math.max(1, Number(maxBytes) || (2 * 1024 * 1024));
   return new Promise((resolve, reject) => {
     let body = '';
     req.on('data', chunk => {
       body += chunk;
-      if (body.length > 2 * 1024 * 1024) {
+      if (body.length > limit) {
         reject(new Error('Payload too large'));
         req.destroy();
       }
@@ -2891,6 +3065,16 @@ const server = http.createServer(async (req, res) => {
 
   if (pathname === '/admin') {
     serveFile(res, path.join(ROOT, 'admin.html'));
+    return;
+  }
+
+  if (pathname === '/assets/docs/manifest.json') {
+    sendDocsManifest(res);
+    return;
+  }
+
+  if (pathname.startsWith('/admin-docs/')) {
+    serveAdminDocFile(res, pathname);
     return;
   }
 
