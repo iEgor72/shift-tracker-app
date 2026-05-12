@@ -75,10 +75,10 @@ const DEFAULT_SALARY_PARAMS = {
 };
 const SALARY_PARAM_KEYS = Object.keys(DEFAULT_SALARY_PARAMS);
 const PUBLIC_SITE_URL = process.env.PUBLIC_SITE_URL || 'https://bloknot-mashinista-bot.ru';
-const ADMIN_USER_IDS = new Set(String(process.env.ADMIN_TELEGRAM_IDS || process.env.ADMIN_USER_IDS || '')
-  .split(/[\s,;]+/)
-  .map(value => value.trim())
-  .filter(Boolean));
+const ADMIN_USER_IDS = new Set([
+  ...parseAdminUserIdList(process.env.ADMIN_TELEGRAM_IDS || process.env.ADMIN_USER_IDS || ''),
+  ...readAdminUserIdsFromEcosystemConfig(),
+]);
 const LOCAL_DEV_USER = {
   id: 'dev-local',
   first_name: 'Dev',
@@ -86,6 +86,26 @@ const LOCAL_DEV_USER = {
   username: 'devuser',
   display_name: 'Local Dev',
 };
+
+function parseAdminUserIdList(rawValue) {
+  return String(rawValue || '')
+    .split(/[\s,;]+/)
+    .map(value => value.trim())
+    .filter(Boolean);
+}
+
+function readAdminUserIdsFromEcosystemConfig() {
+  try {
+    const ecosystem = require(path.join(ROOT, 'ecosystem.config.js'));
+    const apps = Array.isArray(ecosystem && ecosystem.apps) ? ecosystem.apps : [];
+    return apps.reduce((ids, app) => {
+      const env = app && app.env && typeof app.env === 'object' ? app.env : {};
+      return ids.concat(parseAdminUserIdList(env.ADMIN_TELEGRAM_IDS || env.ADMIN_USER_IDS || ''));
+    }, []);
+  } catch (_) {
+    return [];
+  }
+}
 const SEO_PAGE_ROUTES = {
   '/uchet-marshrutov': 'docs/seo/uchet-marshrutov.html',
   '/zarplata-mashinista': 'docs/seo/zarplata-mashinista.html',
