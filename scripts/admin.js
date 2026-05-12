@@ -76,13 +76,28 @@
     return raw.trim() ? JSON.parse(raw) : {};
   }
 
+  function getStoredSessionToken() {
+    try {
+      return localStorage.getItem('shift_tracker_session_token') || '';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function getAuthHeaders(extraHeaders) {
+    var headers = extraHeaders && typeof extraHeaders === 'object' ? Object.assign({}, extraHeaders) : {};
+    var token = getStoredSessionToken();
+    if (token) headers.Authorization = 'Bearer ' + token;
+    return headers;
+  }
+
   function request(resource, options) {
     var params = new URLSearchParams();
     params.set('resource', resource);
     if (options && options.sid) params.set('sid', options.sid);
     return fetch('/api/admin?' + params.toString(), {
       method: options && options.method ? options.method : 'GET',
-      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      headers: getAuthHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
       credentials: 'same-origin',
       body: options && options.body ? JSON.stringify(options.body) : undefined,
     }).then(function(response) {
@@ -97,7 +112,12 @@
   }
 
   function checkAdmin() {
-    return fetch('/api/admin/me', { credentials: 'same-origin', cache: 'no-store' })
+    setStatus('Проверяю доступ...');
+    return fetch('/api/admin/me', {
+      credentials: 'same-origin',
+      cache: 'no-store',
+      headers: getAuthHeaders({ 'Accept': 'application/json' }),
+    })
       .then(function(response) {
         return response.text().then(function(text) {
           var body = text ? JSON.parse(text) : {};
@@ -107,6 +127,7 @@
       })
       .then(function(body) {
         state.admin = body.user || null;
+        document.body.classList.remove('admin-locked');
         els.adminUser.textContent = state.admin
           ? ((state.admin.display_name || state.admin.username || ('ID ' + state.admin.id)) + ' · admin')
           : 'Администратор';
@@ -714,8 +735,8 @@
       .then(refreshAll)
       .catch(function(error) {
         els.adminUser.textContent = 'Нет доступа';
-        setStatus(error.message + '. В проде укажите ADMIN_TELEGRAM_IDS с вашим Telegram ID и войдите через приложение.', 'error');
-        els.overview.innerHTML = '<div class="empty">Админ API закрыт. Для локальной разработки откройте localhost, для продакшена настройте ADMIN_TELEGRAM_IDS.</div>';
+        setStatus(error.message + '. Войдите в основное приложение через Telegram тем же аккаунтом и откройте /admin снова.', 'error');
+        els.overview.innerHTML = '';
       });
   }
 
