@@ -1,10 +1,11 @@
-const CACHE_VERSION = 'v324';
+const CACHE_VERSION = 'v325';
 const CACHE_NAME = `shift-tracker-shell-${CACHE_VERSION}`;
 const NAVIGATION_FALLBACK_URL = '/index.html';
 const NETWORK_TIMEOUT_MS = 4500;
 const ASSET_NETWORK_TIMEOUT_MS = 8000;
 const DOCS_ASSET_NETWORK_TIMEOUT_MS = 8000;
 const APP_SHELL_PATHS = new Set(['/', '/index.html']);
+const ADMIN_PAGE_PATHS = new Set(['/admin', '/admin.html']);
 const SEO_PAGE_PATHS = new Set([
   '/uchet-marshrutov',
   '/zarplata-mashinista',
@@ -357,7 +358,7 @@ function isAppShellPath(pathname) {
 }
 
 function shouldBypassNavigationFallback(pathname) {
-  return SEO_PAGE_PATHS.has(pathname);
+  return SEO_PAGE_PATHS.has(pathname) || ADMIN_PAGE_PATHS.has(pathname);
 }
 
 function withTimeout(promise, timeoutMs) {

@@ -1969,7 +1969,7 @@ function getAdminOverview() {
   return {
     generatedAt: new Date().toISOString(),
     app: {
-      cacheVersion: 'v324',
+      cacheVersion: 'v325',
       nodeEnv: process.env.NODE_ENV || '',
       port: String(PORT),
       adminIdsConfigured: ADMIN_USER_IDS.size > 0,
