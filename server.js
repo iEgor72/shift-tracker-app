@@ -16,6 +16,7 @@ const POEKHALI_RUNS_DIR = path.join(DATA_DIR, 'poekhali-runs');
 const USER_STATS_FILE = path.join(DATA_DIR, 'user-presence.json');
 const LOGIN_REQUESTS_FILE = path.join(DATA_DIR, 'auth-login-requests.json');
 const ADMIN_CONFIG_FILE = path.join(DATA_DIR, 'admin-config.json');
+const ADMIN_POEKHALI_MAP_FILE = path.join(DATA_DIR, 'admin-poekhali-map.json');
 const DOCS_ROOT_DIR = path.join(ROOT, 'assets', 'docs');
 const DOCS_STATIC_MANIFEST_FILE = path.join(DOCS_ROOT_DIR, 'manifest.json');
 const DOCS_MANIFEST_FILE = path.join(DATA_DIR, 'docs-manifest.json');
@@ -2052,6 +2053,90 @@ function sanitizeAdminConfig(payload) {
   };
 }
 
+function getDefaultPoekhaliMapConfig() {
+  return {
+    version: 1,
+    routes: [
+      { id: 'bam-silinka-halgaso', title: 'Силинка - Хальгасо', sector: 18, start: 3787846, end: 3801977, kind: 'route' },
+      { id: 'bam-holoni', title: 'Холони', sector: 18, start: 3751329, end: 3775256, kind: 'station' },
+      { id: 'bam-halgaso-lian-holoni', title: 'Хальгасо - Лиан - Холони', sector: 18, start: 3763395, end: 3789976, kind: 'route' },
+    ],
+    speedRules: [],
+    objects: [],
+    updatedAt: '',
+  };
+}
+
+function sanitizePoekhaliMapConfig(payload) {
+  const source = payload && typeof payload === 'object' && !Array.isArray(payload) ? payload : {};
+  const defaults = getDefaultPoekhaliMapConfig();
+  const normalizeId = (value, fallback) => String(value || fallback).trim().replace(/[^\w.-]+/g, '-').slice(0, 80) || fallback;
+  const normalizeNumber = (value, fallback, min, max) => {
+    const number = Math.round(Number(value));
+    if (!Number.isFinite(number)) return fallback;
+    return Math.max(min, Math.min(max, number));
+  };
+  const routes = (Array.isArray(source.routes) ? source.routes : defaults.routes).slice(0, 80).map((item, index) => {
+    const row = item && typeof item === 'object' && !Array.isArray(item) ? item : {};
+    const start = normalizeNumber(row.start, 0, 0, 10000000);
+    const end = normalizeNumber(row.end, start + 100, 0, 10000000);
+    return {
+      id: normalizeId(row.id, `route-${index + 1}`),
+      title: String(row.title || '').trim().slice(0, 140),
+      sector: normalizeNumber(row.sector, 18, 1, 999999),
+      start: Math.min(start, end),
+      end: Math.max(start, end),
+      kind: String(row.kind || 'route').trim().slice(0, 40),
+    };
+  }).filter(item => item.title);
+  const speedRules = (Array.isArray(source.speedRules) ? source.speedRules : []).slice(0, 500).map((item, index) => {
+    const row = item && typeof item === 'object' && !Array.isArray(item) ? item : {};
+    const start = normalizeNumber(row.start || row.coordinate, 0, 0, 10000000);
+    const end = normalizeNumber(row.end, start, 0, 10000000);
+    const left = Math.min(start, end);
+    const right = Math.max(start, end);
+    return {
+      id: normalizeId(row.id, `speed-${index + 1}`),
+      routeId: normalizeId(row.routeId, ''),
+      sector: normalizeNumber(row.sector, 18, 1, 999999),
+      coordinate: left,
+      start: left,
+      end: right,
+      length: Math.max(0, right - left),
+      speed: normalizeNumber(row.speed, 60, 5, 160),
+      wayNumber: row.wayNumber ? normalizeNumber(row.wayNumber, 0, 1, 2) : 0,
+      name: String(row.name || '').trim().slice(0, 160),
+    };
+  }).filter(item => item.routeId && item.end >= item.start);
+  const objects = (Array.isArray(source.objects) ? source.objects : []).slice(0, 500).map((item, index) => {
+    const row = item && typeof item === 'object' && !Array.isArray(item) ? item : {};
+    const coordinate = normalizeNumber(row.coordinate, 0, 0, 10000000);
+    const length = normalizeNumber(row.length, 0, 0, 5000);
+    return {
+      id: normalizeId(row.id, `object-${index + 1}`),
+      routeId: normalizeId(row.routeId, ''),
+      sector: normalizeNumber(row.sector, 18, 1, 999999),
+      type: String(row.type || '1').trim().slice(0, 8),
+      coordinate,
+      length,
+      end: coordinate + length,
+      name: String(row.name || '').trim().slice(0, 160),
+      wayNumber: row.wayNumber ? normalizeNumber(row.wayNumber, 0, 1, 2) : 0,
+    };
+  }).filter(item => item.routeId && item.name);
+  return {
+    version: 1,
+    routes,
+    speedRules,
+    objects,
+    updatedAt: String(source.updatedAt || '').slice(0, 40),
+  };
+}
+
+function readPoekhaliMapConfig() {
+  return sanitizePoekhaliMapConfig(readJsonFileForAdmin(ADMIN_POEKHALI_MAP_FILE, getDefaultPoekhaliMapConfig()));
+}
+
 function sanitizeDocsManifest(payload) {
   const source = payload && typeof payload === 'object' && !Array.isArray(payload) ? payload : {};
   const result = {};
@@ -2202,6 +2287,10 @@ function sendAdminResource(res, resource, sid) {
     sendJson(res, 200, { config: readJsonFileForAdmin(ADMIN_CONFIG_FILE, getDefaultAdminConfig()) });
     return true;
   }
+  if (resource === 'poekhaliMap') {
+    sendJson(res, 200, { map: readPoekhaliMapConfig() });
+    return true;
+  }
   sendJson(res, 404, { error: 'Unknown admin resource' });
   return true;
 }
@@ -2259,6 +2348,13 @@ async function handleAdminApi(req, res, pathname, parsedUrl) {
         const config = sanitizeAdminConfig(payload.config || payload);
         atomicWriteFileSync(ADMIN_CONFIG_FILE, JSON.stringify(config, null, 2));
         sendJson(res, 200, { ok: true, config });
+        return;
+      }
+      if (resource === 'poekhaliMap') {
+        const map = sanitizePoekhaliMapConfig(payload.map || payload);
+        map.updatedAt = new Date().toISOString();
+        atomicWriteFileSync(ADMIN_POEKHALI_MAP_FILE, JSON.stringify(map, null, 2));
+        sendJson(res, 200, { ok: true, map });
         return;
       }
       sendJson(res, 404, { error: 'Unknown admin resource' });
@@ -2583,6 +2679,15 @@ const server = http.createServer(async (req, res) => {
 
   if (pathname === '/api/admin' || pathname === '/api/admin/me') {
     await handleAdminApi(req, res, pathname, parsedUrl);
+    return;
+  }
+
+  if (pathname === '/api/poekhali-map-overrides') {
+    if (req.method !== 'GET') {
+      sendJson(res, 405, { error: 'Method not allowed' });
+      return;
+    }
+    sendJson(res, 200, readPoekhaliMapConfig());
     return;
   }
 

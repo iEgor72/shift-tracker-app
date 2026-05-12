@@ -12,16 +12,19 @@
     docsManifest: null,
     docsCategory: '',
     adminConfig: null,
+    poekhaliMap: null,
+    mapRouteId: 'bam-silinka-halgaso',
     selectedLearningMapId: '',
     selectedLearningSectionId: '',
   };
 
   var panelTitles = {
-    overview: ['Главная', 'Самое важное простым языком'],
-    users: ['Люди и смены', 'Открой человека, посмотри его смены и поправь данные, если нужно'],
-    documents: ['Документы', 'Файлы, которые видны в разделе документов приложения'],
-    functions: ['Идеи и настройки', 'Место для будущих функций и вариантов расчёта, без влияния на приложение'],
-    raw: ['Тех. режим', 'Опасная зона для точной правки данных. Лучше заходить сюда только когда понятно, что меняешь'],
+    overview: ['Главная', 'Что происходит в приложении'],
+    users: ['Люди', 'Карточки пользователей, смены, поездки и карта'],
+    map: ['Карта Поехали', 'Скорости, станции и светофоры без кода'],
+    documents: ['Файлы', 'Документы, которые видят пользователи'],
+    functions: ['Конструктор', 'Настройки, идеи и будущие функции в понятных карточках'],
+    raw: ['Аварийный режим', 'Скрытая техническая правка для разработчика'],
   };
 
   var docCategoryLabels = {
@@ -31,6 +34,22 @@
     memos: 'Режимки',
     reminders: 'Памятки',
   };
+
+  var baseMapSpeedRules = [
+    { id: 'bam-18-3799896-3801977-1', routeId: 'bam-silinka-halgaso', sector: 18, start: 3799896, end: 3801977, speed: 70, wayNumber: 1, name: 'Силинка, путь 1' },
+    { id: 'bam-18-3795000-3799896-0', routeId: 'bam-silinka-halgaso', sector: 18, start: 3795000, end: 3799896, speed: 70, wayNumber: 0, name: 'Силинка - ПП 3796' },
+    { id: 'bam-18-3788300-3789700-1', routeId: 'bam-silinka-halgaso', sector: 18, start: 3788300, end: 3789700, speed: 60, wayNumber: 1, name: 'ПП 3796, путь 1' },
+    { id: 'bam-18-3789800-3793800-1', routeId: 'bam-silinka-halgaso', sector: 18, start: 3789800, end: 3793800, speed: 60, wayNumber: 1, name: 'ПП 3796, путь 1' },
+    { id: 'bam-18-3793900-3795100-1', routeId: 'bam-silinka-halgaso', sector: 18, start: 3793900, end: 3795100, speed: 70, wayNumber: 1, name: 'ПП 3796, путь 1' },
+    { id: 'bam-18-3787846-3795100-2', routeId: 'bam-silinka-halgaso', sector: 18, start: 3787846, end: 3795100, speed: 70, wayNumber: 2, name: 'ПП 3796, путь 2' },
+    { id: 'bam-18-3789976-3792106-1', routeId: 'bam-silinka-halgaso', sector: 18, start: 3789976, end: 3792106, speed: 40, wayNumber: 1, name: 'Хальгасо, путь 1' },
+    { id: 'bam-18-3787846-3789976-2', routeId: 'bam-silinka-halgaso', sector: 18, start: 3787846, end: 3789976, speed: 70, wayNumber: 2, name: 'Хальгасо, путь 2' },
+    { id: 'bam-18-3775256-3789976-0', routeId: 'bam-halgaso-lian-holoni', sector: 18, start: 3775256, end: 3789976, speed: 70, wayNumber: 0, name: 'Хальгасо - Лиан' },
+    { id: 'bam-18-3763395-3775256-0', routeId: 'bam-halgaso-lian-holoni', sector: 18, start: 3763395, end: 3775256, speed: 70, wayNumber: 0, name: 'Лиан - Холони' },
+    { id: 'bam-18-3763395-3766487-1', routeId: 'bam-holoni', sector: 18, start: 3763395, end: 3766487, speed: 80, wayNumber: 1, name: 'Холони, путь 1' },
+    { id: 'bam-18-3760303-3763395-2', routeId: 'bam-holoni', sector: 18, start: 3760303, end: 3763395, speed: 60, wayNumber: 2, name: 'Холони, путь 2' },
+    { id: 'bam-18-3751329-3763395-0', routeId: 'bam-holoni', sector: 18, start: 3751329, end: 3763395, speed: 80, wayNumber: 0, name: 'Холони - Хурмули' },
+  ];
 
   var els = {};
 
@@ -98,6 +117,44 @@
     var meter = coordinate % 1000;
     var pk = Math.floor(meter / 100) + 1;
     return km + ' км ' + pk + ' пк +' + String(meter % 100).padStart(2, '0') + ' м';
+  }
+
+  function getRuleStart(rule) {
+    return Math.min(Number(rule && (rule.start || rule.coordinate)) || 0, Number(rule && rule.end) || 0);
+  }
+
+  function getRuleEnd(rule) {
+    return Math.max(Number(rule && (rule.start || rule.coordinate)) || 0, Number(rule && rule.end) || 0);
+  }
+
+  function normalizeMapConfig(config) {
+    var source = config && typeof config === 'object' ? config : {};
+    return {
+      version: 1,
+      routes: Array.isArray(source.routes) ? source.routes : [],
+      speedRules: Array.isArray(source.speedRules) ? source.speedRules : [],
+      objects: Array.isArray(source.objects) ? source.objects : [],
+      updatedAt: source.updatedAt || '',
+    };
+  }
+
+  function getMapRoute(routeId) {
+    var map = normalizeMapConfig(state.poekhaliMap);
+    return (map.routes || []).find(function(route) { return route.id === routeId; }) || (map.routes || [])[0] || null;
+  }
+
+  function getMergedRouteSpeedRules(routeId) {
+    var map = normalizeMapConfig(state.poekhaliMap);
+    var overrides = {};
+    map.speedRules.forEach(function(rule) {
+      if (rule && rule.id) overrides[rule.id] = rule;
+    });
+    return baseMapSpeedRules
+      .filter(function(rule) { return !routeId || rule.routeId === routeId; })
+      .map(function(rule) { return Object.assign({}, rule, overrides[rule.id] || {}, { baseId: rule.id }); })
+      .concat(map.speedRules.filter(function(rule) {
+        return rule && rule.routeId === routeId && !baseMapSpeedRules.some(function(base) { return base.id === rule.id; });
+      }));
   }
 
   function getCoordinateBounds(items, keys) {
@@ -179,6 +236,14 @@
     });
   }
 
+  function isTechModeAllowed() {
+    try {
+      return new URLSearchParams(window.location.search || '').get('tech') === '1';
+    } catch (_) {
+      return false;
+    }
+  }
+
   function checkAdmin() {
     setStatus('Проверяю доступ...');
     return fetch('/api/admin/me', {
@@ -200,6 +265,29 @@
           ? ((state.admin.display_name || state.admin.username || ('ID ' + state.admin.id)) + ' · admin')
           : 'Администратор';
       });
+  }
+
+  function showAccessDenied(error) {
+    var message = error && error.message ? error.message : 'Доступ закрыт';
+    document.body.classList.remove('admin-locked');
+    document.body.classList.add('admin-denied');
+    els.adminUser.textContent = 'Нет доступа';
+    setStatus('');
+    els.overview.innerHTML =
+      '<div class="access-denied-card">' +
+        '<div class="access-denied-mark">БМ</div>' +
+        '<div class="access-denied-kicker">Закрытый раздел</div>' +
+        '<h2>Панель управления доступна только администратору</h2>' +
+        '<p>Обычные пользователи могут пользоваться приложением, но не видят данные других людей, документы и настройки.</p>' +
+        '<div class="access-denied-actions">' +
+          '<a class="btn-primary" href="/">Вернуться в приложение</a>' +
+          '<button class="btn" id="btnDeniedRefresh" type="button">Проверить ещё раз</button>' +
+        '</div>' +
+        '<div class="access-denied-note">' + escapeHtml(message === 'Admin access is not configured for this account' ? 'Если ты администратор, войди в приложение под своим Telegram-аккаунтом и обнови страницу.' : message) + '</div>' +
+      '</div>';
+    els.overview.classList.add('is-active');
+    var btn = $('#btnDeniedRefresh');
+    if (btn) btn.addEventListener('click', function() { window.location.reload(); });
   }
 
   function loadOverview() {
@@ -245,7 +333,18 @@
     });
   }
 
+  function loadPoekhaliMap() {
+    return request('poekhaliMap').then(function(data) {
+      state.poekhaliMap = normalizeMapConfig(data.map);
+      if (!getMapRoute(state.mapRouteId)) {
+        state.mapRouteId = state.poekhaliMap.routes[0] ? state.poekhaliMap.routes[0].id : '';
+      }
+    });
+  }
+
   function switchPanel(panel) {
+    if (panel === 'raw' && !isTechModeAllowed()) panel = 'overview';
+    if (!panelTitles[panel]) panel = 'overview';
     state.panel = panel;
     $all('.admin-nav-btn').forEach(function(btn) {
       btn.classList.toggle('is-active', btn.dataset.panel === panel);
@@ -274,12 +373,13 @@
       '<div class="welcome-card">' +
         '<div>' +
           '<div class="welcome-kicker">Что здесь делать</div>' +
-          '<div class="welcome-title">Это пульт управления приложением</div>' +
-          '<div class="welcome-text">Сначала смотри цветные карточки. Если нужно поправить конкретного человека, открой раздел "Люди и смены". Тех. режим лучше не трогать без причины.</div>' +
+          '<div class="welcome-title">Это пульт управления без кода</div>' +
+          '<div class="welcome-text">Открывай карточки слева направо: люди, карта Поехали, файлы. Технические данные спрятаны и не мешают обычной работе.</div>' +
         '</div>' +
         '<div class="welcome-actions">' +
           '<button class="btn-primary" type="button" data-jump-panel="users">Открыть людей</button>' +
-          '<button class="btn" type="button" data-jump-panel="documents">Открыть документы</button>' +
+          '<button class="btn" type="button" data-jump-panel="map">Редактировать карту</button>' +
+          '<button class="btn" type="button" data-jump-panel="documents">Загрузить файлы</button>' +
         '</div>' +
       '</div>' +
       '<div class="grid grid-3">' +
@@ -288,20 +388,20 @@
         metricCard('Документов в базе', data.docs && data.docs.totalFiles, 'Файлы из раздела "Документы"', 'docs') +
       '</div>' +
       '<div class="grid grid-2" style="margin-top:12px">' +
-        '<div class="card"><div class="card-title">Где лежат данные</div>' +
-          '<div class="muted card-help">Чем длиннее полоска, тем больше места занимает этот тип данных.</div>' +
+        '<div class="card"><div class="card-title">Что уже заполнено</div>' +
+          '<div class="muted card-help">Это простая шкала: где полоска длиннее, там больше записей.</div>' +
           storageLine('Смены людей', storage.shifts, totalBytes) +
           storageLine('Настройки зарплаты', storage.salaryParams, totalBytes) +
-          storageLine('Данные режима Поехали', storage.poekhaliLearning, totalBytes) +
-          storageLine('Предупреждения на маршруте', storage.poekhaliWarnings, totalBytes) +
-          storageLine('Записанные поездки', storage.poekhaliRuns, totalBytes) +
+          storageLine('Карты и светофоры', storage.poekhaliLearning, totalBytes) +
+          storageLine('Ограничения скорости', storage.poekhaliWarnings, totalBytes) +
+          storageLine('Поездки', storage.poekhaliRuns, totalBytes) +
         '</div>' +
-        '<div class="card"><div class="card-title">Быстрые подсказки</div>' +
-          guideItem('Люди и смены', 'Здесь можно открыть человека и поправить его смены, расчёт зарплаты или данные поездок.', 'users') +
-          guideItem('Документы', 'Здесь меняется список файлов, который видят пользователи в приложении.', 'documents') +
-          guideItem('Идеи и настройки', 'Здесь можно записывать будущие функции. Они не включаются в приложении сами по себе.', 'functions') +
+        '<div class="card"><div class="card-title">Куда нажимать</div>' +
+          guideItem('Люди', 'Карточки пользователей: смены, зарплата, поездки, ограничения и карта.', 'users') +
+          guideItem('Файлы', 'Перетащи документ, дай ему название и подпись. Он появится в приложении.', 'documents') +
+          guideItem('Конструктор', 'Карточки будущих функций и вариантов расчёта без программирования.', 'functions') +
           '<div class="health-strip"><span>Доступ администратора</span><strong>' + (data.app && data.app.adminIdsConfigured ? 'настроен' : 'не настроен') + '</strong></div>' +
-          '<div class="health-strip"><span>Версия кэша</span><strong>' + escapeHtml(data.app && data.app.cacheVersion || '—') + '</strong></div>' +
+          '<div class="health-strip"><span>Обновление админки</span><strong>без fresh-ссылок</strong></div>' +
         '</div>' +
       '</div>';
     $all('[data-jump-panel], [data-guide-panel]', panel).forEach(function(btn) {
@@ -374,14 +474,14 @@
     var panel = els.users;
     var selected = state.selectedUserData;
     panel.innerHTML =
-      '<div class="friendly-note"><strong>Как пользоваться:</strong> нажми на строку человека слева. Справа откроются его смены, расчёт и поездки. Пока не нажал "Сохранить", изменения не применятся.</div>' +
+      '<div class="friendly-note"><strong>Как пользоваться:</strong> выбери карточку человека. Справа откроются понятные вкладки: смены, зарплата, ограничения, поездки и карта. Пока не нажал "Сохранить", изменения не применятся.</div>' +
       '<div class="toolbar">' +
-        '<div class="toolbar-left"><input class="input" id="userSearch" placeholder="Найти человека по Telegram ID" style="width:300px" /></div>' +
+        '<div class="toolbar-left"><input class="input" id="userSearch" placeholder="Найти по ID или открыть нужного человека" style="width:360px" /></div>' +
         '<div class="toolbar-right"><button class="btn-primary" id="btnCreateUser" type="button">Добавить человека</button></div>' +
       '</div>' +
-      '<div class="grid grid-2">' +
-        '<div class="card"><div class="card-title">Список людей</div><div id="usersTableSlot"></div></div>' +
-        '<div class="card"><div id="userEditorSlot">' + (selected ? '' : '<div class="empty">Выберите человека слева. Здесь появится его карточка.</div>') + '</div></div>' +
+      '<div class="people-layout">' +
+        '<div class="card"><div class="card-title">Люди в приложении</div><div id="usersTableSlot"></div></div>' +
+        '<div class="card user-editor-card"><div id="userEditorSlot">' + (selected ? '' : '<div class="empty">Выбери карточку человека слева. Здесь появится управление его сменами и поездками.</div>') + '</div></div>' +
       '</div>';
     renderUsersTable(state.users);
     if (selected) renderUserEditor();
@@ -403,29 +503,33 @@
   function renderUsersTable(users) {
     var slot = $('#usersTableSlot');
     if (!users.length) {
-      slot.innerHTML = '<div class="empty">Пользователей пока нет.</div>';
+      slot.innerHTML = '<div class="empty">Людей пока нет.</div>';
       return;
     }
     slot.innerHTML =
-      '<div class="table-wrap"><table><thead><tr>' +
-      '<th>Человек</th><th>Сейчас</th><th>Смены</th><th>Последний вход</th><th>Поездки и карта</th>' +
-      '</tr></thead><tbody>' +
+      '<div class="people-card-list">' +
       users.map(function(user) {
         var learning = user.learning || {};
-        return '<tr data-sid="' + escapeHtml(user.id) + '">' +
-          '<td><strong>ID ' + escapeHtml(user.id) + '</strong><div class="muted">нажми, чтобы открыть</div></td>' +
-          '<td><span class="pill ' + (user.online ? 'is-online' : '') + '">' + (user.online ? 'онлайн' : 'офлайн') + '</span></td>' +
-          '<td>' + escapeHtml(user.shifts || 0) + '</td>' +
-          '<td>' + escapeHtml(formatDate(user.lastSeenAt)) + '</td>' +
-          '<td>' + escapeHtml((user.warnings || 0) + ' предупреждений · ' + (user.runs || 0) + ' поездок · ' + (learning.maps || 0) + ' карт') + '</td>' +
-        '</tr>';
+        var initials = String(user.id || '?').slice(-2).toUpperCase();
+        var isSelected = String(state.selectedSid) === String(user.id);
+        return '<button class="person-card ' + (isSelected ? 'is-active' : '') + '" type="button" data-sid="' + escapeHtml(user.id) + '">' +
+          '<span class="person-avatar">' + escapeHtml(initials) + '</span>' +
+          '<span class="person-main"><strong>Пользователь ' + escapeHtml(user.id) + '</strong>' +
+            '<span class="person-sub">' + escapeHtml(user.online ? 'сейчас в приложении' : ('последний вход: ' + formatDate(user.lastSeenAt))) + '</span></span>' +
+          '<span class="person-badges">' +
+            '<span>' + escapeHtml(user.shifts || 0) + ' смен</span>' +
+            '<span>' + escapeHtml(user.runs || 0) + ' поездок</span>' +
+            '<span>' + escapeHtml(user.warnings || 0) + ' огр.</span>' +
+            '<span>' + escapeHtml(learning.maps || 0) + ' карт</span>' +
+          '</span>' +
+        '</button>';
       }).join('') +
-      '</tbody></table></div>';
-    $all('tbody tr', slot).forEach(function(row) {
-      row.addEventListener('click', function() {
-        setStatus('Загружаю пользователя ' + row.dataset.sid + '...');
-        loadUser(row.dataset.sid).then(function() {
-          setStatus('Пользователь загружен', 'ok');
+      '</div>';
+    $all('[data-sid]', slot).forEach(function(card) {
+      card.addEventListener('click', function() {
+        setStatus('Открываю карточку человека...');
+        loadUser(card.dataset.sid).then(function() {
+          setStatus('Карточка открыта', 'ok');
           renderUsers();
         }).catch(showError);
       });
@@ -436,8 +540,8 @@
     var data = state.selectedUserData;
     var slot = $('#userEditorSlot');
     slot.innerHTML =
-      '<div class="toolbar"><div><div class="card-title">Карточка человека: ID ' + escapeHtml(data.sid) + '</div>' +
-      '<div class="muted">Правь спокойно: пока не нажмёшь кнопку, на сервер ничего не уйдёт.</div></div>' +
+      '<div class="toolbar"><div><div class="card-title">Человек ' + escapeHtml(data.sid) + '</div>' +
+      '<div class="muted">Измени нужные карточки и нажми сохранить. Без этой кнопки ничего не применится.</div></div>' +
       '<button class="btn-primary" id="btnSaveUser" type="button">Сохранить изменения</button></div>' +
       '<div class="tabs">' + ['shifts','salary','warnings','runs','learning'].map(function(tab) {
         var labels = { shifts:'Смены', salary:'Зарплата', warnings:'Ограничения', runs:'Поездки', learning:'Карта' };
@@ -912,6 +1016,149 @@
       .catch(showError);
   }
 
+  function renderPoekhaliMap() {
+    var map = normalizeMapConfig(state.poekhaliMap);
+    var route = getMapRoute(state.mapRouteId);
+    if (!route) {
+      els.map.innerHTML = '<div class="empty">Карта пока не загружена.</div>';
+      return;
+    }
+    var rules = getMergedRouteSpeedRules(route.id);
+    var objects = map.objects.filter(function(item) { return item.routeId === route.id; });
+    var bounds = getCoordinateBounds([{ coordinate: route.start }, { coordinate: route.end }].concat(rules), ['coordinate', 'start', 'end']);
+    els.map.innerHTML =
+      '<div class="friendly-note"><strong>Как менять карту:</strong> выбери участок, меняй скорость ползунком или цифрой, светофор можно добавить и двигать по линии координат. После сохранения Поехали будет брать эти правки как отдельный админ-слой.</div>' +
+      '<div class="map-editor-layout">' +
+        '<div class="card route-picker-card">' +
+          '<div class="card-title">1. Что редактируем</div>' +
+          '<div class="route-card-list">' + map.routes.map(function(item) {
+            return '<button class="route-choice ' + (item.id === route.id ? 'is-active' : '') + '" type="button" data-map-route="' + escapeHtml(item.id) + '">' +
+              '<strong>' + escapeHtml(item.title) + '</strong><span>' + escapeHtml(formatCoordinate(item.start) + ' - ' + formatCoordinate(item.end)) + '</span>' +
+            '</button>';
+          }).join('') + '</div>' +
+        '</div>' +
+        '<div class="card map-work-card">' +
+          '<div class="card-title">2. Линия участка</div>' +
+          '<div class="route-scale route-scale--large"><span>' + escapeHtml(formatCoordinate(bounds.min)) + '</span><div class="route-scale-line"></div><span>' + escapeHtml(formatCoordinate(bounds.max)) + '</span></div>' +
+          '<div class="map-canvas admin-map-canvas">' +
+            '<div class="map-canvas-rail"></div>' +
+            rules.map(function(rule) {
+              var left = coordinatePercent(getRuleStart(rule), bounds);
+              var width = Math.max(2, coordinatePercent(getRuleEnd(rule), bounds) - left);
+              return '<span class="speed-segment" style="left:' + left + '%;width:' + width + '%"><b>' + escapeHtml(rule.speed) + '</b></span>';
+            }).join('') +
+            objects.map(function(item) {
+              return '<span class="map-marker map-marker--signal" style="left:' + coordinatePercent(item.coordinate, bounds) + '%" title="' + escapeHtml(item.name || '') + '">СВ</span>';
+            }).join('') +
+          '</div>' +
+          '<div class="map-section-title">Скорости на выбранном участке</div>' +
+          '<div class="visual-list">' + (rules.length ? rules.map(function(rule) { return renderMapSpeedCard(rule, bounds); }).join('') : '<div class="empty">Скоростей на участке нет.</div>') + '</div>' +
+          '<div class="map-section-title">Светофоры и точки</div>' +
+          '<div class="visual-list">' + (objects.length ? objects.map(function(item) { return renderMapObjectCard(item, bounds); }).join('') : '<div class="empty">Добавь первый светофор кнопкой ниже.</div>') + '</div>' +
+          '<div class="map-actions">' +
+            '<button class="btn" id="btnAddMapSignal" type="button">Добавить светофор</button>' +
+            '<button class="btn-primary" id="btnSavePoekhaliMap" type="button">Сохранить карту Поехали</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    bindPoekhaliMapEditor(route, bounds);
+  }
+
+  function renderMapSpeedCard(rule, bounds) {
+    var id = escapeHtml(rule.id);
+    return '<div class="row-card map-rule-card">' +
+      '<div class="row-card-head"><div><strong>' + escapeHtml(rule.name || 'Скорость') + '</strong><div class="muted">' + escapeHtml(formatCoordinate(getRuleStart(rule)) + ' - ' + formatCoordinate(getRuleEnd(rule))) + '</div></div><span class="speed-pill">' + escapeHtml(rule.speed) + ' км/ч</span></div>' +
+      '<div class="track-preview"><div class="track-preview-line"></div><span class="track-pin track-pin--wide" style="left:' + coordinatePercent(getRuleStart(rule), bounds) + '%;width:' + Math.max(2, coordinatePercent(getRuleEnd(rule), bounds) - coordinatePercent(getRuleStart(rule), bounds)) + '%"></span></div>' +
+      '<div class="builder-grid">' +
+        '<div class="field"><label>Название</label><input class="input" data-map-speed="' + id + '" data-map-field="name" value="' + escapeHtml(rule.name || '') + '" /></div>' +
+        '<div class="field"><label>Скорость</label><input class="input" type="number" min="5" max="160" data-map-speed="' + id + '" data-map-field="speed" value="' + escapeHtml(rule.speed || 60) + '" /></div>' +
+        '<div class="field range-field"><label>Поменять скорость</label><input type="range" min="5" max="160" step="5" data-map-speed="' + id + '" data-map-field="speed" value="' + escapeHtml(rule.speed || 60) + '" /></div>' +
+        '<div class="field"><label>Начало</label><input class="input" type="number" data-map-speed="' + id + '" data-map-field="start" value="' + escapeHtml(getRuleStart(rule)) + '" /></div>' +
+        '<div class="field"><label>Конец</label><input class="input" type="number" data-map-speed="' + id + '" data-map-field="end" value="' + escapeHtml(getRuleEnd(rule)) + '" /></div>' +
+      '</div></div>';
+  }
+
+  function renderMapObjectCard(item, bounds) {
+    return '<div class="row-card map-rule-card">' +
+      '<div class="row-card-head"><div><strong>' + escapeHtml(item.name || 'Светофор') + '</strong><div class="muted">' + escapeHtml(formatCoordinate(item.coordinate)) + '</div></div><button class="icon-btn" data-delete-map-object="' + escapeHtml(item.id) + '" type="button">×</button></div>' +
+      '<div class="track-preview"><div class="track-preview-line"></div><span class="track-pin" style="left:' + coordinatePercent(item.coordinate, bounds) + '%"></span></div>' +
+      '<div class="builder-grid">' +
+        '<div class="field"><label>Название</label><input class="input" data-map-object="' + escapeHtml(item.id) + '" data-map-field="name" value="' + escapeHtml(item.name || '') + '" /></div>' +
+        '<div class="field"><label>Координата</label><input class="input" type="number" data-map-object="' + escapeHtml(item.id) + '" data-map-field="coordinate" value="' + escapeHtml(item.coordinate || 0) + '" /></div>' +
+        '<div class="field range-field"><label>Передвинуть по линии</label><input type="range" min="' + Math.round(bounds.min) + '" max="' + Math.round(bounds.max) + '" step="1" data-map-object="' + escapeHtml(item.id) + '" data-map-field="coordinate" value="' + escapeHtml(item.coordinate || 0) + '" /></div>' +
+      '</div></div>';
+  }
+
+  function ensureMapOverrideRule(baseRule) {
+    var map = normalizeMapConfig(state.poekhaliMap);
+    state.poekhaliMap = map;
+    var existing = map.speedRules.find(function(rule) { return rule.id === baseRule.id; });
+    if (existing) return existing;
+    var copy = Object.assign({}, baseRule, {
+      coordinate: getRuleStart(baseRule),
+      length: Math.max(0, getRuleEnd(baseRule) - getRuleStart(baseRule)),
+    });
+    map.speedRules.push(copy);
+    return copy;
+  }
+
+  function bindPoekhaliMapEditor(route) {
+    $all('[data-map-route]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        state.mapRouteId = btn.dataset.mapRoute;
+        renderPoekhaliMap();
+      });
+    });
+    $all('[data-map-speed]').forEach(function(input) {
+      input.addEventListener('input', function() {
+        var base = getMergedRouteSpeedRules(route.id).find(function(rule) { return rule.id === input.dataset.mapSpeed; });
+        if (!base) return;
+        var row = ensureMapOverrideRule(base);
+        var key = input.dataset.mapField;
+        row[key] = input.type === 'number' || input.type === 'range' ? Number(input.value || 0) : input.value;
+        row.coordinate = getRuleStart(row);
+        row.length = Math.max(0, getRuleEnd(row) - getRuleStart(row));
+      });
+      input.addEventListener('change', renderPoekhaliMap);
+    });
+    $all('[data-map-object]').forEach(function(input) {
+      var updateObject = function() {
+        var map = normalizeMapConfig(state.poekhaliMap);
+        state.poekhaliMap = map;
+        var row = map.objects.find(function(item) { return item.id === input.dataset.mapObject; });
+        if (!row) return;
+        row[input.dataset.mapField] = input.type === 'number' || input.type === 'range' ? Number(input.value || 0) : input.value;
+        row.end = Number(row.coordinate) + Number(row.length || 0);
+      };
+      input.addEventListener('input', updateObject);
+      input.addEventListener('change', function() { updateObject(); renderPoekhaliMap(); });
+    });
+    $all('[data-delete-map-object]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        state.poekhaliMap.objects = state.poekhaliMap.objects.filter(function(item) { return item.id !== btn.dataset.deleteMapObject; });
+        renderPoekhaliMap();
+      });
+    });
+    $('#btnAddMapSignal').addEventListener('click', function() {
+      var map = normalizeMapConfig(state.poekhaliMap);
+      state.poekhaliMap = map;
+      var coordinate = Math.round((Number(route.start) + Number(route.end)) / 2);
+      map.objects.push({ id: 'signal-' + Date.now(), routeId: route.id, sector: route.sector, type: '1', coordinate: coordinate, length: 0, end: coordinate, name: 'Новый светофор' });
+      renderPoekhaliMap();
+    });
+    $('#btnSavePoekhaliMap').addEventListener('click', savePoekhaliMap);
+  }
+
+  function savePoekhaliMap() {
+    request('poekhaliMap', { method: 'PUT', body: { map: state.poekhaliMap } })
+      .then(function(body) {
+        state.poekhaliMap = normalizeMapConfig(body.map);
+        setStatus('Карта Поехали сохранена', 'ok');
+        renderPoekhaliMap();
+      })
+      .catch(showError);
+  }
+
   function renderDocuments() {
     var panel = els.documents;
     var manifest = state.docsManifest || {};
@@ -1238,6 +1485,7 @@
   function render() {
     renderOverview();
     if (state.panel === 'users') renderUsers();
+    if (state.panel === 'map') renderPoekhaliMap();
     if (state.panel === 'documents') renderDocuments();
     if (state.panel === 'functions') renderFunctions();
     if (state.panel === 'raw') renderRaw();
@@ -1249,7 +1497,7 @@
 
   function refreshAll() {
     setStatus('Обновляю данные...');
-    return Promise.all([loadOverview(), loadUsers(), loadDocs(), loadConfig()])
+    return Promise.all([loadOverview(), loadUsers(), loadDocs(), loadConfig(), loadPoekhaliMap()])
       .then(function() {
         setStatus('Данные обновлены', 'ok');
         render();
@@ -1264,6 +1512,7 @@
     els.adminUser = $('#adminUser');
     els.overview = $('#panel-overview');
     els.users = $('#panel-users');
+    els.map = $('#panel-map');
     els.documents = $('#panel-documents');
     els.functions = $('#panel-functions');
     els.raw = $('#panel-raw');
@@ -1278,9 +1527,7 @@
     checkAdmin()
       .then(refreshAll)
       .catch(function(error) {
-        els.adminUser.textContent = 'Нет доступа';
-        setStatus(error.message + '. Войдите в основное приложение через Telegram тем же аккаунтом и откройте /admin снова.', 'error');
-        els.overview.innerHTML = '';
+        showAccessDenied(error);
       });
   }
 

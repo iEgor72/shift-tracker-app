@@ -42,7 +42,8 @@
     manifest: '/assets/tracker/maps-manifest.json',
     reference: '/assets/tracker/tch9-reference.json',
     speedDocs: '/assets/tracker/speed-docs.json',
-    regimeMaps: '/assets/tracker/regime-maps.json'
+    regimeMaps: '/assets/tracker/regime-maps.json',
+    adminMap: '/api/poekhali-map-overrides'
   };
   var MAP_STORAGE_KEY = 'poekhali.mapId';
   var OPS_VIEW_STORAGE_KEY = 'poekhali.opsView';
@@ -265,6 +266,10 @@
     regimeObjectsBySector: {},
     regimeControlMarksBySector: {},
     regimeMapsPromise: null,
+    adminMap: null,
+    adminMapLoaded: false,
+    adminMapError: '',
+    adminMapPromise: null,
     canvas: null,
     ctx: null,
     mapPicker: null,
@@ -5413,6 +5418,58 @@
     return result;
   }
 
+  function appendAdminMapSpeedRules(rules, left, right, sector) {
+    var adminMap = tracker.adminMap && Array.isArray(tracker.adminMap.speedRules) ? tracker.adminMap.speedRules : [];
+    for (var i = 0; i < adminMap.length; i++) {
+      var item = adminMap[i];
+      if (!item || getSectorKey(item.sector) !== getSectorKey(sector)) continue;
+      if (item.wayNumber && normalizeWayNumber(item.wayNumber) !== normalizeWayNumber(tracker.wayNumber)) continue;
+      var start = Math.min(Number(item.start || item.coordinate) || 0, Number(item.end) || 0);
+      var end = Math.max(Number(item.start || item.coordinate) || 0, Number(item.end) || 0);
+      var speed = Math.round(Number(item.speed) || 0);
+      if (!start || !end || end < start || speed <= 0) continue;
+      var rule = {
+        coordinate: start,
+        end: end,
+        length: Math.max(0, end - start),
+        speed: speed,
+        name: item.name || ('Админ ' + speed),
+        source: 'admin',
+        sourceName: 'Админка',
+        sourceCode: 'ADMIN-MAP',
+        confidence: 'admin'
+      };
+      if (isFinite(left) && isFinite(right) && !isObjectInRange(rule, left, right)) continue;
+      rules.push(rule);
+    }
+  }
+
+  function getAdminMapTrackObjectsForSector(sector) {
+    var adminMap = tracker.adminMap && Array.isArray(tracker.adminMap.objects) ? tracker.adminMap.objects : [];
+    var currentWay = normalizeWayNumber(tracker.wayNumber);
+    var result = [];
+    for (var i = 0; i < adminMap.length; i++) {
+      var item = adminMap[i];
+      if (!item || getSectorKey(item.sector) !== getSectorKey(sector)) continue;
+      if (item.wayNumber && normalizeWayNumber(item.wayNumber) !== currentWay) continue;
+      var coordinate = Math.max(0, Math.round(Number(item.coordinate) || 0));
+      var length = Math.max(0, Math.round(Number(item.length) || 0));
+      result.push({
+        type: String(item.type || '1'),
+        coordinate: coordinate,
+        length: length,
+        end: coordinate + length,
+        name: String(item.name || '').trim(),
+        sector: item.sector,
+        source: 'admin',
+        sourceName: 'Админка',
+        sourceCode: 'ADMIN-MAP',
+        confidence: 'admin'
+      });
+    }
+    return result;
+  }
+
   function getManualBamControlMarksForSector(sector) {
     if (getSectorKey(sector) !== '18') return [];
     var result = [];
@@ -6730,6 +6787,36 @@
         return null;
       });
     return tracker.regimeMapsPromise;
+  }
+
+  function normalizeAdminMapPayload(payload) {
+    var source = payload && typeof payload === 'object' ? payload : {};
+    return {
+      version: 1,
+      routes: Array.isArray(source.routes) ? source.routes : [],
+      speedRules: Array.isArray(source.speedRules) ? source.speedRules : [],
+      objects: Array.isArray(source.objects) ? source.objects : [],
+      updatedAt: source.updatedAt ? String(source.updatedAt) : ''
+    };
+  }
+
+  function loadAdminMap() {
+    if (tracker.adminMapPromise) return tracker.adminMapPromise;
+    tracker.adminMapPromise = fetchText(ASSET_PATHS.adminMap)
+      .then(function(text) {
+        tracker.adminMap = normalizeAdminMapPayload(JSON.parse(text || '{}'));
+        tracker.adminMapLoaded = true;
+        tracker.adminMapError = '';
+        requestDraw();
+        return tracker.adminMap;
+      })
+      .catch(function(error) {
+        tracker.adminMap = normalizeAdminMapPayload(null);
+        tracker.adminMapLoaded = false;
+        tracker.adminMapError = error && error.message ? error.message : 'Админ-правки карты не загружены';
+        return tracker.adminMap;
+      });
+    return tracker.adminMapPromise;
   }
 
   function buildRegimeProfilesBySector(bySector) {
@@ -13921,7 +14008,7 @@
       base = base.filter(function(item) { return !item || item.type !== '1'; }).concat(signalItems);
     }
     return mergeRegimeTrackObjects(
-      base.concat(getManualBamTrackObjectsForSector(sector)).concat(getUserObjectsForSector(sector)),
+      base.concat(getManualBamTrackObjectsForSector(sector)).concat(getAdminMapTrackObjectsForSector(sector)).concat(getUserObjectsForSector(sector)),
       getRegimeTrackObjectsForSector(sector)
     );
   }
@@ -13937,7 +14024,7 @@
         result.push(items[i]);
       }
     });
-    result = result.concat(getManualBamTrackObjectsForSector(sector)).concat(getUserObjectsForSector(sector));
+    result = result.concat(getManualBamTrackObjectsForSector(sector)).concat(getAdminMapTrackObjectsForSector(sector)).concat(getUserObjectsForSector(sector));
     return mergeRegimeTrackObjects(result, getRegimeTrackObjectsForSector(sector));
   }
 
@@ -13999,6 +14086,7 @@
     appendRegimeSpeedRules(rules, left, right, sector);
     appendDocumentSpeedRules(rules, left, right, sector);
     appendManualBamSpeedRules(rules, left, right, sector);
+    appendAdminMapSpeedRules(rules, left, right, sector);
     rules.sort(function(a, b) {
       return a.coordinate - b.coordinate;
     });
@@ -14519,6 +14607,7 @@
   function getSpeedRulePriority(rule) {
     if (!rule) return 0;
     if (rule.source === 'warning') return 80;
+    if (rule.source === 'admin') return 70;
     if (rule.source === 'manual') return 60;
     if (rule.source === 'document') return 40;
     if (rule.source === 'regime') return 30;
@@ -14529,7 +14618,7 @@
 
   function isFactualSpeedRuleSource(rule) {
     var source = String(rule && rule.source || '');
-    return source === 'warning' || source === 'manual' || source === 'user';
+    return source === 'warning' || source === 'admin' || source === 'manual' || source === 'user';
   }
 
   function getSpeedRulePrefix(rule) {
@@ -15345,6 +15434,7 @@
     appendRegimeSpeedRules(rules, left, right, sector);
     appendDocumentSpeedRules(rules, left, right, sector);
     appendManualBamSpeedRules(rules, left, right, sector);
+    appendAdminMapSpeedRules(rules, left, right, sector);
     var warnings = getWarningsForSector(sector, left, right);
     for (var j = 0; j < warnings.length; j++) {
       var warning = warnings[j];
@@ -18021,6 +18111,7 @@
     loadReference();
     loadSpeedDocs();
     loadRegimeMaps();
+    loadAdminMap();
     preparePoekhaliModeEntry().then(function() {
       scheduleAutoRunStart('entry', AUTO_RUN_START_DELAY_MS);
     });
@@ -18153,6 +18244,7 @@
     loadManifest();
     loadSpeedDocs();
     loadRegimeMaps();
+    loadAdminMap();
     resizeCanvas();
     drawCanvas();
     if (isPoekhaliPanelActive() || (document.body && document.body.classList.contains('is-poekhali-mode'))) {

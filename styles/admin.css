@@ -47,6 +47,73 @@ body.admin-locked .status-line {
   text-align: center;
 }
 
+body.admin-denied .admin-main {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+}
+
+body.admin-denied .admin-sidebar,
+body.admin-denied .admin-topbar,
+body.admin-denied .status-line {
+  display: none;
+}
+
+.access-denied-card {
+  width: min(560px, calc(100vw - 32px));
+  padding: 26px;
+  border: 1px solid rgba(122,183,255,.22);
+  border-radius: var(--radius);
+  background: var(--surface);
+  text-align: center;
+  box-shadow: 0 18px 60px rgba(0,0,0,.28);
+}
+
+.access-denied-mark {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 14px;
+  border-radius: var(--radius);
+  background: #e9f2ff;
+  color: #101217;
+  font-weight: 900;
+}
+
+.access-denied-kicker {
+  color: var(--accent-2);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.access-denied-card h2 {
+  margin: 8px 0 10px;
+  font-size: 24px;
+}
+
+.access-denied-card p {
+  margin: 0 auto;
+  max-width: 430px;
+  color: #c5cfdd;
+  line-height: 1.5;
+}
+
+.access-denied-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.access-denied-note {
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
 button, input, select, textarea {
   font: inherit;
 }
@@ -491,6 +558,99 @@ tbody tr:hover {
   background: rgba(255,255,255,.04);
 }
 
+.people-layout,
+.map-editor-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 12px;
+}
+
+.people-card-list,
+.route-card-list {
+  display: grid;
+  gap: 8px;
+  max-height: calc(100vh - 250px);
+  overflow: auto;
+}
+
+.person-card,
+.route-choice {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #101217;
+  color: var(--text);
+  padding: 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.route-choice {
+  display: block;
+}
+
+.person-card:hover,
+.route-choice:hover,
+.person-card.is-active,
+.route-choice.is-active {
+  border-color: rgba(122,183,255,.5);
+  background: var(--surface-2);
+}
+
+.person-avatar {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius);
+  background: rgba(122,183,255,.16);
+  color: #d8ebff;
+  font-weight: 850;
+}
+
+.person-main,
+.person-meta,
+.person-badges {
+  min-width: 0;
+}
+
+.person-title {
+  font-weight: 760;
+}
+
+.person-meta,
+.route-choice span {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.person-badges {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-top: 7px;
+}
+
+.person-badges span {
+  min-height: 22px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  color: #c5cfdd;
+  font-size: 11px;
+}
+
+.person-badges .is-online {
+  color: #dffdea;
+  background: #173625;
+}
+
 .pill {
   display: inline-flex;
   align-items: center;
@@ -680,6 +840,75 @@ tbody tr:hover {
   background: var(--surface-3);
   border: 3px solid var(--accent-2);
   box-shadow: 0 0 0 5px rgba(122,183,255,.12);
+}
+
+.track-pin--wide {
+  width: auto;
+  height: 14px;
+  top: 14px;
+  margin-left: 0;
+  border-radius: 999px;
+  border: 0;
+  background: rgba(97,211,148,.72);
+}
+
+.admin-map-canvas {
+  position: relative;
+  height: 92px;
+  margin: 12px 0 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #101217;
+  overflow: hidden;
+}
+
+.admin-map-canvas .map-canvas-rail {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  top: 45px;
+}
+
+.speed-segment {
+  position: absolute;
+  top: 37px;
+  height: 20px;
+  min-width: 28px;
+  border-radius: 999px;
+  background: rgba(97,211,148,.65);
+  border: 1px solid rgba(97,211,148,.9);
+  color: #092113;
+  text-align: center;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.admin-map-canvas .map-marker {
+  top: 18px;
+}
+
+.map-section-title {
+  margin: 16px 0 8px;
+  font-weight: 800;
+}
+
+.map-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.speed-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(97,211,148,.16);
+  color: #dffdea;
+  font-weight: 850;
+  white-space: nowrap;
 }
 
 .range-field input[type="range"] {
@@ -979,7 +1208,9 @@ tbody tr:hover {
   .builder-grid,
   .trip-card-list,
   .doc-card-list,
-  .learning-layout {
+  .learning-layout,
+  .people-layout,
+  .map-editor-layout {
     grid-template-columns: 1fr;
   }
 
