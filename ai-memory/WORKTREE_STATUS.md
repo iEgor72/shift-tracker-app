@@ -1,36 +1,40 @@
 # Worktree Status
 
-Generated: 2026-05-07 06:23:38 +0000
+Generated: 2026-05-13 16:26:52 +1000
 
 ## git status -sb
 ```text
 ## main...origin/main
+ M admin.html
+ M ai-memory/CHANGELOG.md
+ M ai-memory/INDEX.md
  M ai-memory/PROJECT_STATE.md
+ M ai-memory/RECENT_COMMITS.md
+ M ai-memory/WORKTREE_STATUS.md
+ M scripts/admin.js
+ M scripts/docs-app.js
+ M scripts/poekhali-tracker.js
+ M server.js
+ M styles/10-navigation-and-cards.css
+ M styles/admin.css
+?? ai-memory/sessions/2026-05-12.md
+?? ai-memory/sessions/2026-05-13.md
 ```
 
 ## git branch -vv
 ```text
-+ calendar-fix-main                             4b9e6c6 (/tmp/bloknot-batch/calendar-fix) Fix home calendar to show manual shifts only
-+ chore/remove-graphs-and-restore-calendar-flow e90d829 (/tmp/bloknot-remove-graphs) refactor(app): remove remaining schedule tails
-+ cleanup-archaeology                           6219db2 (/tmp/bloknot-batch/archaeology) Revert "refactor(schedule): switch app to manual-only shifts"
-+ cleanup-backend                               6219db2 (/tmp/bloknot-clean/backend) Revert "refactor(schedule): switch app to manual-only shifts"
-+ cleanup-backend-migrate                       6219db2 (/tmp/bloknot-batch/backend-migrate) Revert "refactor(schedule): switch app to manual-only shifts"
-+ cleanup-frontend                              6219db2 (/tmp/bloknot-clean/frontend) Revert "refactor(schedule): switch app to manual-only shifts"
-+ cleanup-frontend-smoke                        ed81af6 (/tmp/bloknot-batch/frontend-smoke) Hide schedule planner UI from frontend
-+ cleanup-integration                           dba6ed0 (/tmp/bloknot-batch/integration) Remove schedule planner and add local smoke test
-+ cleanup-review                                6219db2 (/tmp/bloknot-clean/review) Revert "refactor(schedule): switch app to manual-only shifts"
-+ cleanup-test-harness                          6219db2 (/tmp/bloknot-batch/test-harness) Revert "refactor(schedule): switch app to manual-only shifts"
-+ feat/manual-calendar-from-scratch             8345ab9 (/tmp/bloknot-manual-calendar) feat(home): polish manual calendar flow
-* main                                          241d11c [origin/main] fix(tracker): auto resume gps after pause
+codex/next-direction b044dd5 offline mvp
+  codex/tabs-ui        117f1fa [origin/codex/tabs-ui] tabs ui
+* main                 eddb094 [origin/main] feat(admin): add visual Poekhali map editor
 ```
 
 ## HEAD
 ```text
-241d11c fix(tracker): auto resume gps after pause
- ai-memory/CHANGELOG.md           |  8 ++++++++
- ai-memory/sessions/2026-05-07.md |  1 +
- scripts/app-constants.js         |  2 +-
- scripts/poekhali-tracker.js      | 26 ++++++++++++++++++++++----
- sw.js                            |  2 +-
- 5 files changed, 33 insertions(+), 6 deletions(-)
+eddb094 feat(admin): add visual Poekhali map editor
+ admin.html                  |   9 +-
+ scripts/admin.js            | 339 ++++++++++++++++++++++++++++++++++++++------
+ scripts/poekhali-tracker.js | 100 ++++++++++++-
+ server.js                   | 105 ++++++++++++++
+ styles/admin.css            | 233 +++++++++++++++++++++++++++++-
+ 5 files changed, 731 insertions(+), 55 deletions(-)
 ```

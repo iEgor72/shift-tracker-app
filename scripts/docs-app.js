@@ -305,16 +305,16 @@
     function buildDocDisplayMeta(folder, file) {
       var path = file && file.path ? String(file.path) : '';
       var explicit = DOC_DISPLAY_META_BY_PATH[path];
+      var baseName = extractDocBaseName(file);
+      var safeName = normalizeDocDisplayText(file && file.name);
+      var caption = normalizeDocDisplayText(file && (file.caption || file.subtitle));
       if (explicit) {
         return {
-          title: explicit.title,
-          subtitle: explicit.subtitle
+          title: safeName || explicit.title,
+          subtitle: caption || explicit.subtitle
         };
       }
 
-      var baseName = extractDocBaseName(file);
-      var safeName = normalizeDocDisplayText(file && file.name);
-      var caption = normalizeDocDisplayText(file && file.caption);
       if (folder === 'folders') {
         return {
           title: safeName || baseName || 'Папка',

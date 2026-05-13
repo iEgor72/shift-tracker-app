@@ -1925,21 +1925,37 @@
 
   function normalizeDateValue(value) {
     var text = String(value || '').trim();
-    return /^\d{4}-\d{2}-\d{2}$/.test(text) ? text : '';
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(text)) return text.slice(0, 16);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+    return '';
+  }
+
+  function getMoscowDateTimeString() {
+    var now = new Date();
+    var moscow = new Date(now.getTime() + (3 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    var pad = function(n) { return String(n).padStart(2, '0'); };
+    return moscow.getFullYear() + '-' + pad(moscow.getMonth() + 1) + '-' + pad(moscow.getDate()) +
+      'T' + pad(moscow.getHours()) + ':' + pad(moscow.getMinutes());
+  }
+
+  function getMoscowDateString() {
+    return getMoscowDateTimeString().slice(0, 10);
   }
 
   function getTodayDateString() {
-    var date = new Date();
-    var month = String(date.getMonth() + 1).padStart(2, '0');
-    var day = String(date.getDate()).padStart(2, '0');
-    return date.getFullYear() + '-' + month + '-' + day;
+    return getMoscowDateString();
   }
 
   function formatDateLabel(value) {
     var date = normalizeDateValue(value);
     if (!date) return '';
-    var parts = date.split('-');
-    return parts[2] + '.' + parts[1] + '.' + parts[0];
+    if (date.indexOf('T') >= 0) {
+      var parts = date.split('T');
+      var d = parts[0].split('-');
+      return d[2] + '.' + d[1] + '.' + d[0] + ' ' + parts[1];
+    }
+    var p = date.split('-');
+    return p[2] + '.' + p[1] + '.' + p[0];
   }
 
   function normalizeWarning(item) {
@@ -3826,7 +3842,11 @@
   }
 
   function isWarningExpired(item) {
-    return !!(item && item.validUntil && item.validUntil < getTodayDateString());
+    if (!item || !item.validUntil) return false;
+    if (String(item.validUntil).indexOf('T') >= 0) {
+      return item.validUntil < getMoscowDateTimeString();
+    }
+    return item.validUntil < getMoscowDateString();
   }
 
   function isWarningUsable(item) {
@@ -7869,6 +7889,23 @@
       subtitle: subtitle,
       content: content
     };
+    if (!tracker.opsSheetFocusGuardBound) {
+      tracker.opsSheetFocusGuardBound = true;
+      document.addEventListener('focusout', function() {
+        setTimeout(function() {
+          if (!tracker.opsSheetRenderPending) return;
+          var sheet = tracker.opsSheet;
+          if (!sheet || !sheet.root || sheet.root.classList.contains('hidden')) {
+            tracker.opsSheetRenderPending = false;
+            return;
+          }
+          var active = document.activeElement;
+          if (active && active !== document.body && sheet.root.contains(active) && /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName)) return;
+          tracker.opsSheetRenderPending = false;
+          renderOpsSheet();
+        }, 60);
+      });
+    }
     return tracker.opsSheet;
   }
 
@@ -10938,332 +10975,805 @@
     parent.appendChild(section);
   }
 
-  function renderWarningsSection(parent) {
-    var section = document.createElement('section');
-    section.className = 'poekhali-ops-section';
+  function warnCoordPercent(coord, bounds) {
+    var min = Number(bounds && bounds.min) || 0;
+    var max = Number(bounds && bounds.max) || (min + 1);
+    var current = Math.max(min, Math.min(max, Number(coord) || 0));
+    return Math.max(0, Math.min(100, ((current - min) / Math.max(1, max - min)) * 100));
+  }
+
+  function warnPopoverAnchor(percent) {
+    if (percent < 20) return 'left';
+    if (percent > 80) return 'right';
+    return 'mid';
+  }
+
+  function getWarnAppPopover() {
+    if (!tracker.warningsAppPopover) tracker.warningsAppPopover = { id: null };
+    return tracker.warningsAppPopover;
+  }
+
+  function getWarnAppSector(sectors, projection) {
+    var cur = tracker.warningsAppSector;
+    if (cur != null && sectors.indexOf(Number(cur)) >= 0) return Number(cur);
+    if (projection && isRealNumber(projection.sector) && sectors.indexOf(Number(projection.sector)) >= 0) return Number(projection.sector);
+    return sectors[0];
+  }
+
+  function getWarnAppRouteBounds(sectorWarnings, projection, sector) {
+    var coords = [];
+    sectorWarnings.forEach(function(w) {
+      if (isFinite(Number(w.start))) coords.push(Number(w.start));
+      if (isFinite(Number(w.end))) coords.push(Number(w.end));
+    });
+    if (projection && Number(projection.sector) === Number(sector) && isRealNumber(projection.lineCoordinate)) {
+      coords.push(Number(projection.lineCoordinate));
+    }
+    if (!coords.length) {
+      var preferred = getPreferredSectorCoordinate(sector, 'middle');
+      var center = isRealNumber(preferred) ? Number(preferred) : 100000;
+      return { min: Math.max(0, center - 50000), max: center + 50000 };
+    }
+    var min = Math.min.apply(Math, coords);
+    var max = Math.max.apply(Math, coords);
+    var span = Math.max(4000, max - min);
+    var pad = Math.max(2000, Math.round(span * 0.15));
+    return { min: Math.max(0, min - pad), max: max + pad };
+  }
+
+  function getWarnAppViewBounds(routeBounds, sector) {
+    var fullSpan = Math.max(2000, routeBounds.max - routeBounds.min);
+    var zoom = tracker.warningsAppZoom;
+    if (!zoom || Number(zoom.sector) !== Number(sector)) {
+      zoom = { sector: Number(sector), center: (routeBounds.min + routeBounds.max) / 2, span: fullSpan };
+    }
+    zoom.span = Math.max(500, Math.min(fullSpan, zoom.span));
+    var half = zoom.span / 2;
+    zoom.center = Math.max(routeBounds.min + half, Math.min(routeBounds.max - half, zoom.center));
+    tracker.warningsAppZoom = zoom;
+    return { min: Math.round(zoom.center - half), max: Math.round(zoom.center + half) };
+  }
+
+  function toggleWarnPopover(id) {
+    var pop = getWarnAppPopover();
+    pop.id = pop.id === id ? null : id;
+    renderOpsSheet();
+  }
+
+  function addWarnEntity() {
+    var sectors = getAvailableSectors();
+    if (!sectors.length) sectors = [1];
+    var projection = getCurrentProjectionForForm();
+    var sector = projection && isRealNumber(projection.sector) && sectors.indexOf(Number(projection.sector)) >= 0
+      ? Number(projection.sector)
+      : Number(tracker.warningsAppSector || sectors[0]);
+    tracker.warningsAppSector = sector;
+    var scopedNow = getScopedWarnings(true).filter(function(w) { return Number(w.sector) === sector; });
+    var routeBounds = getWarnAppRouteBounds(scopedNow, projection, sector);
+    var viewBounds = getWarnAppViewBounds(routeBounds, sector);
+    var center;
+    if (projection && Number(projection.sector) === sector && isRealNumber(projection.lineCoordinate)) {
+      center = Math.round(projection.lineCoordinate);
+    } else {
+      center = Math.round((viewBounds.min + viewBounds.max) / 2);
+    }
+    var created = createWarning(sector, center, center, 40, '', getMoscowDateTimeString());
+    if (created) {
+      tracker.warningBulkMessage = '';
+      tracker.warningsAppPopover = { id: created.id };
+    } else {
+      tracker.warningBulkMessage = 'ПР не добавлено: попробуй позже.';
+    }
+    renderOpsSheet();
+    requestDraw();
+  }
+
+  function startWarnDrag(el, downEvent, id, bounds) {
+    if (downEvent.button !== undefined && downEvent.button !== 0) return;
+    var rail = document.getElementById('poekhaliWarnRail');
+    if (!rail) return;
+    var rect = rail.getBoundingClientRect();
+    var pointerId = downEvent.pointerId;
+    var moved = false;
+    var initialX = downEvent.clientX;
+    var entity = getWarningById(id);
+    if (!entity) return;
+    var initial = {
+      start: Math.min(Number(entity.start) || 0, Number(entity.end) || 0),
+      end: Math.max(Number(entity.start) || 0, Number(entity.end) || 0),
+    };
+    var sectors = getAvailableSectors();
+    var sector = Number(tracker.warningsAppSector || sectors[0]);
+    var sectorWarnings = getScopedWarnings(true).filter(function(w) { return Number(w.sector) === sector; });
+    var routeBounds = getWarnAppRouteBounds(sectorWarnings, getCurrentProjectionForForm(), sector);
+
+    if (el.setPointerCapture) {
+      try { el.setPointerCapture(pointerId); } catch (_) {}
+    }
+    el.classList.add('is-dragging');
+
+    function onMove(event) {
+      var dx = event.clientX - initialX;
+      if (!moved && Math.abs(dx) < 4) return;
+      moved = true;
+      var ratio = dx / Math.max(1, rect.width);
+      var deltaCoord = Math.round(ratio * (bounds.max - bounds.min));
+      var newStart = initial.start + deltaCoord;
+      var newEnd = initial.end + deltaCoord;
+      if (newStart < routeBounds.min) {
+        newEnd += routeBounds.min - newStart;
+        newStart = routeBounds.min;
+      }
+      if (newEnd > routeBounds.max) {
+        newStart -= newEnd - routeBounds.max;
+        newEnd = routeBounds.max;
+      }
+      entity.start = newStart;
+      entity.end = newEnd;
+      entity.updatedAt = new Date().toISOString();
+      var leftPct = warnCoordPercent(Math.max(newStart, bounds.min), bounds);
+      var rightPct = warnCoordPercent(Math.min(newEnd, bounds.max), bounds);
+      el.style.left = leftPct + '%';
+      el.style.width = Math.max(0.6, rightPct - leftPct) + '%';
+    }
+
+    function finish() {
+      el.removeEventListener('pointermove', onMove);
+      el.removeEventListener('pointerup', finish);
+      el.removeEventListener('pointercancel', finish);
+      if (el.releasePointerCapture) {
+        try { el.releasePointerCapture(pointerId); } catch (_) {}
+      }
+      el.classList.remove('is-dragging');
+      if (moved) {
+        el.dataset.draggedRecently = '1';
+        saveWarnings();
+        renderOpsSheet();
+        requestDraw();
+      }
+    }
+
+    el.addEventListener('pointermove', onMove);
+    el.addEventListener('pointerup', finish);
+    el.addEventListener('pointercancel', finish);
+  }
+
+  function buildWarnBar(warning, bounds, pop) {
+    var startC = Math.max(Math.min(Number(warning.start) || 0, Number(warning.end) || 0), bounds.min);
+    var endC = Math.min(Math.max(Number(warning.start) || 0, Number(warning.end) || 0), bounds.max);
+    var left = warnCoordPercent(startC, bounds);
+    var right = warnCoordPercent(endC, bounds);
+    var width = Math.max(0.6, right - left);
+    var speed = Math.max(1, Math.round(Number(warning.speed) || 25));
+    var tone = speed <= 40 ? 'danger' : speed <= 60 ? 'warning' : 'success';
+    var selected = pop.id === warning.id;
+    var disabled = warning.enabled === false;
+    var bar = document.createElement('button');
+    bar.type = 'button';
+    bar.className = 'poekhali-warn-bar poekhali-warn-bar--' + tone +
+      (selected ? ' is-selected' : '') + (disabled ? ' is-disabled' : '');
+    bar.style.left = left + '%';
+    bar.style.width = width + '%';
+    bar.dataset.warnBar = warning.id;
+    bar.title = (warning.note ? warning.note + ' · ' : '') + speed + ' км/ч';
+    var label = document.createElement('span');
+    label.className = 'poekhali-warn-bar-label';
+    label.textContent = String(speed);
+    bar.appendChild(label);
+    bar.addEventListener('click', function(event) {
+      if (bar.dataset.draggedRecently === '1') {
+        bar.dataset.draggedRecently = '0';
+        return;
+      }
+      event.stopPropagation();
+      toggleWarnPopover(warning.id);
+    });
+    bar.addEventListener('pointerdown', function(event) {
+      startWarnDrag(bar, event, warning.id, bounds);
+    });
+    return bar;
+  }
+
+  function buildWarnPopover(warning, routeBounds) {
+    var startC = Math.min(Number(warning.start) || 0, Number(warning.end) || 0);
+    var endC = Math.max(Number(warning.start) || 0, Number(warning.end) || 0);
+    var speed = Math.max(1, Math.round(Number(warning.speed) || 25));
+    var tone = speed <= 40 ? 'danger' : speed <= 60 ? 'warning' : 'success';
+    var enabled = warning.enabled !== false;
+    var validUntilValue = String(warning.validUntil || '');
+
+    var pop = document.createElement('div');
+    pop.className = 'poekhali-warn-popover poekhali-warn-popover--' + tone;
+
     var head = document.createElement('div');
-    head.className = 'poekhali-ops-section-head';
+    head.className = 'poekhali-warn-popover-head';
+    var headTitle = document.createElement('strong');
+    headTitle.textContent = 'ПР · ' + speed + ' км/ч';
+    var closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'poekhali-warn-popover-close';
+    closeBtn.textContent = '×';
+    closeBtn.addEventListener('click', function() {
+      tracker.warningsAppPopover.id = null;
+      renderOpsSheet();
+    });
+    head.appendChild(headTitle);
+    head.appendChild(closeBtn);
+    pop.appendChild(head);
+
+    var speedRow = document.createElement('div');
+    speedRow.className = 'poekhali-warn-popover-row';
+    var speedLabel = document.createElement('label');
+    speedLabel.appendChild(document.createTextNode('Скорость: '));
+    var speedLabelStrong = document.createElement('strong');
+    speedLabelStrong.textContent = speed + ' км/ч';
+    speedLabel.appendChild(speedLabelStrong);
+    var speedSlider = document.createElement('input');
+    speedSlider.type = 'range';
+    speedSlider.min = '5';
+    speedSlider.max = '120';
+    speedSlider.step = '1';
+    speedSlider.value = String(speed);
+    speedSlider.addEventListener('input', function() {
+      warning.speed = Number(speedSlider.value);
+      warning.updatedAt = new Date().toISOString();
+      speedLabelStrong.textContent = warning.speed + ' км/ч';
+      headTitle.textContent = 'ПР · ' + warning.speed + ' км/ч';
+    });
+    speedSlider.addEventListener('change', function() {
+      saveWarnings();
+      renderOpsSheet();
+      requestDraw();
+    });
+    speedRow.appendChild(speedLabel);
+    speedRow.appendChild(speedSlider);
+    pop.appendChild(speedRow);
+
+    var presets = document.createElement('div');
+    presets.className = 'poekhali-warn-popover-presets';
+    [25, 40, 60, 80].forEach(function(v) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'poekhali-warn-preset' + (speed === v ? ' is-active' : '');
+      btn.textContent = String(v);
+      btn.addEventListener('click', function() {
+        warning.speed = v;
+        warning.updatedAt = new Date().toISOString();
+        saveWarnings();
+        renderOpsSheet();
+        requestDraw();
+      });
+      presets.appendChild(btn);
+    });
+    pop.appendChild(presets);
+
+    var isPointWarning = Math.abs(endC - startC) <= 100;
+    function buildKmPkRow(field, value, optional, initiallyEmpty) {
+      var row = document.createElement('div');
+      row.className = 'poekhali-warn-popover-row';
+      var label = document.createElement('label');
+      label.textContent = field === 'start' ? 'Начало' : 'Конец';
+      if (optional) {
+        var hint = document.createElement('small');
+        hint.className = 'poekhali-warn-kmpk-hint';
+        hint.textContent = 'оставь пустым — только в этой точке';
+        label.appendChild(hint);
+      }
+      var inputs = document.createElement('div');
+      inputs.className = 'poekhali-warn-kmpk';
+      var kmpk = coordinateToKmPk(value);
+      var kmInput = document.createElement('input');
+      kmInput.type = 'number';
+      kmInput.min = '0';
+      kmInput.max = '9999';
+      kmInput.step = '1';
+      kmInput.inputMode = 'numeric';
+      kmInput.value = initiallyEmpty ? '' : String(kmpk.km);
+      if (optional) kmInput.placeholder = 'км';
+      var kmTag = document.createElement('span');
+      kmTag.textContent = 'км';
+      var pkInput = document.createElement('input');
+      pkInput.type = 'number';
+      pkInput.min = '0';
+      pkInput.max = '9';
+      pkInput.step = '1';
+      pkInput.inputMode = 'numeric';
+      pkInput.value = initiallyEmpty ? '' : String(kmpk.pk);
+      if (optional) pkInput.placeholder = 'пк';
+      var pkTag = document.createElement('span');
+      pkTag.textContent = 'пк';
+
+      function applyKmPk() {
+        var kmRaw = String(kmInput.value || '').trim();
+        var pkRaw = String(pkInput.value || '').trim();
+        if (optional && kmRaw === '' && pkRaw === '') {
+          warning.end = Number(warning.start) || 0;
+        } else {
+          var coord = coordinateFromKmPk(kmRaw || '0', pkRaw || '0');
+          warning[field] = coord;
+          if (field === 'start' && Number(warning.start) > Number(warning.end)) warning.end = warning.start;
+          if (field === 'end' && Number(warning.end) < Number(warning.start)) warning.start = warning.end;
+        }
+        warning.updatedAt = new Date().toISOString();
+      }
+      kmInput.addEventListener('input', applyKmPk);
+      pkInput.addEventListener('input', applyKmPk);
+      kmInput.addEventListener('change', function() {
+        applyKmPk();
+        saveWarnings();
+        renderOpsSheet();
+        requestDraw();
+      });
+      pkInput.addEventListener('change', function() {
+        applyKmPk();
+        saveWarnings();
+        renderOpsSheet();
+        requestDraw();
+      });
+
+      inputs.appendChild(kmInput);
+      inputs.appendChild(kmTag);
+      inputs.appendChild(pkInput);
+      inputs.appendChild(pkTag);
+      row.appendChild(label);
+      row.appendChild(inputs);
+      return row;
+    }
+    pop.appendChild(buildKmPkRow('start', startC, false, false));
+    pop.appendChild(buildKmPkRow('end', endC, true, isPointWarning));
+
+    var noteRow = document.createElement('div');
+    noteRow.className = 'poekhali-warn-popover-row';
+    var noteLabel = document.createElement('label');
+    noteLabel.textContent = 'Пометка';
+    var noteInput = document.createElement('input');
+    noteInput.type = 'text';
+    noteInput.maxLength = 40;
+    noteInput.placeholder = 'например: работы';
+    noteInput.value = warning.note || '';
+    noteInput.addEventListener('input', function() {
+      warning.note = noteInput.value;
+      warning.updatedAt = new Date().toISOString();
+    });
+    noteInput.addEventListener('change', function() { saveWarnings(); });
+    noteRow.appendChild(noteLabel);
+    noteRow.appendChild(noteInput);
+    pop.appendChild(noteRow);
+
+    var inlineRow = document.createElement('div');
+    inlineRow.className = 'poekhali-warn-popover-row poekhali-warn-popover-inline';
+    var dateWrap = document.createElement('div');
+    var dateLabel = document.createElement('label');
+    dateLabel.textContent = 'Действует до (МСК)';
+    var dateInput = document.createElement('input');
+    dateInput.type = 'datetime-local';
+    var initialDateValue = validUntilValue && validUntilValue.indexOf('T') >= 0
+      ? validUntilValue
+      : (validUntilValue ? validUntilValue + 'T23:59' : '');
+    dateInput.value = initialDateValue;
+    dateInput.addEventListener('change', function() {
+      warning.validUntil = dateInput.value;
+      warning.updatedAt = new Date().toISOString();
+      saveWarnings();
+      renderOpsSheet();
+    });
+    dateWrap.appendChild(dateLabel);
+    dateWrap.appendChild(dateInput);
+    inlineRow.appendChild(dateWrap);
+
+    var toggleWrap = document.createElement('div');
+    var toggleLabel = document.createElement('label');
+    toggleLabel.textContent = 'Показывать';
+    var toggleBtn = document.createElement('button');
+    toggleBtn.type = 'button';
+    toggleBtn.className = 'poekhali-warn-toggle' + (enabled ? ' is-on' : '');
+    toggleBtn.textContent = enabled ? 'Да' : 'Нет';
+    toggleBtn.addEventListener('click', function() {
+      warning.enabled = warning.enabled === false;
+      warning.updatedAt = new Date().toISOString();
+      saveWarnings();
+      renderOpsSheet();
+      requestDraw();
+    });
+    toggleWrap.appendChild(toggleLabel);
+    toggleWrap.appendChild(toggleBtn);
+    inlineRow.appendChild(toggleWrap);
+    pop.appendChild(inlineRow);
+
+    var foot = document.createElement('div');
+    foot.className = 'poekhali-warn-popover-foot';
+    var delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'poekhali-warning-delete';
+    delBtn.textContent = 'Удалить';
+    delBtn.addEventListener('click', function() {
+      deleteWarning(warning.id);
+      tracker.warningsAppPopover.id = null;
+      renderOpsSheet();
+      requestDraw();
+    });
+    foot.appendChild(delBtn);
+
+    var saveBtn = document.createElement('button');
+    saveBtn.type = 'button';
+    saveBtn.className = 'poekhali-warn-save';
+    saveBtn.textContent = 'Сохранить';
+    saveBtn.addEventListener('click', function() {
+      warning.speed = Math.max(1, Math.round(Number(speedSlider.value) || warning.speed));
+      warning.note = noteInput.value;
+      warning.validUntil = dateInput.value;
+      warning.updatedAt = new Date().toISOString();
+      saveWarnings();
+      tracker.warningsAppPopover.id = null;
+      renderOpsSheet();
+      requestDraw();
+    });
+    foot.appendChild(saveBtn);
+
+    pop.appendChild(foot);
+
+    return pop;
+  }
+
+  function buildWarnToolbar(sectors, currentSector, count) {
+    var wrap = document.createElement('div');
+    wrap.className = 'poekhali-warn-toolbar';
+
+    var addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'poekhali-warn-add-main';
+    addBtn.textContent = '+ Добавить предупреждение';
+    addBtn.addEventListener('click', addWarnEntity);
+    wrap.appendChild(addBtn);
+
+    var row = document.createElement('div');
+    row.className = 'poekhali-warn-toolbar-row';
+
+    var counts = document.createElement('div');
+    counts.className = 'poekhali-warn-counts';
+    counts.textContent = count + ' ПР';
+    row.appendChild(counts);
+
+    var zoomWrap = document.createElement('div');
+    zoomWrap.className = 'poekhali-warn-zoom';
+    [['−', 'out'], ['⌂', 'reset'], ['+', 'in']].forEach(function(p) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'poekhali-warn-zoom-btn';
+      btn.textContent = p[0];
+      btn.addEventListener('click', function() {
+        if (p[1] === 'in' && tracker.warningsAppZoom) {
+          tracker.warningsAppZoom.span = Math.max(500, tracker.warningsAppZoom.span * 0.55);
+        } else if (p[1] === 'out' && tracker.warningsAppZoom) {
+          tracker.warningsAppZoom.span = tracker.warningsAppZoom.span * 1.8;
+        } else if (p[1] === 'reset') {
+          tracker.warningsAppZoom = null;
+        }
+        renderOpsSheet();
+      });
+      zoomWrap.appendChild(btn);
+    });
+    row.appendChild(zoomWrap);
+
+    wrap.appendChild(row);
+    return wrap;
+  }
+
+  function buildWarnStage(warnings, bounds, sector, projection, pop) {
+    var wrap = document.createElement('div');
+    wrap.className = 'poekhali-warn-stage';
+
+    var scale = document.createElement('div');
+    scale.className = 'poekhali-warn-scale';
+    var step = (bounds.max - bounds.min) / 6;
+    for (var i = 0; i <= 6; i += 1) {
+      var coord = bounds.min + step * i;
+      var tick = document.createElement('span');
+      tick.className = 'poekhali-warn-tick';
+      tick.style.left = warnCoordPercent(coord, bounds) + '%';
+      var line = document.createElement('i');
+      var label = document.createElement('b');
+      var kmpk = coordinateToKmPk(coord);
+      label.textContent = kmpk.km + 'км ' + kmpk.pk + 'пк';
+      tick.appendChild(line);
+      tick.appendChild(label);
+      scale.appendChild(tick);
+    }
+    wrap.appendChild(scale);
+
+    var rail = document.createElement('div');
+    rail.className = 'poekhali-warn-rail';
+    rail.id = 'poekhaliWarnRail';
+    var centerLine = document.createElement('div');
+    centerLine.className = 'poekhali-warn-line';
+    rail.appendChild(centerLine);
+
+    if (projection && Number(projection.sector) === Number(sector) && isRealNumber(projection.lineCoordinate)) {
+      var gpsCoord = Number(projection.lineCoordinate);
+      if (gpsCoord >= bounds.min && gpsCoord <= bounds.max) {
+        var gps = document.createElement('span');
+        gps.className = 'poekhali-warn-gps';
+        gps.style.left = warnCoordPercent(gpsCoord, bounds) + '%';
+        gps.title = 'Текущее положение';
+        rail.appendChild(gps);
+      }
+    }
+
+    warnings.forEach(function(w) {
+      var startC = Math.min(Number(w.start) || 0, Number(w.end) || 0);
+      var endC = Math.max(Number(w.start) || 0, Number(w.end) || 0);
+      if (endC < bounds.min || startC > bounds.max) return;
+      rail.appendChild(buildWarnBar(w, bounds, pop));
+    });
+
+    rail.addEventListener('click', function(event) {
+      if (event.target.closest && event.target.closest('[data-warn-bar]')) return;
+      if (tracker.warningsAppPopover && tracker.warningsAppPopover.id) {
+        tracker.warningsAppPopover.id = null;
+        renderOpsSheet();
+      }
+    });
+
+    wrap.appendChild(rail);
+    return wrap;
+  }
+
+  function buildWarnSummary(warnings, pop, projection) {
+    var wrap = document.createElement('div');
+    wrap.className = 'poekhali-warn-summary';
+
+    var head = document.createElement('div');
+    head.className = 'poekhali-warn-summary-head';
+    var title = document.createElement('strong');
+    title.textContent = 'Все ПР по участку';
+    var subtitle = document.createElement('span');
+    subtitle.textContent = warnings.length + ' элементов';
+    head.appendChild(title);
+    head.appendChild(subtitle);
+    wrap.appendChild(head);
+
+    if (!warnings.length) {
+      var empty = document.createElement('div');
+      empty.className = 'poekhali-warning-empty';
+      empty.textContent = 'Нет введенных предупреждений';
+      wrap.appendChild(empty);
+      return wrap;
+    }
+
+    var list = document.createElement('div');
+    list.className = 'poekhali-warn-summary-list';
+    var sorted = warnings.slice().sort(function(a, b) {
+      return (Number(a.start) || 0) - (Number(b.start) || 0);
+    });
+    sorted.forEach(function(w) {
+      var speed = Math.max(1, Math.round(Number(w.speed) || 25));
+      var tone = speed <= 40 ? 'danger' : speed <= 60 ? 'warning' : 'success';
+      var selected = pop.id === w.id;
+      var disabled = w.enabled === false;
+      var status = getWarningRuntimeStatus(w, projection);
+
+      var row = document.createElement('button');
+      row.type = 'button';
+      row.className = 'poekhali-warn-summary-row is-' + status +
+        (selected ? ' is-selected' : '') + (disabled ? ' is-muted' : '');
+
+      var badge = document.createElement('span');
+      badge.className = 'poekhali-warn-summary-badge poekhali-warn-summary-badge--' + tone;
+      badge.textContent = String(speed);
+      row.appendChild(badge);
+
+      var info = document.createElement('span');
+      info.className = 'poekhali-warn-summary-info';
+      var nameLine = document.createElement('strong');
+      nameLine.textContent = formatWarningRange(w);
+      var meta = document.createElement('small');
+      meta.textContent = getWarningStatusText(status) +
+        (w.validUntil ? ' · до ' + formatDateLabel(w.validUntil) : '') +
+        (w.note ? ' · ' + w.note : '');
+      info.appendChild(nameLine);
+      info.appendChild(meta);
+      row.appendChild(info);
+
+      row.addEventListener('click', function() {
+        tracker.warningsAppPopover = { id: w.id };
+        if (tracker.warningsAppZoom) {
+          tracker.warningsAppZoom.center = ((Number(w.start) || 0) + (Number(w.end) || 0)) / 2;
+        }
+        renderOpsSheet();
+      });
+      list.appendChild(row);
+    });
+    wrap.appendChild(list);
+    return wrap;
+  }
+
+  function buildWarnAdvanced(sector) {
+    var details = document.createElement('details');
+    details.className = 'poekhali-warn-advanced';
+
+    var summary = document.createElement('summary');
+    summary.textContent = 'Быстрый ввод и пакет';
+    details.appendChild(summary);
+
+    var quickRow = document.createElement('div');
+    quickRow.className = 'poekhali-warn-advanced-row';
+    var quickField = document.createElement('label');
+    quickField.className = 'poekhali-ops-field is-wide';
+    var quickLabel = document.createElement('span');
+    quickLabel.textContent = 'Быстро: «3732км 9пк скорость 25»';
+    var quickInput = document.createElement('input');
+    quickInput.type = 'text';
+    quickInput.autocomplete = 'off';
+    quickInput.placeholder = '3732км 9пк скорость 25';
+    quickField.appendChild(quickLabel);
+    quickField.appendChild(quickInput);
+    var quickBtn = document.createElement('button');
+    quickBtn.type = 'button';
+    quickBtn.className = 'poekhali-secondary-action';
+    quickBtn.textContent = 'Добавить';
+    quickBtn.addEventListener('click', function() {
+      var result = createWarningFromQuickText(quickInput.value, Number(sector), '');
+      tracker.warningBulkMessage = result.warning
+        ? 'Добавлено ПР: ' + formatWarningRange(result.warning) + ' · ' + result.warning.speed + ' км/ч'
+        : 'ПР не добавлено: ' + result.error;
+      if (result.warning) tracker.warningsAppPopover = { id: result.warning.id };
+      renderOpsSheet();
+      requestDraw();
+    });
+    quickRow.appendChild(quickField);
+    quickRow.appendChild(quickBtn);
+    details.appendChild(quickRow);
+
+    if (isPoekhaliDebugUiEnabled()) {
+      var bulkRow = document.createElement('div');
+      bulkRow.className = 'poekhali-warn-advanced-row';
+      var bulkField = document.createElement('label');
+      bulkField.className = 'poekhali-ops-field is-wide';
+      var bulkLabel = document.createElement('span');
+      bulkLabel.textContent = 'Пакет ПР';
+      var bulkInput = document.createElement('textarea');
+      bulkInput.rows = 3;
+      bulkInput.maxLength = 2000;
+      bulkInput.placeholder = '84/1-84/5 40 работы';
+      bulkInput.value = tracker.warningBulkDraft || '';
+      bulkInput.addEventListener('input', function() {
+        tracker.warningBulkDraft = bulkInput.value;
+      });
+      bulkField.appendChild(bulkLabel);
+      bulkField.appendChild(bulkInput);
+      var bulkBtn = document.createElement('button');
+      bulkBtn.type = 'button';
+      bulkBtn.className = 'poekhali-secondary-action';
+      bulkBtn.textContent = 'Добавить пакет';
+      bulkBtn.addEventListener('click', function() {
+        var result = createWarningsFromBulkText(bulkInput.value, Number(sector), '');
+        tracker.warningBulkMessage = result.created.length
+          ? 'Добавлено ПР: ' + result.created.length
+          : 'ПР не добавлены' + (result.errors.length ? ': ' + result.errors.slice(0, 2).join(' / ') : '.');
+        if (result.created.length && !result.errors.length) tracker.warningBulkDraft = '';
+        renderOpsSheet();
+        requestDraw();
+      });
+      bulkRow.appendChild(bulkField);
+      bulkRow.appendChild(bulkBtn);
+      details.appendChild(bulkRow);
+
+      var importBtn = document.createElement('button');
+      importBtn.type = 'button';
+      importBtn.className = 'poekhali-secondary-action';
+      importBtn.textContent = 'Импорт файла';
+      var fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = '.txt,.csv,.json,text/plain,text/csv,application/json';
+      fileInput.style.display = 'none';
+      fileInput.addEventListener('change', function() {
+        var file = fileInput.files && fileInput.files[0];
+        fileInput.value = '';
+        if (!file) return;
+        if (file.size > 1024 * 1024) {
+          tracker.warningBulkMessage = 'Файл ПР не прочитан: размер больше 1 МБ.';
+          renderOpsSheet();
+          return;
+        }
+        var reader = new FileReader();
+        reader.onload = function() {
+          var result = createWarningsFromBulkText(String(reader.result || ''), Number(sector), '');
+          tracker.warningBulkMessage = result.created.length
+            ? 'Импортировано ПР: ' + result.created.length
+            : 'ПР из файла не добавлены' + (result.errors.length ? ': ' + result.errors.slice(0, 2).join(' / ') : '.');
+          renderOpsSheet();
+          requestDraw();
+        };
+        reader.onerror = function() {
+          tracker.warningBulkMessage = 'Файл ПР не прочитан: ошибка чтения.';
+          renderOpsSheet();
+        };
+        reader.readAsText(file);
+      });
+      importBtn.addEventListener('click', function() { fileInput.click(); });
+      details.appendChild(importBtn);
+      details.appendChild(fileInput);
+    }
+
+    return details;
+  }
+
+  function renderWarningsSection(parent) {
+    var pop = getWarnAppPopover();
+    var projection = getCurrentProjectionForForm();
+    var sectors = getAvailableSectors();
+    if (!sectors.length) sectors = [1];
+    var sector = getWarnAppSector(sectors, projection);
+    tracker.warningsAppSector = sector;
+
+    var scopedWarnings = getScopedWarnings(true);
+    var sectorWarnings = scopedWarnings.filter(function(w) {
+      if (Number(w.sector) !== Number(sector)) return false;
+      if (pop.id && w.id === pop.id) return true;
+      return !isWarningExpired(w);
+    });
+    if (pop.id && !sectorWarnings.some(function(w) { return w.id === pop.id; })) {
+      pop.id = null;
+    }
+
+    var routeBounds = getWarnAppRouteBounds(sectorWarnings, projection, sector);
+    var bounds = getWarnAppViewBounds(routeBounds, sector);
+
+    var section = document.createElement('section');
+    section.className = 'poekhali-ops-section poekhali-warn-wrap';
+
+    var headRow = document.createElement('div');
+    headRow.className = 'poekhali-ops-section-head';
     var title = document.createElement('div');
     title.textContent = 'Предупреждения';
     var count = document.createElement('div');
     count.className = 'poekhali-ops-total';
     var activeWarnings = getCurrentWarnings();
-    var scopedWarnings = getScopedWarnings(true);
     count.textContent = activeWarnings.length
       ? activeWarnings.length + ' активно' + (scopedWarnings.length > activeWarnings.length ? ' · всего ' + scopedWarnings.length : '')
       : scopedWarnings.length ? 'нет активных · всего ' + scopedWarnings.length : 'пусто';
-    head.appendChild(title);
-    head.appendChild(count);
+    headRow.appendChild(title);
+    headRow.appendChild(count);
+    section.appendChild(headRow);
 
     var syncNote = document.createElement('div');
     syncNote.className = 'poekhali-shift-route ' + getWarningSyncTone();
     syncNote.textContent = 'Сохранение: ' + getWarningSyncLabel() +
       (tracker.warningSync && tracker.warningSync.error ? ' · ' + tracker.warningSync.error : '') +
       (tracker.warningSync && tracker.warningSync.lastSyncAt ? ' · ' + formatLearningTime(tracker.warningSync.lastSyncAt) : '');
+    section.appendChild(syncNote);
 
-    var projection = getCurrentProjectionForForm();
-    var editing = tracker.editingWarningId ? getWarningById(tracker.editingWarningId) : null;
-    if (editing && scopedWarnings.indexOf(editing) < 0) {
-      editing = null;
-      tracker.editingWarningId = '';
-    }
-    var baseSector = projection && isRealNumber(projection.sector) ? projection.sector : (getAvailableSectors()[0] || 1);
-    var baseCoordinate = projection && isRealNumber(projection.lineCoordinate)
-      ? projection.lineCoordinate
-      : getPreferredSectorCoordinate(baseSector, 'middle');
-    var draft = !editing ? getWarningFormDraft() : null;
-    if (editing) {
-      baseSector = editing.sector;
-      baseCoordinate = editing.start;
-    } else if (draft) {
-      if (isRealNumber(draft.sector)) baseSector = draft.sector;
-      if (isRealNumber(draft.start)) baseCoordinate = draft.start;
-    }
-    var draftEnd = draft && isRealNumber(draft.end) ? draft.end : NaN;
-    var startKmPk = coordinateToKmPk(baseCoordinate);
-    var endKmPk = coordinateToKmPk(editing ? editing.end : (isRealNumber(draftEnd) ? draftEnd : baseCoordinate + 1000));
+    section.appendChild(buildWarnToolbar(sectors, sector, sectorWarnings.length));
+    section.appendChild(buildWarnStage(sectorWarnings, bounds, sector, projection, pop));
 
-    var sectorSelect = document.createElement('select');
-    var sectors = getAvailableSectors();
-    for (var i = 0; i < sectors.length; i++) {
-      var option = document.createElement('option');
-      option.value = String(sectors[i]);
-      option.textContent = 'Участок ' + sectors[i];
-      if (getSectorKey(sectors[i]) === getSectorKey(baseSector)) option.selected = true;
-      sectorSelect.appendChild(option);
-    }
-    var startKmInput = createNumberInput(startKmPk.km, 0, 9999, 1);
-    var startPkInput = createNumberInput(startKmPk.pk, 0, 9, 1);
-    var endKmInput = createNumberInput(endKmPk.km, 0, 9999, 1);
-    var endPkInput = createNumberInput(endKmPk.pk, 0, 9, 1);
-    var speedInput = createNumberInput(editing ? editing.speed : (draft && isRealNumber(draft.speed) ? draft.speed : 40), 1, 200, 1);
-    var noteInput = document.createElement('input');
-    noteInput.type = 'text';
-    noteInput.maxLength = 40;
-    noteInput.placeholder = 'например: работы';
-    noteInput.value = editing ? editing.note : (draft ? String(draft.note || '') : '');
-    var validUntilInput = document.createElement('input');
-    validUntilInput.type = 'date';
-    validUntilInput.value = editing ? editing.validUntil : (draft ? String(draft.validUntil || '') : '');
-
-    function captureWarningDraft() {
-      if (editing) return;
-      updateWarningFormDraft(
-        Number(sectorSelect.value),
-        coordinateFromKmPk(startKmInput.value, startPkInput.value),
-        coordinateFromKmPk(endKmInput.value, endPkInput.value),
-        speedInput.value,
-        noteInput.value,
-        validUntilInput.value
-      );
-    }
-    [sectorSelect, startKmInput, startPkInput, endKmInput, endPkInput, speedInput, noteInput, validUntilInput].forEach(function(input) {
-      input.addEventListener('input', captureWarningDraft);
-      input.addEventListener('change', captureWarningDraft);
-    });
-
-    var quickInput = document.createElement('input');
-    quickInput.type = 'text';
-    quickInput.inputMode = 'text';
-    quickInput.autocomplete = 'off';
-    quickInput.placeholder = 'Быстро: 3732км 9пк скорость 25';
-    quickInput.value = '';
-    var quickField = createField('Быстрое ПР', quickInput);
-    quickField.classList.add('is-wide');
-    var quickActions = document.createElement('div');
-    quickActions.className = 'poekhali-warning-form-actions';
-    var quickBtn = document.createElement('button');
-    quickBtn.type = 'button';
-    quickBtn.className = 'poekhali-secondary-action';
-    quickBtn.textContent = 'Добавить быстро';
-    quickBtn.addEventListener('click', function() {
-      var result = createWarningFromQuickText(quickInput.value, Number(sectorSelect.value), validUntilInput.value);
-      tracker.warningBulkMessage = result.warning
-        ? 'Добавлено ПР: ' + formatWarningRange(result.warning) + ' · ' + result.warning.speed + ' км/ч'
-        : 'ПР не добавлено: ' + result.error;
-      if (result.warning) {
-        tracker.editingWarningId = '';
-        setWarningFormDraft(null);
-      }
-      renderOpsSheet();
-      requestDraw();
-    });
-    quickActions.appendChild(quickBtn);
-
-    var grid = document.createElement('div');
-    grid.className = 'poekhali-ops-grid is-warning-grid';
-    grid.appendChild(createField('Участок', sectorSelect));
-    grid.appendChild(createField('Нач. км', startKmInput));
-    grid.appendChild(createField('Нач. ПК', startPkInput));
-    grid.appendChild(createField('Кон. км', endKmInput));
-    grid.appendChild(createField('Кон. ПК', endPkInput));
-    grid.appendChild(createField('Скорость', speedInput));
-    grid.appendChild(createField('Пометка', noteInput));
-    grid.appendChild(createField('Действует до', validUntilInput));
-
-    var formActions = document.createElement('div');
-    formActions.className = 'poekhali-warning-form-actions';
-    var saveBtn = document.createElement('button');
-    saveBtn.type = 'button';
-    saveBtn.className = 'poekhali-primary-action';
-    saveBtn.textContent = editing ? 'Сохранить предупреждение' : 'Добавить предупреждение';
-    saveBtn.addEventListener('click', function() {
-      var startCoordinate = coordinateFromKmPk(startKmInput.value, startPkInput.value);
-      var endCoordinate = coordinateFromKmPk(endKmInput.value, endPkInput.value);
-      var saved = saveWarningFromForm(
-        editing ? editing.id : '',
-        Number(sectorSelect.value),
-        startCoordinate,
-        endCoordinate,
-        speedInput.value,
-        noteInput.value,
-        validUntilInput.value
-      );
-      if (saved && !editing) {
-        var nextStart = Math.max(startCoordinate, endCoordinate);
-        updateWarningFormDraft(Number(sectorSelect.value), nextStart, nextStart + 1000, speedInput.value, '', validUntilInput.value);
-      }
-      tracker.warningBulkMessage = saved ? 'Добавлено ПР: ' + formatWarningRange(saved) + ' · ' + saved.speed + ' км/ч' : 'ПР не добавлено: проверь км/пк и скорость';
-      renderOpsSheet();
-      requestDraw();
-    });
-    formActions.appendChild(saveBtn);
-    if (editing) {
-      var cancelBtn = document.createElement('button');
-      cancelBtn.type = 'button';
-      cancelBtn.className = 'poekhali-secondary-action';
-      cancelBtn.textContent = 'Отмена';
-      cancelBtn.addEventListener('click', function() {
-        tracker.editingWarningId = '';
-        renderOpsSheet();
-      });
-      formActions.appendChild(cancelBtn);
+    if (pop.id) {
+      var popoverEntity = sectorWarnings.find(function(w) { return w.id === pop.id; });
+      if (popoverEntity) section.appendChild(buildWarnPopover(popoverEntity, routeBounds));
     }
 
-    var bulkInput = document.createElement('textarea');
-    bulkInput.rows = 4;
-    bulkInput.maxLength = 2000;
-    bulkInput.placeholder = '84/1-84/5 40 работы\nуч 9 85км3пк-86км1пк 60 окно';
-    bulkInput.value = tracker.warningBulkDraft || '';
-    bulkInput.addEventListener('input', function() {
-      tracker.warningBulkDraft = bulkInput.value;
-    });
-    var bulkField = createField('Пакет ПР', bulkInput);
-    bulkField.classList.add('is-wide');
-
-    var bulkActions = document.createElement('div');
-    bulkActions.className = 'poekhali-warning-form-actions';
-    var bulkBtn = document.createElement('button');
-    bulkBtn.type = 'button';
-    bulkBtn.className = 'poekhali-secondary-action';
-    bulkBtn.textContent = 'Добавить пакет';
-    bulkBtn.addEventListener('click', function() {
-      var result = createWarningsFromBulkText(bulkInput.value, Number(sectorSelect.value), validUntilInput.value);
-      tracker.warningBulkMessage = result.created.length
-        ? 'Добавлено ПР: ' + result.created.length + (result.errors.length ? '. Ошибки: ' + result.errors.slice(0, 2).join(' / ') : '')
-        : 'ПР не добавлены' + (result.errors.length ? ': ' + result.errors.slice(0, 2).join(' / ') : '.');
-      if (result.created.length && !result.errors.length) tracker.warningBulkDraft = '';
-      tracker.editingWarningId = '';
-      renderOpsSheet();
-      requestDraw();
-    });
-    bulkActions.appendChild(bulkBtn);
-
-    var importFileInput = document.createElement('input');
-    importFileInput.type = 'file';
-    importFileInput.accept = '.txt,.csv,.json,text/plain,text/csv,application/json';
-    importFileInput.className = 'poekhali-warning-file-input';
-    importFileInput.addEventListener('change', function() {
-      var file = importFileInput.files && importFileInput.files[0] ? importFileInput.files[0] : null;
-      importFileInput.value = '';
-      if (!file) return;
-      if (file.size > 1024 * 1024) {
-        tracker.warningBulkMessage = 'Файл ПР не прочитан: размер больше 1 МБ.';
-        renderOpsSheet();
-        return;
-      }
-      var reader = new FileReader();
-      reader.onload = function() {
-        var text = String(reader.result || '');
-        var result = createWarningsFromBulkText(text, Number(sectorSelect.value), validUntilInput.value);
-        tracker.warningBulkMessage = result.created.length
-          ? 'Импортировано ПР из файла "' + file.name + '": ' + result.created.length + (result.errors.length ? '. Ошибки: ' + result.errors.slice(0, 2).join(' / ') : '')
-          : 'ПР из файла "' + file.name + '" не добавлены' + (result.errors.length ? ': ' + result.errors.slice(0, 2).join(' / ') : '.');
-        tracker.editingWarningId = '';
-        renderOpsSheet();
-        requestDraw();
-      };
-      reader.onerror = function() {
-        tracker.warningBulkMessage = 'Файл ПР не прочитан: ошибка чтения.';
-        renderOpsSheet();
-      };
-      reader.readAsText(file);
-    });
-    var importFileBtn = document.createElement('button');
-    importFileBtn.type = 'button';
-    importFileBtn.className = 'poekhali-secondary-action';
-    importFileBtn.textContent = 'Импорт файла';
-    importFileBtn.addEventListener('click', function() {
-      importFileInput.click();
-    });
-    bulkActions.appendChild(importFileBtn);
-    bulkActions.appendChild(importFileInput);
-
-    var bulkNote = null;
     if (tracker.warningBulkMessage) {
-      bulkNote = document.createElement('div');
+      var bulkNote = document.createElement('div');
       bulkNote.className = 'poekhali-shift-route ' + (tracker.warningBulkMessage.indexOf('Добавлено') === 0 || tracker.warningBulkMessage.indexOf('Импортировано') === 0 ? 'is-success' : 'is-danger');
       bulkNote.textContent = tracker.warningBulkMessage;
+      section.appendChild(bulkNote);
     }
 
-    var list = document.createElement('div');
-    list.className = 'poekhali-warning-list';
-    var warnings = scopedWarnings.slice().sort(function(a, b) {
-      var aStatus = getWarningRuntimeStatus(a, projection);
-      var bStatus = getWarningRuntimeStatus(b, projection);
-      if (aStatus === 'active' && bStatus !== 'active') return -1;
-      if (bStatus === 'active' && aStatus !== 'active') return 1;
-      if (a.sector !== b.sector) return a.sector - b.sector;
-      return a.start - b.start;
-    });
-    if (!warnings.length) {
-      var empty = document.createElement('div');
-      empty.className = 'poekhali-warning-empty';
-      empty.textContent = 'Нет введенных предупреждений';
-      list.appendChild(empty);
-    }
-    for (var w = 0; w < warnings.length; w++) {
-      (function(item) {
-        var status = getWarningRuntimeStatus(item, projection);
-        var row = document.createElement('div');
-        row.className = 'poekhali-warning-row';
-        row.classList.add('is-' + status);
-        if (editing && item.id === editing.id) row.classList.add('is-editing');
-        var text = document.createElement('div');
-        text.className = 'poekhali-warning-text';
-        var strong = document.createElement('strong');
-        strong.textContent = 'Участок ' + item.sector + ' · ПР ' + item.speed;
-        var span = document.createElement('span');
-        span.textContent = formatWarningRange(item) +
-          (item.validUntil ? ' · до ' + formatDateLabel(item.validUntil) : '') +
-          (item.note ? ' · ' + item.note : '');
-        var statusLine = document.createElement('small');
-        statusLine.className = 'poekhali-warning-status';
-        statusLine.textContent = getWarningStatusText(status);
-        text.appendChild(strong);
-        text.appendChild(span);
-        text.appendChild(statusLine);
-        var actions = document.createElement('div');
-        actions.className = 'poekhali-warning-actions';
-        var editBtn = document.createElement('button');
-        editBtn.type = 'button';
-        editBtn.className = 'poekhali-warning-action';
-        editBtn.textContent = 'Изм.';
-        editBtn.addEventListener('click', function() {
-          tracker.editingWarningId = item.id;
-          renderOpsSheet();
-        });
-        var toggleBtn = document.createElement('button');
-        toggleBtn.type = 'button';
-        toggleBtn.className = 'poekhali-warning-action ' + (item.enabled === false ? 'is-enable' : 'is-disable');
-        toggleBtn.textContent = item.enabled === false ? 'Вкл.' : 'Откл.';
-        toggleBtn.addEventListener('click', function() {
-          toggleWarningEnabled(item);
-        });
-        var del = document.createElement('button');
-        del.type = 'button';
-        del.className = 'poekhali-warning-delete';
-        del.textContent = 'Убрать';
-        del.addEventListener('click', function() {
-          deleteWarning(item.id);
-        });
-        actions.appendChild(editBtn);
-        actions.appendChild(toggleBtn);
-        actions.appendChild(del);
-        row.appendChild(text);
-        row.appendChild(actions);
-        list.appendChild(row);
-      })(warnings[w]);
-    }
+    section.appendChild(buildWarnSummary(sectorWarnings, pop, projection));
 
-    section.appendChild(head);
-    section.appendChild(syncNote);
-    section.appendChild(quickField);
-    section.appendChild(quickActions);
-    section.appendChild(grid);
-    section.appendChild(formActions);
-    if (isPoekhaliDebugUiEnabled()) {
-      section.appendChild(bulkField);
-      section.appendChild(bulkActions);
-      if (bulkNote) section.appendChild(bulkNote);
-    }
-    section.appendChild(list);
     parent.appendChild(section);
   }
 
   function renderOpsSheet() {
     var sheet = getOpsSheet();
     if (!sheet) return;
+    if (sheet.root && !sheet.root.classList.contains('hidden')) {
+      var active = document.activeElement;
+      if (active && active !== document.body && sheet.root.contains(active) && /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName)) {
+        tracker.opsSheetRenderPending = true;
+        return;
+      }
+    }
+    tracker.opsSheetRenderPending = false;
     clearElement(sheet.content);
     var details = getPoekhaliTrainDetails();
     var warningCount = getCurrentWarnings().length;

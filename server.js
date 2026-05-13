@@ -33,6 +33,56 @@ const DOC_MIME_BY_EXTENSION = {
   '.png': 'image/png',
   '.txt': 'text/plain; charset=utf-8',
 };
+const DOC_DISPLAY_META_BY_PATH = {
+  '/assets/docs/instructions/1357р безопасное нахождение на ж.д. путях.docx': {
+    title: 'Безопасное нахождение на ж.д. путях',
+    caption: '1357р',
+  },
+  '/assets/docs/instructions/2580p.docx': {
+    title: 'Действия в аварийных и нестандартных ситуациях',
+    caption: '2580р от 12.12.2017',
+  },
+  '/assets/docs/instructions/ИОТ ТЧЭ-9-002-2023.pdf': {
+    title: 'Инструкция по охране труда',
+    caption: 'ИОТ ТЧЭ-9-002-2023',
+  },
+  '/assets/docs/instructions/ИОТ ТЧЭ-9-003-2023.pdf': {
+    title: 'Инструкция по охране труда',
+    caption: 'ИОТ ТЧЭ-9-003-2023',
+  },
+  '/assets/docs/instructions/ПТЭ приказ 250.pdf': {
+    title: 'ПТЭ',
+    caption: 'приказ 250',
+  },
+  '/assets/docs/instructions/Распоряжение ЦТ-5р Методика КСОТ-П.pdf': {
+    title: 'Методика КСОТ-П',
+    caption: 'Распоряжение ЦТ-5р',
+  },
+  '/assets/docs/speeds/Скоростя БАМ Парк Д Приказ № 161.pdf': {
+    title: 'Скорости БАМ',
+    caption: 'Приказ №161 от 27.02.2026',
+  },
+  '/assets/docs/speeds/Скоростя ВСГ Парк Д Приказ № 161.pdf': {
+    title: 'Скорости ВСГ',
+    caption: 'Приказ №161 от 27.02.2026',
+  },
+  '/assets/docs/speeds/Скоростя ВЛЧ Приказ № 161.pdf': {
+    title: 'Скорости ВЛЧ',
+    caption: 'Приказ №161 от 27.02.2026',
+  },
+  '/assets/docs/memos/БАМ кмс-пост-1.pdf': {
+    title: 'Режимка БАМ',
+    caption: '',
+  },
+  '/assets/docs/memos/ВСКГ- КСМ новый 2 пассажир.pdf': {
+    title: 'Режимка ВСГ',
+    caption: '',
+  },
+  '/assets/docs/memos/КСМ-ВЛЧ 2.pdf': {
+    title: 'Режимка ВЛЧ',
+    caption: '',
+  },
+};
 const PUBLIC_TOP_LEVEL_FILES = new Set([
   'index.html',
   'admin.html',
@@ -1314,7 +1364,9 @@ function readSharedPoekhaliLearning(sid) {
 
 function normalizeDateOnly(value) {
   const text = String(value || '').trim();
-  return /^\d{4}-\d{2}-\d{2}$/.test(text) ? text : '';
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(text)) return text.slice(0, 16);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+  return '';
 }
 
 function normalizeIsoish(value) {
@@ -1870,13 +1922,35 @@ function readJsonFileForAdmin(filePath, fallback) {
 function readDocsManifestForAdmin() {
   const dynamicManifest = readJsonFileForAdmin(DOCS_MANIFEST_FILE, null);
   if (dynamicManifest && typeof dynamicManifest === 'object' && !Array.isArray(dynamicManifest)) {
-    return sanitizeDocsManifest(dynamicManifest);
+    return enrichDocsManifestDisplay(sanitizeDocsManifest(dynamicManifest), false);
   }
-  return sanitizeDocsManifest(readJsonFileForAdmin(DOCS_STATIC_MANIFEST_FILE, {}));
+  return enrichDocsManifestDisplay(sanitizeDocsManifest(readJsonFileForAdmin(DOCS_STATIC_MANIFEST_FILE, {})), true);
 }
 
 function sendDocsManifest(res) {
   sendJson(res, 200, readDocsManifestForAdmin());
+}
+
+function enrichDocsManifestDisplay(manifest, forceKnownTitles) {
+  const source = manifest && typeof manifest === 'object' && !Array.isArray(manifest) ? manifest : {};
+  const result = {};
+  Object.keys(source).forEach(category => {
+    if (!Array.isArray(source[category])) return;
+    result[category] = source[category].map(item => {
+      const row = item && typeof item === 'object' && !Array.isArray(item) ? { ...item } : {};
+      const meta = DOC_DISPLAY_META_BY_PATH[row.path] || null;
+      if (meta) {
+        if (forceKnownTitles || !String(row.name || '').trim()) {
+          row.name = meta.title;
+        }
+        if (!String(row.caption || '').trim()) {
+          row.caption = meta.caption;
+        }
+      }
+      return row;
+    });
+  });
+  return result;
 }
 
 function getDirectoryJsonStats(dirPath) {
@@ -2147,7 +2221,7 @@ function sanitizeDocsManifest(payload) {
       const row = item && typeof item === 'object' && !Array.isArray(item) ? item : {};
       return {
         name: String(row.name || '').trim().slice(0, 180),
-        caption: String(row.caption || '').trim().slice(0, 280),
+        caption: String(row.caption || row.subtitle || '').trim().slice(0, 280),
         path: String(row.path || '').trim().slice(0, 500),
         mime_type: String(row.mime_type || '').trim().slice(0, 120),
         size: Math.max(0, Math.round(Number(row.size) || 0)),
