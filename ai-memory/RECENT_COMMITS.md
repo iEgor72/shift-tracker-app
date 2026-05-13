@@ -1,9 +1,10 @@
 # Recent Commits
 
-Generated: 2026-05-13 16:26:53 +1000
+Generated: 2026-05-13 16:27:32 +1000
 
 | Hash | Date | Author | Message |
 | --- | --- | --- | --- |
+| `5bf61c2` | 2026-05-13T16:27:31+10:00 | iEgor72 | feat(poehali): refine visual warning editors |
 | `eddb094` | 2026-05-13T01:32:20+10:00 | iEgor72 | feat(admin): add visual Poekhali map editor |
 | `12b83a3` | 2026-05-13T00:49:02+10:00 | iEgor72 | feat(admin): add visual constructor tools |
 | `6a41adc` | 2026-05-13T00:12:35+10:00 | iEgor72 | feat(admin): make panel more user friendly |
@@ -43,4 +44,3 @@ Generated: 2026-05-13 16:26:53 +1000
 | `28537cf` | 2026-05-06T19:51:07Z | iEgor72 | fix(poekhali): use station points for navigation |
 | `1a62570` | 2026-05-06T19:48:53Z | iEgor72 | chore(memory): refresh after poekhali tracking fixes |
 | `3351e11` | 2026-05-06T19:48:43Z | iEgor72 | fix(poekhali): stabilize station and warning tracking |
-| `30ef3c5` | 2026-05-06T18:30:31Z | iEgor72 | chore(memory): refresh after station name fix |

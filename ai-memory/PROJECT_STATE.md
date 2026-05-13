@@ -1,14 +1,14 @@
 # Project State
 
 <!-- AUTO_STATUS:START -->
-Generated: 2026-05-13 16:26:52 +1000
+Generated: 2026-05-13 16:27:32 +1000
 
 ## Repository Snapshot
 - Local repo path: `D:\work\bloknot-mashinista-tg`
 - Project memory path: `D:\work\bloknot-mashinista-tg\ai-memory`
 - Branch: `main`
-- HEAD: `eddb094`
-- Last commit: `eddb094 feat(admin): add visual Poekhali map editor`
+- HEAD: `5bf61c2`
+- Last commit: `5bf61c2 feat(poehali): refine visual warning editors`
 
 ## Git Remote
 ```text
@@ -20,25 +20,13 @@ origin	https://github.com/iEgor72/bloknot-mashinista.git (push)
 ```text
 codex/next-direction b044dd5 offline mvp
   codex/tabs-ui        117f1fa [origin/codex/tabs-ui] tabs ui
-* main                 eddb094 [origin/main] feat(admin): add visual Poekhali map editor
+* main                 5bf61c2 [origin/main: ahead 1] feat(poehali): refine visual warning editors
 ```
 
 ## Worktree
 ```text
-M admin.html
- M ai-memory/CHANGELOG.md
- M ai-memory/INDEX.md
- M ai-memory/PROJECT_STATE.md
- M ai-memory/RECENT_COMMITS.md
- M ai-memory/WORKTREE_STATUS.md
- M scripts/admin.js
- M scripts/docs-app.js
- M scripts/poekhali-tracker.js
- M server.js
- M styles/10-navigation-and-cards.css
- M styles/admin.css
-?? ai-memory/sessions/2026-05-12.md
-?? ai-memory/sessions/2026-05-13.md
+M ai-memory/CHANGELOG.md
+ M ai-memory/sessions/2026-05-13.md
 ```
 <!-- AUTO_STATUS:END -->
 
