@@ -1,14 +1,14 @@
 # Project State
 
 <!-- AUTO_STATUS:START -->
-Generated: 2026-05-13 16:27:32 +1000
+Generated: 2026-05-13 16:28:14 +1000
 
 ## Repository Snapshot
 - Local repo path: `D:\work\bloknot-mashinista-tg`
 - Project memory path: `D:\work\bloknot-mashinista-tg\ai-memory`
 - Branch: `main`
-- HEAD: `5bf61c2`
-- Last commit: `5bf61c2 feat(poehali): refine visual warning editors`
+- HEAD: `fe93d44`
+- Last commit: `fe93d44 chore(memory): record poekhali editor commit`
 
 ## Git Remote
 ```text
@@ -20,7 +20,7 @@ origin	https://github.com/iEgor72/bloknot-mashinista.git (push)
 ```text
 codex/next-direction b044dd5 offline mvp
   codex/tabs-ui        117f1fa [origin/codex/tabs-ui] tabs ui
-* main                 5bf61c2 [origin/main: ahead 1] feat(poehali): refine visual warning editors
+* main                 fe93d44 [origin/main: ahead 2] chore(memory): record poekhali editor commit
 ```
 
 ## Worktree
